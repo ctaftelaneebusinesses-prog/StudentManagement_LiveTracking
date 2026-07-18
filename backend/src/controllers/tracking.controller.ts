@@ -1,0 +1,10 @@
+import { NextFunction, Request, Response } from "express";
+import * as tracking from "../services/tracking.service";
+import { sendSuccess } from "../utils/ApiResponse";
+import { resolveSchoolId } from "../utils/tenant";
+const wrap = (fn: (req: Request) => Promise<unknown>, status = 200) => async (req: Request, res: Response, next: NextFunction) => { try { return sendSuccess(res, await fn(req), status); } catch (error) { return next(error); } };
+export const startTrip = wrap((req) => tracking.startTrip(resolveSchoolId(req), req.user!.id, req.body.direction), 201);
+export const recordLocation = wrap((req) => tracking.recordLocation(resolveSchoolId(req), req.user!.id, req.params.tripId, req.body), 201);
+export const endTrip = wrap((req) => tracking.endTrip(resolveSchoolId(req), req.user!.id, req.params.tripId));
+export const parentVehicles = wrap((req) => tracking.parentVehicles(resolveSchoolId(req), req.user!.id));
+export const activeVehicles = wrap((req) => tracking.activeVehicles(resolveSchoolId(req)));

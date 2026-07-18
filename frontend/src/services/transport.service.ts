@@ -1,0 +1,11 @@
+import { api } from "@/lib/axios";
+import { Driver, DriverDashboard, Route, Vehicle } from "@/types/transport.types";
+const get = async <T>(url: string): Promise<T> => (await api.get(url)).data.data;
+export const fetchVehicles = () => get<Vehicle[]>("/transport/vehicles");
+export const fetchDrivers = () => get<Driver[]>("/transport/drivers");
+export const fetchRoutes = () => get<Route[]>("/transport/routes");
+export const fetchDriverDashboard = () => get<DriverDashboard>("/transport/driver/dashboard");
+export const createVehicle = (input: { vehicle_number: string; capacity: number; driver_id?: string; route_id?: string; make_model?: string; gps_device_id?: string }) => api.post("/transport/vehicles", input);
+export const createDriver = (input: { email: string; full_name: string; phone?: string; license_number: string; license_expiry?: string }) => api.post("/transport/drivers", input);
+export const createRoute = (input: { name: string; route_code: string; description?: string }) => api.post("/transport/routes", input);
+export const createPickup = (input: { route_id: string; name: string; address?: string; stop_order: number; pickup_time?: string }) => api.post("/transport/pickup-points", input);

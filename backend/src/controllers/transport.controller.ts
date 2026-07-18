@@ -1,0 +1,14 @@
+import { NextFunction, Request, Response } from "express";
+import * as transport from "../services/transport.service";
+import { sendSuccess } from "../utils/ApiResponse";
+import { resolveSchoolId } from "../utils/tenant";
+const wrap = (fn: (req: Request) => Promise<unknown>, status = 200) => async (req: Request, res: Response, next: NextFunction) => { try { return sendSuccess(res, await fn(req), status); } catch (error) { return next(error); } };
+export const listVehicles = wrap((req) => transport.listVehicles(resolveSchoolId(req)));
+export const createVehicle = wrap((req) => transport.createVehicle(resolveSchoolId(req), req.body), 201);
+export const listDrivers = wrap((req) => transport.listDrivers(resolveSchoolId(req)));
+export const createDriver = wrap((req) => transport.createDriver(resolveSchoolId(req), req.body), 201);
+export const listRoutes = wrap((req) => transport.listRoutes(resolveSchoolId(req)));
+export const createRoute = wrap((req) => transport.createRoute(resolveSchoolId(req), req.body), 201);
+export const createPickupPoint = wrap((req) => transport.createPickupPoint(resolveSchoolId(req), req.body), 201);
+export const assignStudentPickup = wrap((req) => transport.assignStudentPickup(resolveSchoolId(req), req.body), 201);
+export const driverDashboard = wrap((req) => transport.getDriverDashboard(resolveSchoolId(req), req.user!.id));

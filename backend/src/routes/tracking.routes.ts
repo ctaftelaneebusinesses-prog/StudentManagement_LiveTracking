@@ -1,0 +1,12 @@
+import { Router } from "express";
+import * as controller from "../controllers/tracking.controller";
+import { requireAuth, requirePermission, requireRole } from "../middleware/auth.middleware";
+import { validate } from "../middleware/validate.middleware";
+import { locationSchema, startTripSchema, tripParamSchema } from "../validators/tracking.validator";
+const router = Router(); router.use(requireAuth);
+router.post("/driver/trips", requireRole("driver"), validate(startTripSchema), controller.startTrip);
+router.post("/driver/trips/:tripId/location", requireRole("driver"), validate(locationSchema), controller.recordLocation);
+router.post("/driver/trips/:tripId/end", requireRole("driver"), validate(tripParamSchema), controller.endTrip);
+router.get("/parent/vehicles", requireRole("parent"), controller.parentVehicles);
+router.get("/admin/active-vehicles", requirePermission("transport.manage"), controller.activeVehicles);
+export default router;

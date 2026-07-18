@@ -1,0 +1,14 @@
+import { Router } from "express";
+import * as controller from "../controllers/transport.controller";
+import { requireAuth, requirePermission, requireRole } from "../middleware/auth.middleware";
+import { validate } from "../middleware/validate.middleware";
+import { assignPickupSchema, driverSchema, pickupSchema, routeSchema, vehicleSchema } from "../validators/transport.validator";
+const router = Router();
+router.use(requireAuth);
+router.get("/driver/dashboard", requireRole("driver"), controller.driverDashboard);
+router.get("/vehicles", requirePermission("transport.manage"), controller.listVehicles); router.post("/vehicles", requirePermission("transport.manage"), validate(vehicleSchema), controller.createVehicle);
+router.get("/drivers", requirePermission("transport.manage"), controller.listDrivers); router.post("/drivers", requirePermission("transport.manage"), validate(driverSchema), controller.createDriver);
+router.get("/routes", requirePermission("transport.manage"), controller.listRoutes); router.post("/routes", requirePermission("transport.manage"), validate(routeSchema), controller.createRoute);
+router.post("/pickup-points", requirePermission("transport.manage"), validate(pickupSchema), controller.createPickupPoint);
+router.post("/student-pickups", requirePermission("transport.manage"), validate(assignPickupSchema), controller.assignStudentPickup);
+export default router;
