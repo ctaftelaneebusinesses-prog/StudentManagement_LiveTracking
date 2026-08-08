@@ -13,6 +13,8 @@ import {
   assertTeacherOwnsClassSubject,
   assertTeacherOwnsExam,
   assertOwnHomeworkOrStaff,
+  assertIsClassTeacher,
+  requireStudentWriteAccess,
 } from "./teacherAccess";
 
 function fakeReq(roles: string[], id = "teacher-1"): Request {
@@ -34,7 +36,7 @@ describe("assertTeacherOwnsClass", () => {
   });
 
   it("rejects a caller who holds neither a staff role nor teacher", async () => {
-    await expect(assertTeacherOwnsClass(fakeReq(["parent"]), "class-1")).rejects.toThrow(ApiError);
+    await expect(assertTeacherOwnsClass(fakeReq(["accountant"]), "class-1")).rejects.toThrow(ApiError);
     expect(fromMock).not.toHaveBeenCalled();
   });
 
@@ -117,8 +119,12 @@ describe("assertOwnHomeworkOrStaff", () => {
     await expect(assertOwnHomeworkOrStaff(fakeReq(["teacher"], "teacher-1"), "hw-1")).resolves.toBeUndefined();
   });
 
-  it("rejects a teacher who did not create the homework", async () => {
-    fromMock.mockImplementation(() => chain({ data: { teacher_id: "someone-else" }, error: null }));
+  it("rejects a teacher who did not create the homework and is not its class teacher", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "homework") return chain({ data: { teacher_id: "someone-else", class_id: "class-1" }, error: null });
+      if (table === "classes") return chain({ data: null, error: null });
+      throw new Error(`unexpected table ${table}`);
+    });
     await expect(assertOwnHomeworkOrStaff(fakeReq(["teacher"], "teacher-1"), "hw-1")).rejects.toMatchObject({
       statusCode: 403,
     });
@@ -129,5 +135,113 @@ describe("assertOwnHomeworkOrStaff", () => {
     await expect(assertOwnHomeworkOrStaff(fakeReq(["teacher"]), "hw-missing")).rejects.toMatchObject({
       statusCode: 404,
     });
+  });
+
+  it("allows the class teacher to manage homework they didn't create", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "homework") return chain({ data: { teacher_id: "subject-teacher", class_id: "class-1" }, error: null });
+      if (table === "classes") return chain({ data: { id: "class-1" }, error: null });
+      throw new Error(`unexpected table ${table}`);
+    });
+    await expect(assertOwnHomeworkOrStaff(fakeReq(["teacher"], "class-teacher-1"), "hw-1")).resolves.toBeUndefined();
+  });
+
+  it("rejects a subject teacher of the class who is neither the creator nor the class teacher", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "homework") return chain({ data: { teacher_id: "subject-teacher", class_id: "class-1" }, error: null });
+      if (table === "classes") return chain({ data: null, error: null });
+      throw new Error(`unexpected table ${table}`);
+    });
+    await expect(assertOwnHomeworkOrStaff(fakeReq(["teacher"], "other-teacher"), "hw-1")).rejects.toMatchObject({
+      statusCode: 403,
+    });
+  });
+});
+
+describe("assertIsClassTeacher", () => {
+  it("bypasses for staff without querying the DB", async () => {
+    await expect(assertIsClassTeacher(fakeReq(["school_admin"]), "class-1")).resolves.toBeUndefined();
+    expect(fromMock).not.toHaveBeenCalled();
+  });
+
+  it("allows the class's homeroom teacher", async () => {
+    fromMock.mockImplementation(() => chain({ data: { id: "class-1" }, error: null }));
+    await expect(assertIsClassTeacher(fakeReq(["teacher"], "class-teacher-1"), "class-1")).resolves.toBeUndefined();
+  });
+
+  it("rejects a subject teacher of the class who is not its class teacher", async () => {
+    fromMock.mockImplementation(() => chain({ data: null, error: null }));
+    await expect(assertIsClassTeacher(fakeReq(["teacher"], "subject-teacher-1"), "class-1")).rejects.toMatchObject({
+      statusCode: 403,
+    });
+  });
+});
+
+describe("requireStudentWriteAccess", () => {
+  it("calls next() with no error for staff, without querying the DB", async () => {
+    const req = { ...fakeReq(["school_admin"]), method: "POST", body: { class_id: "class-1" }, params: {} };
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith();
+    expect(fromMock).not.toHaveBeenCalled();
+  });
+
+  it("allows a teacher creating a student in a class they own", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "classes") return chain({ data: { id: "class-1" }, error: null });
+      throw new Error(`unexpected table ${table}`);
+    });
+    const req = { ...fakeReq(["teacher"]), method: "POST", body: { class_id: "class-1" }, params: {} };
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith();
+  });
+
+  it("rejects a teacher creating a student in a class they don't own", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "classes") return chain({ data: null, error: null });
+      if (table === "class_subjects") return chain({ data: null, error: null });
+      throw new Error(`unexpected table ${table}`);
+    });
+    const req = { ...fakeReq(["teacher"]), method: "POST", body: { class_id: "class-1" }, params: {} };
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 403 }));
+  });
+
+  it("allows a teacher updating a student already in their class, resolved from the DB", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "students") return chain({ data: { class_id: "class-1" }, error: null });
+      if (table === "classes") return chain({ data: { id: "class-1" }, error: null });
+      throw new Error(`unexpected table ${table}`);
+    });
+    const req = { ...fakeReq(["teacher"]), method: "PATCH", body: { phone: "12345" }, params: { id: "student-1" } };
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith();
+  });
+
+  it("rejects a teacher trying to move a student to a different class via update", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "students") return chain({ data: { class_id: "class-1" }, error: null });
+      throw new Error(`unexpected table ${table}`);
+    });
+    const req = {
+      ...fakeReq(["teacher"]),
+      method: "PATCH",
+      body: { class_id: "class-2" },
+      params: { id: "student-1" },
+    };
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 403 }));
+  });
+
+  it("rejects a non-teacher, non-staff caller outright", async () => {
+    const req = { ...fakeReq(["accountant"]), method: "POST", body: { class_id: "class-1" }, params: {} };
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 403 }));
+    expect(fromMock).not.toHaveBeenCalled();
   });
 });

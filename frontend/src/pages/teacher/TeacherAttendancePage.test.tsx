@@ -21,6 +21,11 @@ const dashboardFixture = {
   totalClasses: 1,
   totalSubjects: 0,
   totalStudents: 1,
+  todayClassesCount: 0,
+  pendingHomeworkCount: 0,
+  upcomingAssessmentsCount: 0,
+  leaveBalance: 0,
+  pendingLeaveRequestsCount: 0,
 };
 
 const rosterFixture = [

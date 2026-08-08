@@ -1,4 +1,4 @@
-export type AttendanceStatus = "present" | "absent" | "late" | "half_day" | "leave";
+export type AttendanceStatus = "present" | "absent" | "late" | "half_day" | "leave" | "excused";
 
 export interface AttendanceRecord {
   id: string;
@@ -38,6 +38,16 @@ export interface MarksSummary {
   exams: ExamSummary[];
 }
 
+export interface HomeworkSubmission {
+  id: string;
+  homework_id: string;
+  submission_text: string | null;
+  attachment_url: string | null;
+  submitted_at: string;
+}
+
+export type HomeworkStatus = "pending" | "approved" | "needs_changes";
+
 export interface HomeworkItem {
   id: string;
   class_id: string;
@@ -48,9 +58,26 @@ export interface HomeworkItem {
   due_date: string;
   attachment_url: string | null;
   created_at: string;
+  status: HomeworkStatus;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  review_note: string | null;
   classes: { name: string; section: string } | null;
   subjects: { name: string; code: string } | null;
   users: { full_name: string } | null;
+  /** Only present on the "all homework" endpoint (student/parent views) — the caller's own submission, if any. */
+  submission?: HomeworkSubmission | null;
+}
+
+export interface HomeworkSubmissionRecord {
+  id: string;
+  homework_id: string;
+  student_id: string;
+  submission_text: string | null;
+  attachment_url: string | null;
+  submitted_at: string;
+  updated_at: string;
+  students: { admission_no: string; users: { full_name: string } | null } | null;
 }
 
 export interface TimetablePeriod {

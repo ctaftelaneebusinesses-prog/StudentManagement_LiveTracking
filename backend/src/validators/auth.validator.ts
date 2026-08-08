@@ -34,3 +34,21 @@ export const resetPasswordSchema = z.object({
   query: z.object({}).optional(),
   params: z.object({}).optional(),
 });
+
+export const recordLoginAttemptSchema = z.object({
+  body: z.object({
+    email: z.string().email("A valid email is required"),
+    success: z.boolean(),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});
+
+export const changePasswordSchema = z.object({
+  body: z.object({
+    currentPassword: z.string().min(1, "Current password is required"),
+    newPassword: z.string().min(6, "Password must be at least 6 characters"),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});

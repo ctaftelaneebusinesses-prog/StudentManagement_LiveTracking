@@ -4,12 +4,15 @@ const CHAIN_METHODS = [
   "select",
   "eq",
   "neq",
+  "is",
   "order",
   "limit",
   "in",
   "gte",
   "lte",
   "or",
+  "ilike",
+  "range",
   "upsert",
   "insert",
   "update",
@@ -19,6 +22,7 @@ const CHAIN_METHODS = [
 export interface FakeResult<T = unknown> {
   data: T;
   error: unknown;
+  count?: number | null;
 }
 
 /**

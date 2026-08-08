@@ -3,9 +3,11 @@ export type RoleName =
   | "school_admin"
   | "principal"
   | "teacher"
-  | "parent"
   | "student"
-  | "driver";
+  | "driver"
+  | "support_staff"
+  | "accountant"
+  | "extracurricular_staff";
 
 export interface AppUser {
   id: string;
@@ -17,6 +19,8 @@ export interface AppUser {
   role_id: number;
   avatar_url: string | null;
   roles: { name: RoleName };
+  /** Approval-workflow status (061_registration_approval.sql). Admin-created accounts are always 'approved'; only self-registered accounts start 'pending'. */
+  status?: "pending" | "approved" | "rejected";
 }
 
 export interface AuthState {

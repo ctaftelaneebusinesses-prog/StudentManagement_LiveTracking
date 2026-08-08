@@ -1,0 +1,23 @@
+-- ============================================================================
+-- Phase 14 — Production Preparation: database optimization
+--
+-- Index audit: every table's primary key, foreign key, and multi-tenant
+-- (school_id) column already carries a supporting index (see schema.sql and
+-- migrations 002-013) — the schema was built with per-table indexes from the
+-- start, so this pass only adds the one genuine gap found:
+--
+--   Phase 13's Reports Dashboard (admin/principal overview + attendance
+--   trend) queries `attendance` filtered by school_id and a date range with
+--   no class_id/student_id predicate. The existing idx_attendance_school_id
+--   is single-column, so Postgres falls back to a school_id index scan plus
+--   a row-by-row date filter; a composite index lets it satisfy both
+--   predicates directly.
+--
+-- Beyond this, further index tuning should be driven by real query stats
+-- (enable `pg_stat_statements` in the Supabase dashboard and watch
+-- `EXPLAIN ANALYZE` on slow queries) rather than speculative additions —
+-- every index also costs write throughput and storage, so it isn't added
+-- unless a query actually needs it.
+-- ============================================================================
+
+create index if not exists idx_attendance_school_date on public.attendance(school_id, date);

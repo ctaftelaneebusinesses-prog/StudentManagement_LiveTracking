@@ -1,0 +1,315 @@
+<title>Certificate of Website Proficiency — Preview</title>
+<style>
+  /* ---------------------------------------------------------------------
+     Tokens
+     - Certificate "paper" colors are fixed literals (a printed document
+       doesn't have a dark mode) — only the surrounding page chrome is
+       theme-aware, per the three-state contract (unstamped/light/dark).
+  --------------------------------------------------------------------- */
+  :root {
+    --page-bg: #eae7dd;
+    --page-ink: #2b2a25;
+    --page-muted: #6f6d62;
+    --chip-bg: #ffffff;
+    --chip-border: rgba(13, 24, 38, 0.12);
+
+    --ink-950: #0d1826;
+    --ink-700: #1e3a5f;
+    --gold-600: #96702f;
+    --gold-300: #cbab66;
+    --paper: #f5f6f2;
+    --slate: #5b6472;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page-bg: #12151b;
+      --page-ink: #e9e7de;
+      --page-muted: #9a988d;
+      --chip-bg: #1b1f28;
+      --chip-border: rgba(255, 255, 255, 0.1);
+    }
+  }
+  :root[data-theme="dark"] {
+    --page-bg: #12151b;
+    --page-ink: #e9e7de;
+    --page-muted: #9a988d;
+    --chip-bg: #1b1f28;
+    --chip-border: rgba(255, 255, 255, 0.1);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--page-ink);
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 48px 20px 64px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .stage { animation: rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: none; } }
+
+  .chrome-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--page-muted);
+    text-align: center;
+  }
+
+  .toolbar { display: flex; gap: 10px; }
+  .toolbar button {
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 7px;
+    border: 1px solid var(--chip-border);
+    background: var(--chip-bg);
+    color: var(--page-ink);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .toolbar button:hover { border-color: var(--gold-600); }
+  .toolbar button:focus-visible { outline: 2px solid var(--gold-600); outline-offset: 2px; }
+
+  /* -----------------------------------------------------------------
+     The certificate plate itself — theme-invariant paper.
+  ----------------------------------------------------------------- */
+  .stage {
+    width: min(1100px, 94vw);
+    aspect-ratio: 297 / 210; /* A4 landscape */
+    position: relative;
+    background: var(--paper);
+    box-shadow: 0 40px 80px -32px rgba(13, 24, 38, 0.5), 0 4px 16px -8px rgba(13, 24, 38, 0.3);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .rule-outer {
+    position: absolute;
+    inset: 14px;
+    border: 3px solid var(--ink-950);
+  }
+  .rule-inner {
+    position: absolute;
+    inset: 28px;
+    border: 5px double var(--gold-600);
+  }
+  .mark {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-color: var(--gold-600);
+  }
+  .mark.tl { top: 40px; left: 40px; border-top: 2px solid; border-left: 2px solid; }
+  .mark.tr { top: 40px; right: 40px; border-top: 2px solid; border-right: 2px solid; }
+  .mark.bl { bottom: 40px; left: 40px; border-bottom: 2px solid; border-left: 2px solid; }
+  .mark.br { bottom: 40px; right: 40px; border-bottom: 2px solid; border-right: 2px solid; }
+
+  .content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 46px 74px 42px;
+  }
+
+  .logo-well {
+    position: absolute;
+    left: 46px;
+    top: 38px;
+    width: 68px;
+    height: 68px;
+    border: 1px dashed #9a9689;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #9a9689;
+    text-align: center;
+  }
+
+  .eyebrow {
+    text-align: center;
+    font-family: "Big Caslon", "Baskerville Old Face", Baskerville, Georgia, serif;
+    font-size: 13px;
+    letter-spacing: 0.38em;
+    text-transform: uppercase;
+    color: var(--gold-600);
+    padding-top: 2px;
+  }
+
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 19px;
+    text-align: center;
+  }
+
+  .headline {
+    font-family: "Futura PT", Futura, "Century Gothic", "Avenir Next", sans-serif;
+    font-weight: 700;
+    font-size: clamp(24px, 3.1vw, 34px);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-950);
+    text-wrap: balance;
+    margin: 0;
+  }
+  .headline-rule { width: 64px; height: 1px; background: var(--gold-600); margin: 12px auto 0; }
+
+  .lede {
+    font-family: "Big Caslon", "Baskerville Old Face", Baskerville, Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--slate);
+    margin: 0;
+  }
+
+  .recipient {
+    font-family: "Big Caslon", "Baskerville Old Face", Baskerville, Georgia, serif;
+    font-size: clamp(32px, 4.6vw, 48px);
+    color: var(--ink-950);
+    line-height: 1.1;
+  }
+  .recipient-rule { width: 220px; height: 1px; background: var(--gold-300); margin: 10px auto 0; }
+
+  .assessment {
+    font-family: "Futura PT", Futura, "Century Gothic", "Avenir Next", sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.03em;
+    color: var(--ink-700);
+    max-width: 420px;
+  }
+
+  .ledger {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid rgba(203, 171, 102, 0.55);
+    border-bottom: 1px solid rgba(203, 171, 102, 0.55);
+    padding: 15px 0;
+  }
+  .ledger > div { text-align: center; border-left: 1px solid rgba(203, 171, 102, 0.4); }
+  .ledger > div:first-child { border-left: none; }
+  .ledger .label {
+    font-family: "Cascadia Code", "SF Mono", Consolas, "Roboto Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+  .ledger .value {
+    font-family: "Cascadia Code", "SF Mono", Consolas, "Roboto Mono", monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink-950);
+    margin-top: 4px;
+  }
+
+  .footer-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 30px; }
+  .powered-by {
+    font-family: "Cascadia Code", "SF Mono", Consolas, "Roboto Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--slate);
+    opacity: 0.7;
+  }
+  .signature { text-align: center; }
+  .signature-rule { width: 160px; height: 1px; background: #8b8879; }
+  .signature-label {
+    font-family: "Cascadia Code", "SF Mono", Consolas, "Roboto Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-top: 6px;
+  }
+
+  .cert-id {
+    text-align: center;
+    margin-top: 14px;
+    font-family: "Cascadia Code", "SF Mono", Consolas, "Roboto Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    color: #94918a;
+  }
+
+  @media print {
+    @page { size: landscape; margin: 0; }
+    body { padding: 0; background: var(--paper); }
+    .toolbar, .chrome-label { display: none; }
+    .stage { box-shadow: none; width: 100vw; height: 100vh; aspect-ratio: auto; animation: none; }
+  }
+</style>
+
+<p class="chrome-label">Website Knowledge Assessment · Certificate Redesign</p>
+
+<div class="stage" id="stage">
+  <div class="rule-outer"></div>
+  <div class="rule-inner"></div>
+  <div class="mark tl"></div>
+  <div class="mark tr"></div>
+  <div class="mark bl"></div>
+  <div class="mark br"></div>
+
+  <div class="content">
+    <div class="logo-well">Logo</div>
+    <div class="eyebrow">Demo School</div>
+
+    <div class="main">
+      <div>
+        <h1 class="headline">Certificate of Website Proficiency</h1>
+        <div class="headline-rule"></div>
+      </div>
+
+      <p class="lede">This certificate is proudly presented to</p>
+
+      <div>
+        <div class="recipient">Teacher</div>
+        <div class="recipient-rule"></div>
+      </div>
+
+      <div>
+        <p class="lede">for successfully completing the</p>
+        <p class="assessment">School ERP Website Knowledge Assessment</p>
+      </div>
+    </div>
+
+    <div class="ledger">
+      <div><div class="label">Score</div><div class="value">95%</div></div>
+      <div><div class="label">Role</div><div class="value">Teacher</div></div>
+      <div><div class="label">Date</div><div class="value">Aug 8, 2026</div></div>
+    </div>
+
+    <div class="footer-row">
+      <div class="powered-by">Powered by CraftLanee</div>
+      <div class="signature">
+        <div class="signature-rule"></div>
+        <div class="signature-label">Authorized Signature</div>
+      </div>
+    </div>
+    <div class="cert-id">Certificate ID: WK-65bbedfd-MSJY01J1RQ8</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button onclick="window.print()">🖨 Print / Save as PDF</button>
+</div>

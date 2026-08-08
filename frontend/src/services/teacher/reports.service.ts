@@ -16,3 +16,14 @@ export async function fetchStudentMarksSummary(studentId: string): Promise<Marks
   const { data } = await api.get(`/students/${studentId}/marks/summary`);
   return data.data;
 }
+
+export interface ClassPerformance {
+  studentCount: number;
+  attendance: { percentage: number | null; total: number; from: string; to: string };
+  subjectPerformance: { subjectId: string; subjectName: string; subjectCode: string; averagePercentage: number | null }[];
+}
+
+export async function fetchClassPerformance(classId: string): Promise<ClassPerformance> {
+  const { data } = await api.get("/reports/teacher/class-performance", { params: { classId } });
+  return data.data;
+}

@@ -50,3 +50,22 @@ export async function uploadAvatar(userId: string, file: File): Promise<string> 
 
   return data.publicUrl;
 }
+
+/**
+ * Removes any uploaded avatar(s) under the user's own storage prefix and
+ * clears `avatar_url` — the prefix (not a fixed filename) is listed first
+ * since the original upload's extension isn't tracked separately.
+ */
+export async function removeAvatar(userId: string): Promise<void> {
+  const { data: files, error: listError } = await supabase.storage.from("avatars").list(userId);
+  if (listError) throw listError;
+
+  if (files && files.length > 0) {
+    const paths = files.map((f) => `${userId}/${f.name}`);
+    const { error: removeError } = await supabase.storage.from("avatars").remove(paths);
+    if (removeError) throw removeError;
+  }
+
+  const { error: updateError } = await supabase.from("users").update({ avatar_url: null }).eq("id", userId);
+  if (updateError) throw updateError;
+}

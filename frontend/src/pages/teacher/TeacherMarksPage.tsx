@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/Card";
@@ -7,10 +7,56 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Spinner } from "@/components/ui/Spinner";
+import { Badge } from "@/components/ui/Badge";
+import { DataTable } from "@/components/ui/DataTable";
+import { Tabs } from "@/components/ui/Tabs";
+import { useToast } from "@/components/ui/Toast";
+import { getApiErrorMessage } from "@/lib/axios";
+import { useAuth } from "@/hooks/useAuth";
 import * as portalService from "@/services/teacher/portal.service";
 import * as marksService from "@/services/teacher/marks.service";
+import * as evaluatedPapersService from "@/services/teacher/evaluatedPapers.service";
+import { ClassSubjectMarksStatus, TeacherClassSummary } from "@/types/teacher.types";
+
+type TeacherMarksTab = "entry" | "overview" | "papers";
 
 export function TeacherMarksPage() {
+  const dashboardQuery = useQuery({ queryKey: ["teacher", "dashboard"], queryFn: portalService.fetchDashboard });
+  const classes = dashboardQuery.data?.classes ?? [];
+  const homeroomClasses = classes.filter((c) => c.isHomeroom);
+  const [tab, setTab] = useState<TeacherMarksTab>("entry");
+  const showOverviewTab = homeroomClasses.length > 0;
+  const activeTab = tab === "overview" && !showOverviewTab ? "entry" : tab;
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">Marks</h1>
+        <p className="text-sm text-slate-500">
+          {showOverviewTab
+            ? "Enter marks for your subjects, upload evaluated papers, and track your class's marks completion."
+            : "Enter exam marks and upload evaluated papers for your classes."}
+        </p>
+      </div>
+
+      <Tabs
+        tabs={[
+          { key: "entry", label: "Marks Entry" },
+          ...(showOverviewTab ? [{ key: "overview" as const, label: "Class Overview" }] : []),
+          { key: "papers", label: "Evaluated Papers" },
+        ]}
+        active={activeTab}
+        onChange={setTab}
+      />
+
+      {activeTab === "entry" && <MarksEntryPanel classes={classes} />}
+      {activeTab === "overview" && <ClassOverviewPanel homeroomClasses={homeroomClasses} />}
+      {activeTab === "papers" && <EvaluatedPapersPanel classes={classes} />}
+    </div>
+  );
+}
+
+function MarksEntryPanel({ classes }: { classes: TeacherClassSummary[] }) {
   const queryClient = useQueryClient();
   const [classId, setClassId] = useState("");
   const [examId, setExamId] = useState("");
@@ -19,12 +65,8 @@ export function TeacherMarksPage() {
   const [marksDraft, setMarksDraft] = useState<Record<string, { marks_obtained: string; max_marks: string; grade: string }>>({});
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
-  const dashboardQuery = useQuery({ queryKey: ["teacher", "dashboard"], queryFn: portalService.fetchDashboard });
-  const classOptions = (dashboardQuery.data?.classes ?? []).map((c) => ({
-    value: c.id,
-    label: `${c.name} - ${c.section}`,
-  }));
-  const selectedClass = dashboardQuery.data?.classes.find((c) => c.id === classId);
+  const classOptions = classes.map((c) => ({ value: c.id, label: `${c.name} - ${c.section}` }));
+  const selectedClass = classes.find((c) => c.id === classId);
   const subjectOptions = (selectedClass?.subjects ?? []).map((s) => ({ value: s.id, label: `${s.name} (${s.code})` }));
 
   const examsQuery = useQuery({
@@ -106,11 +148,6 @@ export function TeacherMarksPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Marks</h1>
-        <p className="text-sm text-slate-500">Enter and update exam marks for your classes.</p>
-      </div>
-
       <Card className="space-y-4">
         <div className="flex flex-wrap items-end gap-4">
           <Select
@@ -289,5 +326,217 @@ function ExamModal({
         </Button>
       </form>
     </Modal>
+  );
+}
+
+function ClassOverviewPanel({ homeroomClasses }: { homeroomClasses: TeacherClassSummary[] }) {
+  const toast = useToast();
+  const [classId, setClassId] = useState(homeroomClasses[0]?.id ?? "");
+  const [examId, setExamId] = useState("");
+
+  const classOptions = homeroomClasses.map((c) => ({ value: c.id, label: `${c.name} - ${c.section}` }));
+
+  const examsQuery = useQuery({
+    queryKey: ["teacher", "exams", classId],
+    queryFn: () => marksService.fetchExams(classId),
+    enabled: !!classId,
+  });
+  const examOptions = (examsQuery.data ?? []).map((e) => ({ value: e.id, label: e.name }));
+
+  const statusQuery = useQuery({
+    queryKey: ["teacher", "marks-status", classId, examId],
+    queryFn: () => marksService.fetchClassSubjectStatus(examId, classId),
+    enabled: !!classId && !!examId,
+  });
+
+  const reminderMutation = useMutation({
+    mutationFn: (subjectId: string) => marksService.sendMarksReminder(examId, subjectId, classId),
+    onSuccess: () => toast.success("Reminder sent."),
+    onError: (err) => toast.error(getApiErrorMessage(err, "Failed to send reminder.")),
+  });
+
+  return (
+    <Card className="space-y-4">
+      <div className="flex flex-wrap items-end gap-4">
+        <Select
+          label="Class"
+          options={classOptions}
+          value={classId}
+          onChange={(e) => {
+            setClassId(e.target.value);
+            setExamId("");
+          }}
+        />
+        <Select
+          label="Exam"
+          placeholder="Select exam"
+          options={examOptions}
+          value={examId}
+          onChange={(e) => setExamId(e.target.value)}
+        />
+      </div>
+
+      {!examId ? (
+        <p className="text-sm text-slate-500">Select an exam to see each subject's marks completion status.</p>
+      ) : (
+        <DataTable<ClassSubjectMarksStatus>
+          isLoading={statusQuery.isLoading}
+          rows={statusQuery.data ?? []}
+          rowKey={(s) => s.subjectId}
+          emptyMessage="No subjects are assigned to this class yet."
+          columns={[
+            { header: "Subject", cell: (s) => `${s.subjectName} (${s.subjectCode})` },
+            { header: "Assigned teacher", cell: (s) => s.teacherName },
+            {
+              header: "Marks status",
+              cell: (s) => (
+                <Badge variant={s.status === "completed" ? "success" : "warning"}>
+                  {s.status === "completed" ? "Completed" : `Pending (${s.markedCount}/${s.rosterCount})`}
+                </Badge>
+              ),
+            },
+            {
+              header: "Last updated",
+              cell: (s) => (s.lastUpdated ? new Date(s.lastUpdated).toLocaleString() : "—"),
+            },
+            {
+              header: "",
+              cell: (s) =>
+                s.status === "pending" && s.teacherId ? (
+                  <Button
+                    variant="ghost"
+                    className="!px-2 !py-1 text-xs"
+                    isLoading={reminderMutation.isPending}
+                    onClick={() => reminderMutation.mutate(s.subjectId)}
+                  >
+                    Remind
+                  </Button>
+                ) : null,
+            },
+          ]}
+        />
+      )}
+    </Card>
+  );
+}
+
+/** Uploads one student's corrected/graded answer sheet for a chosen exam + subject — mirrors MarksEntryPanel's class/exam/subject selectors and roster query. */
+function EvaluatedPapersPanel({ classes }: { classes: TeacherClassSummary[] }) {
+  const { user } = useAuth();
+  const toast = useToast();
+  const [classId, setClassId] = useState("");
+  const [examId, setExamId] = useState("");
+  const [subjectId, setSubjectId] = useState("");
+  const [uploadingStudentId, setUploadingStudentId] = useState<string | null>(null);
+  const [uploadedStudentIds, setUploadedStudentIds] = useState<Set<string>>(new Set());
+
+  const classOptions = classes.map((c) => ({ value: c.id, label: `${c.name} - ${c.section}` }));
+  const selectedClass = classes.find((c) => c.id === classId);
+  const subjectOptions = (selectedClass?.subjects ?? []).map((s) => ({ value: s.id, label: `${s.name} (${s.code})` }));
+
+  const examsQuery = useQuery({
+    queryKey: ["teacher", "exams", classId],
+    queryFn: () => marksService.fetchExams(classId),
+    enabled: !!classId,
+  });
+  const examOptions = (examsQuery.data ?? []).map((e) => ({ value: e.id, label: e.name }));
+
+  const rosterQuery = useQuery({
+    queryKey: ["teacher", "roster", classId],
+    queryFn: () => portalService.fetchRoster(classId),
+    enabled: !!classId,
+  });
+
+  const uploadMutation = useMutation({
+    mutationFn: async ({ studentId, file }: { studentId: string; file: File }) => {
+      const storagePath = await evaluatedPapersService.uploadEvaluatedPaperFile(user!.school_id!, studentId, file);
+      return evaluatedPapersService.addEvaluatedPaper(studentId, {
+        exam_id: examId,
+        subject_id: subjectId,
+        file_name: file.name,
+        storage_path: storagePath,
+      });
+    },
+    onSuccess: (_result, { studentId }) => {
+      setUploadedStudentIds((prev) => new Set(prev).add(studentId));
+      toast.success("Evaluated paper uploaded.");
+    },
+    onError: (err) => toast.error(getApiErrorMessage(err, "Failed to upload the evaluated paper.")),
+    onSettled: () => setUploadingStudentId(null),
+  });
+
+  function handleFileSelected(studentId: string, event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadingStudentId(studentId);
+      uploadMutation.mutate({ studentId, file });
+    }
+    event.target.value = "";
+  }
+
+  return (
+    <Card className="space-y-4">
+      <div className="flex flex-wrap items-end gap-4">
+        <Select
+          label="Class"
+          placeholder="Select class"
+          options={classOptions}
+          value={classId}
+          onChange={(e) => {
+            setClassId(e.target.value);
+            setExamId("");
+            setSubjectId("");
+          }}
+        />
+        <Select
+          label="Exam"
+          placeholder="Select exam"
+          options={examOptions}
+          value={examId}
+          onChange={(e) => setExamId(e.target.value)}
+        />
+        <Select
+          label="Subject"
+          placeholder="Select subject"
+          options={subjectOptions}
+          value={subjectId}
+          onChange={(e) => setSubjectId(e.target.value)}
+        />
+      </div>
+
+      {!classId || !examId || !subjectId ? (
+        <p className="text-sm text-slate-500">Select a class, exam, and subject to upload evaluated papers.</p>
+      ) : rosterQuery.isLoading ? (
+        <Spinner label="Loading students..." />
+      ) : (
+        <DataTable
+          rows={rosterQuery.data ?? []}
+          rowKey={(s) => s.id}
+          emptyMessage="No students in this class yet."
+          columns={[
+            { header: "Student", cell: (s) => s.users.full_name },
+            { header: "Admission No.", cell: (s) => s.admission_no },
+            {
+              header: "",
+              className: "text-right",
+              cell: (s) => (
+                <label className="inline-flex cursor-pointer items-center gap-2 text-xs">
+                  {uploadedStudentIds.has(s.id) && <Badge variant="success">Uploaded</Badge>}
+                  <span className="rounded-md border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 dark:border-white/20 dark:text-slate-200 dark:hover:bg-white/10">
+                    {uploadingStudentId === s.id && uploadMutation.isPending ? "Uploading…" : "Upload paper"}
+                  </span>
+                  <input
+                    type="file"
+                    className="hidden"
+                    disabled={uploadMutation.isPending}
+                    onChange={(e) => handleFileSelected(s.id, e)}
+                  />
+                </label>
+              ),
+            },
+          ]}
+        />
+      )}
+    </Card>
   );
 }

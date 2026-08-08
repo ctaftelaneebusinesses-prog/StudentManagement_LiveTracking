@@ -17,15 +17,16 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     const selectId = id ?? props.name;
     return (
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={selectId} className="text-sm font-medium text-slate-700">
+        <label htmlFor={selectId} className="text-sm font-medium text-slate-700 dark:text-slate-300">
           {label}
         </label>
         <select
           ref={ref}
           id={selectId}
-          className={`rounded-md border px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition-colors
+          className={`rounded-md border bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none transition-colors
             focus:border-brand-500 focus:ring-1 focus:ring-brand-500
-            ${error ? "border-red-500" : "border-slate-300"} ${className}`}
+            dark:bg-white/10 dark:text-white dark:[color-scheme:dark]
+            ${error ? "border-red-500 dark:border-red-500" : "border-slate-300 dark:border-white/20"} ${className}`}
           aria-invalid={!!error}
           {...props}
         >

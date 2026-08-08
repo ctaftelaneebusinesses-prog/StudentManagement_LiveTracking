@@ -1,6 +1,7 @@
 import { api } from "@/lib/axios";
 import { supabase } from "@/lib/supabaseClient";
 import { HomeworkItem } from "@/types/teacher.types";
+import { HomeworkSubmissionRecord } from "@/types/dashboard.types";
 
 export async function fetchHomework(classId: string): Promise<HomeworkItem[]> {
   const { data } = await api.get("/homework", { params: { classId } });
@@ -28,6 +29,33 @@ export async function updateHomework(id: string, patch: Partial<CreateHomeworkIn
 
 export async function deleteHomework(id: string): Promise<void> {
   await api.delete(`/homework/${id}`);
+}
+
+/** Class Teacher's review queue for one of their homeroom classes — every status, not just pending. */
+export async function fetchForReview(classId: string): Promise<HomeworkItem[]> {
+  const { data } = await api.get("/homework/review", { params: { classId } });
+  return data.data;
+}
+
+export async function approveHomework(id: string): Promise<HomeworkItem> {
+  const { data } = await api.patch(`/homework/${id}/approve`);
+  return data.data;
+}
+
+export async function requestHomeworkChanges(id: string, note: string): Promise<HomeworkItem> {
+  const { data } = await api.patch(`/homework/${id}/request-changes`, { note });
+  return data.data;
+}
+
+export async function fetchSubmissions(homeworkId: string): Promise<HomeworkSubmissionRecord[]> {
+  const { data } = await api.get(`/homework/${homeworkId}/submissions`);
+  return data.data;
+}
+
+/** Rule-based homework formatter (see backend ai.service.ts) — returns AI-style formatted text the teacher can still edit before publishing. */
+export async function enhanceHomeworkDescription(input: { title: string; description: string; due_date?: string }): Promise<string> {
+  const { data } = await api.post("/teacher-portal/homework/ai-enhance", input);
+  return data.data.enhanced;
 }
 
 /**

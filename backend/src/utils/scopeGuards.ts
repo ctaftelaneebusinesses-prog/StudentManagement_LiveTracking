@@ -31,6 +31,28 @@ export async function assertClassInSchool(schoolId: string, classId: string): Pr
   if (!data) throw ApiError.notFound("Class not found");
 }
 
+export async function assertTeacherInSchool(schoolId: string, teacherId: string): Promise<void> {
+  const { data, error } = await supabaseAdmin
+    .from("teachers")
+    .select("id")
+    .eq("id", teacherId)
+    .eq("school_id", schoolId)
+    .maybeSingle();
+  if (error) throw ApiError.internal(error.message);
+  if (!data) throw ApiError.notFound("Teacher not found");
+}
+
+export async function assertExtracurricularStaffInSchool(schoolId: string, staffId: string): Promise<void> {
+  const { data, error } = await supabaseAdmin
+    .from("extracurricular_staff")
+    .select("id")
+    .eq("id", staffId)
+    .eq("school_id", schoolId)
+    .maybeSingle();
+  if (error) throw ApiError.internal(error.message);
+  if (!data) throw ApiError.notFound("Extracurricular staff member not found");
+}
+
 export async function assertUserInSchool(schoolId: string, userId: string): Promise<void> {
   const { data, error } = await supabaseAdmin
     .from("users")

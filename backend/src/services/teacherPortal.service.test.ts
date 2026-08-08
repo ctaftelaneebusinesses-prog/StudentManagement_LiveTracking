@@ -14,6 +14,29 @@ beforeEach(() => {
   fromMock.mockReset();
 });
 
+/**
+ * getDashboard also fans out to today's timetable, pending-homework count,
+ * upcoming assessments, and the leave summary (schools.settings +
+ * leave_requests) — these tests only care about the class/subject/student
+ * merge logic, so every one of those extra tables resolves empty/zero here.
+ */
+function dashboardExtrasStub(table: string) {
+  if (table === "timetable_periods") return chain({ data: [], error: null });
+  if (table === "homework") return chain({ data: null, error: null, count: 0 });
+  if (table === "exams") return chain({ data: [], error: null });
+  if (table === "schools") return chain({ data: { settings: {} }, error: null });
+  if (table === "leave_requests") return chain({ data: [], error: null });
+  throw new Error(`unexpected table ${table}`);
+}
+
+const EMPTY_DASHBOARD_EXTRAS = {
+  todayClassesCount: 0,
+  pendingHomeworkCount: 0,
+  upcomingAssessmentsCount: 0,
+  leaveBalance: 27,
+  pendingLeaveRequestsCount: 0,
+};
+
 describe("getDashboard", () => {
   it("merges class_subjects assignments with homeroom classes and counts students per class", async () => {
     fromMock.mockImplementation((table: string) => {
@@ -45,7 +68,7 @@ describe("getDashboard", () => {
           error: null,
         });
       }
-      throw new Error(`unexpected table ${table}`);
+      return dashboardExtrasStub(table);
     });
 
     const result = await getDashboard("school-1", "teacher-1");
@@ -86,7 +109,7 @@ describe("getDashboard", () => {
       if (table === "students") {
         return chain({ data: [], error: null });
       }
-      throw new Error(`unexpected table ${table}`);
+      return dashboardExtrasStub(table);
     });
 
     const result = await getDashboard("school-1", "teacher-1");
@@ -100,11 +123,17 @@ describe("getDashboard", () => {
     fromMock.mockImplementation((table: string) => {
       if (table === "class_subjects") return chain({ data: [], error: null });
       if (table === "classes") return chain({ data: [], error: null });
-      throw new Error(`unexpected table ${table}`);
+      return dashboardExtrasStub(table);
     });
 
     const result = await getDashboard("school-1", "teacher-1");
-    expect(result).toEqual({ classes: [], totalClasses: 0, totalSubjects: 0, totalStudents: 0 });
+    expect(result).toEqual({
+      classes: [],
+      totalClasses: 0,
+      totalSubjects: 0,
+      totalStudents: 0,
+      ...EMPTY_DASHBOARD_EXTRAS,
+    });
     // No classes means the student-count lookup should be skipped entirely.
     expect(fromMock).not.toHaveBeenCalledWith("students");
   });

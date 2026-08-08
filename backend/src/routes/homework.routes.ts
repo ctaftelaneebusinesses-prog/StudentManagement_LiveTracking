@@ -7,12 +7,21 @@ import {
   createHomeworkSchema,
   updateHomeworkSchema,
   homeworkIdParamSchema,
+  submitHomeworkSchema,
+  reviewHomeworkSchema,
+  requestChangesSchema,
 } from "../validators/homework.validator";
 
 const router = Router();
 
 router.use(requireAuth);
 
+router.get(
+  "/review",
+  requirePermission("homework.manage"),
+  validate(reviewHomeworkSchema),
+  homeworkController.listForReview
+);
 router.get("/", requirePermission("homework.view"), validate(listHomeworkSchema), homeworkController.listForClass);
 router.post(
   "/",
@@ -26,11 +35,36 @@ router.patch(
   validate(updateHomeworkSchema),
   homeworkController.updateHomework
 );
+router.patch(
+  "/:id/approve",
+  requirePermission("homework.manage"),
+  validate(homeworkIdParamSchema),
+  homeworkController.approveHomework
+);
+router.patch(
+  "/:id/request-changes",
+  requirePermission("homework.manage"),
+  validate(requestChangesSchema),
+  homeworkController.requestChanges
+);
 router.delete(
   "/:id",
   requirePermission("homework.manage"),
   validate(homeworkIdParamSchema),
   homeworkController.deleteHomework
+);
+
+router.post(
+  "/:id/submit",
+  requirePermission("homework.submit"),
+  validate(submitHomeworkSchema),
+  homeworkController.submitHomework
+);
+router.get(
+  "/:id/submissions",
+  requirePermission("homework.manage"),
+  validate(homeworkIdParamSchema),
+  homeworkController.listSubmissionsForHomework
 );
 
 export default router;

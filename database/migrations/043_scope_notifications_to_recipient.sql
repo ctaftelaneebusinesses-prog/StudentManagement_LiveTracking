@@ -1,0 +1,30 @@
+-- ============================================================================
+-- Migration: 043_scope_notifications_to_recipient
+-- Run AFTER 042_student_profile_change_requests.sql.
+--
+-- `notifications_select_staff` (006_student_management_module.sql) grants
+-- ANY staff account (is_staff() = super_admin/school_admin/principal) SELECT
+-- on every notification row in the school, regardless of audience_scope or
+-- audience_user_id. Because Postgres RLS OR's together every permissive
+-- policy on a table, this silently defeated the careful per-recipient
+-- targeting added later for the leave workflow (034/035/036): a teacher's
+-- leave submission is only ever inserted addressed to the principal
+-- (leaveRequest.service.ts::notifyOnApply), a student's leave submission
+-- only to their class teacher (studentLeaveRequest.service.ts), and a
+-- review's outcome only back to the applicant — but any admin/principal's
+-- own "my notifications" bell (GET /notifications/me, RLS-scoped) and
+-- realtime subscription showed ALL of these regardless of who they were
+-- actually addressed to, since notifications_select_staff had no
+-- audience_user_id check at all.
+--
+-- The admin-facing "all notifications sent in the school" oversight list
+-- (GET /notifications, notification.service.ts::listForSchool) does NOT
+-- depend on this policy — it queries via supabaseAdmin (service-role,
+-- bypasses RLS entirely), so dropping this changes nothing there. Every
+-- other legitimate case (school-wide broadcasts, class-scoped, direct-to-
+-- student-or-parent, direct-to-user) already has its own correctly-scoped
+-- policy (notifications_select_school_wide / _class / _direct /
+-- _direct_user) — this policy's only remaining effect was the leak.
+-- ============================================================================
+
+drop policy if exists notifications_select_staff on public.notifications;

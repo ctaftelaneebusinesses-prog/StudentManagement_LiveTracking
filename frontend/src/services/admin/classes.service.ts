@@ -1,8 +1,35 @@
 import { api } from "@/lib/axios";
-import { ClassRoom, ClassSubject, Subject } from "@/types/admin.types";
+import {
+  ClassAttendanceToday,
+  ClassRoom,
+  ClassSubject,
+  PaginatedResult,
+  Student,
+  Subject,
+} from "@/types/admin.types";
 
 export async function fetchClasses(): Promise<ClassRoom[]> {
   const { data } = await api.get("/classes");
+  return data.data;
+}
+
+export async function fetchClass(id: string): Promise<ClassRoom> {
+  const { data } = await api.get(`/classes/${id}`);
+  return data.data;
+}
+
+export async function fetchClassStudents(
+  id: string,
+  params: { search?: string; page?: number; pageSize?: number } = {}
+): Promise<PaginatedResult<Student>> {
+  const { data } = await api.get(`/classes/${id}/students`, { params });
+  return data.data;
+}
+
+/** Today's per-student attendance roster for a class — reuses the same endpoint the teacher portal marks attendance against. */
+export async function fetchClassAttendanceToday(classId: string): Promise<ClassAttendanceToday[]> {
+  const today = new Date().toISOString().slice(0, 10);
+  const { data } = await api.get("/attendance/daily", { params: { class_id: classId, date: today } });
   return data.data;
 }
 
@@ -12,6 +39,8 @@ export async function createClass(input: {
   academic_year_id: string;
   branch_id?: string;
   class_teacher_id?: string;
+  capacity?: number;
+  status?: "active" | "inactive";
 }): Promise<ClassRoom> {
   const { data } = await api.post("/classes", input);
   return data.data;
@@ -31,7 +60,12 @@ export async function fetchSubjects(): Promise<Subject[]> {
   return data.data;
 }
 
-export async function createSubject(input: { name: string; code: string }): Promise<Subject> {
+export async function createSubject(input: {
+  name: string;
+  code: string;
+  description?: string;
+  status?: "active" | "inactive";
+}): Promise<Subject> {
   const { data } = await api.post("/subjects", input);
   return data.data;
 }

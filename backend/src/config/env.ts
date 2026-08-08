@@ -12,6 +12,19 @@ const envSchema = z.object({
   SUPABASE_ANON_KEY: z.string().min(1),
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace"]).default("info"),
+  // Email delivery is optional — if unset, notification emails are skipped
+  // with a warning instead of failing the request that triggered them.
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASSWORD: z.string().optional(),
+  SMTP_FROM: z.string().default("School Management System <no-reply@school.local>"),
+  SMTP_SECURE: z.coerce.boolean().default(false),
+  // Web push is optional — if unset, push sends are skipped with a warning
+  // instead of failing the request that triggered them (same posture as SMTP).
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().default("mailto:admin@school.local"),
 });
 
 const parsed = envSchema.safeParse(process.env);

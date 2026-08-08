@@ -36,3 +36,30 @@ export const homeworkIdParamSchema = z.object({
   query: z.object({}).optional(),
   params: z.object({ id: z.string().uuid() }),
 });
+
+const submitHomeworkBody = z
+  .object({
+    submission_text: z.string().max(5000).optional(),
+    attachment_url: z.string().url().optional(),
+  })
+  .refine((value) => !!(value.submission_text || value.attachment_url), {
+    message: "Provide submission text or an attachment",
+  });
+
+export const submitHomeworkSchema = z.object({
+  body: submitHomeworkBody,
+  query: z.object({}).optional(),
+  params: z.object({ id: z.string().uuid() }),
+});
+
+export const reviewHomeworkSchema = z.object({
+  body: z.object({}).optional(),
+  query: z.object({ classId: z.string().uuid() }),
+  params: z.object({}).optional(),
+});
+
+export const requestChangesSchema = z.object({
+  body: z.object({ note: z.string().min(1) }),
+  query: z.object({}).optional(),
+  params: z.object({ id: z.string().uuid() }),
+});

@@ -26,6 +26,14 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
+  // A self-registered account isn't usable until its approver acts (see
+  // 061_registration_approval.sql) — the backend already rejects every API
+  // call for a non-'approved' status; this just gets the user to the status
+  // page instead of a dashboard full of failed requests.
+  if (user.status && user.status !== "approved") {
+    return <Navigate to="/registration-status" replace />;
+  }
+
   // Checked against ALL roles the user holds (roleNames), not just their
   // single primary role — a user can be granted access via any assigned role.
   if (allowedRoles && !allowedRoles.some((role) => roleNames.includes(role))) {

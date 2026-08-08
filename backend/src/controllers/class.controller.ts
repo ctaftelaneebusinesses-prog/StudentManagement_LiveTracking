@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import * as classService from "../services/class.service";
+import * as studentService from "../services/student.service";
 import { sendSuccess } from "../utils/ApiResponse";
 import { resolveSchoolId } from "../utils/tenant";
 
@@ -7,6 +8,29 @@ export async function listClasses(req: Request, res: Response, next: NextFunctio
   try {
     const schoolId = resolveSchoolId(req);
     return sendSuccess(res, await classService.listClasses(schoolId));
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export async function getClass(req: Request, res: Response, next: NextFunction) {
+  try {
+    const schoolId = resolveSchoolId(req);
+    return sendSuccess(res, await classService.getClass(schoolId, req.params.id));
+  } catch (err) {
+    return next(err);
+  }
+}
+
+/** Roster for a single class — search/pagination delegate to the same listing logic used by GET /students. */
+export async function getClassStudents(req: Request, res: Response, next: NextFunction) {
+  try {
+    const schoolId = resolveSchoolId(req);
+    const { search, page, pageSize } = req.query as unknown as { search?: string; page: number; pageSize: number };
+    return sendSuccess(
+      res,
+      await studentService.listStudents(schoolId, { classId: req.params.id, search, page, pageSize })
+    );
   } catch (err) {
     return next(err);
   }

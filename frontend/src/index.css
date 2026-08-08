@@ -7,3 +7,181 @@ body,
 #root {
   height: 100%;
 }
+
+/*
+ * Chart & admin-dashboard design tokens (validated categorical palette —
+ * see the dataviz skill's references/palette.md). Declared for both the OS
+ * media query and an explicit `.dark` class stamp on <html> so the manual
+ * theme toggle always wins over the OS setting.
+ */
+:root {
+  color-scheme: light;
+  --page-plane: #f8fafc;
+  --surface: #ffffff;
+  --ink-primary: #1f2937;
+  --ink-secondary: #52514e;
+  --ink-muted: #6b7280;
+  --gridline: #e1e0d9;
+  --baseline: #c3c2b7;
+  --hairline: rgba(11, 11, 11, 0.1);
+  --delta-good: #006300;
+  --delta-bad: #d03b3b;
+
+  --series-1: #2a78d6; /* blue */
+  --series-2: #eb6834; /* orange */
+  --series-3: #1baf7a; /* aqua */
+  --series-4: #eda100; /* yellow */
+  --series-5: #e87ba4; /* magenta */
+  --series-6: #008300; /* green */
+  --series-7: #4a3aa7; /* violet */
+  --series-8: #e34948; /* red */
+
+  --status-good: #16a34a;
+  --status-warning: #f59e0b;
+  --status-serious: #dc2626;
+  --status-critical: #b91c1c;
+}
+
+.dark {
+  color-scheme: dark;
+  --page-plane: #0d0d0d;
+  --surface: #1a1a19;
+  --ink-primary: #ffffff;
+  --ink-secondary: #c3c2b7;
+  --ink-muted: #898781;
+  --gridline: #2c2c2a;
+  --baseline: #383835;
+  --hairline: rgba(255, 255, 255, 0.1);
+  --delta-good: #0ca30c;
+  --delta-bad: #e66767;
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+
+  --status-good: #22c55e;
+  --status-warning: #fbbf24;
+  --status-serious: #f87171;
+  --status-critical: #ef4444;
+}
+
+body {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/*
+ * Student/Parent Portal gender theme tokens (see PortalThemeContext,
+ * PortalShell.tsx). Scoped under [data-portal-theme] so they never leak into
+ * admin/teacher/driver chrome, which keeps reading the plain brand/accent
+ * scale above. Each portal component reads these vars instead of a
+ * hardcoded color so one attribute swap repaints the whole tree.
+ */
+[data-portal-theme="boy"] {
+  --portal-grad-from: #2f7dfa;
+  --portal-grad-via: #4fa1ff;
+  --portal-grad-to: #1c5fe0;
+  --portal-accent: #2f7dfa;
+  --portal-accent-soft: #d9ecff;
+  --portal-ring: rgba(47, 125, 250, 0.35);
+  --portal-glow: rgba(47, 125, 250, 0.35);
+  --portal-glass-bg: rgba(239, 246, 255, 0.6);
+  --portal-glass-border: rgba(47, 125, 250, 0.16);
+  --portal-sidebar-from: #0f2557;
+  --portal-sidebar-to: #163b8f;
+}
+[data-portal-theme="girl"] {
+  --portal-grad-from: #dd4aa8;
+  --portal-grad-via: #ea72c3;
+  --portal-grad-to: #a02271;
+  --portal-accent: #dd4aa8;
+  --portal-accent-soft: #fbe4f5;
+  --portal-ring: rgba(221, 74, 168, 0.35);
+  --portal-glow: rgba(221, 74, 168, 0.35);
+  --portal-glass-bg: rgba(253, 242, 250, 0.6);
+  --portal-glass-border: rgba(221, 74, 168, 0.18);
+  --portal-sidebar-from: #4a1240;
+  --portal-sidebar-to: #83235f;
+}
+.dark [data-portal-theme="boy"] {
+  --portal-glass-bg: rgba(27, 41, 74, 0.55);
+  --portal-glass-border: rgba(79, 161, 255, 0.22);
+}
+.dark [data-portal-theme="girl"] {
+  --portal-glass-bg: rgba(58, 27, 51, 0.55);
+  --portal-glass-border: rgba(234, 114, 195, 0.22);
+}
+
+/*
+ * Thin, on-brand scrollbar for the dark sidebar chrome (Sidebar.tsx /
+ * AdminSidebar.tsx nav panels) — without this, Chrome/Edge/Firefox render
+ * their bulky default light-grey OS scrollbar, which clashes hard against a
+ * dark navy/teal/wine/green background.
+ */
+.sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+}
+.sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.38);
+}
+
+/*
+ * Google Translate website widget (see lib/googleTranslate.ts) — we drive
+ * its hidden <select> from our own LanguageSwitcher UI, so all of Google's
+ * default chrome (top banner, tooltip balloon, highlight boxes) is
+ * suppressed here rather than shown.
+ */
+#google_translate_element {
+  display: none;
+}
+/*
+ * Google renames its own banner/tooltip iframe classes per release
+ * (e.g. "VIpgJd-ZVi9od-ORHb-OEVmcd"), but always tags its own UI chrome
+ * with "skiptranslate" — that's the one selector guaranteed to keep
+ * matching across versions.
+ */
+iframe.skiptranslate,
+#goog-gt-tt {
+  display: none !important;
+}
+body {
+  top: 0px !important;
+}
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Auth glass inputs (AuthInput.tsx) always sit on a dark translucent card
+ * (see AuthGlassCard's "dark" variant). Chromium ignores background-color on
+ * autofilled inputs and forces its own light blue fill + dark text instead —
+ * without this override, any autofilled/saved-credential login blows out the
+ * glassmorphism look with a solid light box. The huge transition delay is
+ * the standard trick: Chromium lets background-color transition, just not
+ * apply instantly, so a very long delay effectively keeps our color.
+ */
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:hover,
+.auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  caret-color: #fff;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.55) inset;
+  box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.55) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}

@@ -5,6 +5,8 @@ import { validate } from "../middleware/validate.middleware";
 import {
   createClassSchema,
   updateClassSchema,
+  getClassSchema,
+  getClassStudentsSchema,
   createSubjectSchema,
   updateSubjectSchema,
   assignSubjectToClassSchema,
@@ -17,8 +19,10 @@ router.use(requirePermission("classes.manage"));
 
 router.get("/classes", classController.listClasses);
 router.post("/classes", validate(createClassSchema), classController.createClass);
+router.get("/classes/:id", validate(getClassSchema), classController.getClass);
 router.patch("/classes/:id", validate(updateClassSchema), classController.updateClass);
 router.delete("/classes/:id", classController.deleteClass);
+router.get("/classes/:id/students", validate(getClassStudentsSchema), classController.getClassStudents);
 
 router.get("/classes/:classId/subjects", classController.listClassSubjects);
 router.post(

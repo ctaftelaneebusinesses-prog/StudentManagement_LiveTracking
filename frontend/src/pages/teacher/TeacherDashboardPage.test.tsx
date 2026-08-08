@@ -1,10 +1,13 @@
 import type { ReactElement } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
 import { TeacherDashboardPage } from "./TeacherDashboardPage";
 import * as portalService from "@/services/teacher/portal.service";
+import * as selfAttendanceService from "@/services/teacher/selfAttendance.service";
+import { ToastProvider } from "@/components/ui/Toast";
 
 vi.mock("@/hooks/useAuth", () => ({
   useAuth: () => ({
@@ -12,12 +15,41 @@ vi.mock("@/hooks/useAuth", () => ({
   }),
 }));
 
+// The dashboard's "Recent activity" card reuses the same notifications feed
+// as the bell (useNotifications) — it opens a Supabase Realtime channel and
+// hits the network, neither of which this test cares about or should touch.
+vi.mock("@/hooks/useNotifications", () => ({
+  useNotifications: () => ({
+    notifications: [],
+    unreadCount: 0,
+    isLoading: false,
+    markAsRead: vi.fn(),
+    permission: "default",
+    requestBrowserPermission: vi.fn(),
+  }),
+}));
+
 vi.mock("@/services/teacher/portal.service");
+vi.mock("@/services/teacher/selfAttendance.service");
 
 function renderWithClient(ui: ReactElement) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>);
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <ToastProvider>{ui}</ToastProvider>
+      </MemoryRouter>
+    </QueryClientProvider>
+  );
 }
+
+const todayAttendanceFixture = {
+  date: "2026-08-03",
+  status: null,
+  check_in_at: null,
+  check_out_at: null,
+  checkin_cutoff: null,
+};
 
 const dashboardFixture = {
   classes: [
@@ -33,6 +65,11 @@ const dashboardFixture = {
   totalClasses: 1,
   totalSubjects: 1,
   totalStudents: 2,
+  todayClassesCount: 0,
+  pendingHomeworkCount: 0,
+  upcomingAssessmentsCount: 0,
+  leaveBalance: 0,
+  pendingLeaveRequestsCount: 0,
 };
 
 const rosterFixture = [
@@ -50,6 +87,7 @@ describe("TeacherDashboardPage", () => {
   it("renders the teacher's classes, subjects, and summary counts without throwing", async () => {
     vi.mocked(portalService.fetchDashboard).mockResolvedValue(dashboardFixture);
     vi.mocked(portalService.fetchRoster).mockResolvedValue(rosterFixture);
+    vi.mocked(selfAttendanceService.fetchTodayStatus).mockResolvedValue(todayAttendanceFixture);
 
     renderWithClient(<TeacherDashboardPage />);
 
@@ -62,6 +100,7 @@ describe("TeacherDashboardPage", () => {
   it("loads and displays the class roster when 'View students' is clicked", async () => {
     vi.mocked(portalService.fetchDashboard).mockResolvedValue(dashboardFixture);
     vi.mocked(portalService.fetchRoster).mockResolvedValue(rosterFixture);
+    vi.mocked(selfAttendanceService.fetchTodayStatus).mockResolvedValue(todayAttendanceFixture);
 
     renderWithClient(<TeacherDashboardPage />);
 
