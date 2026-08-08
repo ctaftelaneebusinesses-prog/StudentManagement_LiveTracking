@@ -1,4 +1,5 @@
 import { Menu } from "lucide-react";
+import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
 import { CommandSearch } from "./CommandSearch";
 import { SchoolSelectorMenu } from "./SchoolSelectorMenu";
 import { NotificationsMenu } from "./NotificationsMenu";
@@ -30,6 +31,8 @@ export function AdminTopbar({ onOpenMobileMenu }: AdminTopbarProps) {
         <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
         <ThemeToggle />
         <NotificationsMenu />
+        <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
+        <PoweredByCraftLanee className="hidden text-[var(--ink-muted)] lg:inline" />
         <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
         <ProfileMenu />
       </div>

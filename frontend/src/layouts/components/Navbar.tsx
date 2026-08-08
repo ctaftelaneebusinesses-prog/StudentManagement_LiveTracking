@@ -1,23 +1,17 @@
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
 import { ROLE_LABEL } from "@/utils/roles";
 
 interface NavbarProps {
   onOpenMobileMenu: () => void;
 }
 
+/** No Log out button here: Sidebar's UserCard already has one, so this bar isn't the only way out. */
 export function Navbar({ onOpenMobileMenu }: NavbarProps) {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  async function handleLogout() {
-    await logout();
-    navigate("/login", { replace: true });
-  }
+  const { user } = useAuth();
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 dark:border-white/[0.08] dark:bg-[#17171a] sm:px-6">
@@ -45,9 +39,8 @@ export function Navbar({ onOpenMobileMenu }: NavbarProps) {
             </div>
           </div>
         )}
-        <Button variant="secondary" onClick={handleLogout}>
-          Log out
-        </Button>
+        <div className="mx-0.5 hidden h-6 w-px bg-slate-200 dark:bg-white/[0.1] sm:block" />
+        <PoweredByCraftLanee className="hidden text-slate-500 dark:text-slate-400 sm:inline" />
       </div>
     </header>
   );

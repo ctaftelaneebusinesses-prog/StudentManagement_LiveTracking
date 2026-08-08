@@ -1,25 +1,23 @@
-import { useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
 import { Avatar } from "@/components/ui/Avatar";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
 import { ROLE_LABEL } from "@/utils/roles";
 
 interface PortalNavbarProps {
   onOpenMobileMenu: () => void;
 }
 
-/** Portal-only top bar — glass panel matching PortalSidebar's theme instead of the plain white header every other role uses. */
+/**
+ * Portal-only top bar — glass panel matching PortalSidebar's theme instead
+ * of the plain white header every other role uses. No Log out button here:
+ * PortalSidebar's UserCard already has one, so this bar isn't the only way
+ * out.
+ */
 export function PortalNavbar({ onOpenMobileMenu }: PortalNavbarProps) {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  async function handleLogout() {
-    await logout();
-    navigate("/login", { replace: true });
-  }
+  const { user } = useAuth();
 
   return (
     <header
@@ -34,10 +32,7 @@ export function PortalNavbar({ onOpenMobileMenu }: PortalNavbarProps) {
       >
         <Menu size={20} strokeWidth={1.85} />
       </button>
-      <div className="hidden items-center gap-1.5 md:flex">
-        {/* Swap for an <img src="/craftlanee-logo.svg" className="h-4 w-auto" /> once the asset is in frontend/public. */}
-        <span className="text-xs font-medium uppercase tracking-[0.15em] text-[var(--ink-muted)] opacity-70">Powered by CraftLanee</span>
-      </div>
+      <div className="hidden md:block" />
       <div className="flex items-center gap-2 sm:gap-4">
         <LanguageSwitcher />
         {user && <NotificationBell />}
@@ -50,9 +45,8 @@ export function PortalNavbar({ onOpenMobileMenu }: PortalNavbarProps) {
             </div>
           </div>
         )}
-        <Button variant="secondary" onClick={handleLogout}>
-          Log out
-        </Button>
+        <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
+        <PoweredByCraftLanee className="hidden text-[var(--ink-muted)] sm:inline" />
       </div>
     </header>
   );

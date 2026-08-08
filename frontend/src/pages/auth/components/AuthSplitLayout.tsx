@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { GraduationCap, ShieldCheck, Sparkles } from "lucide-react";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
 
 interface AuthSplitLayoutProps {
   children: ReactNode;
@@ -31,7 +32,8 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
         <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
       </div>
 
-      <div className="absolute right-4 top-4 z-20 lg:right-8 lg:top-8">
+      <div className="absolute right-4 top-4 z-20 flex items-center gap-3 lg:right-8 lg:top-8">
+        <PoweredByCraftLanee className="hidden text-slate-400 sm:inline" />
         <LanguageSwitcher />
       </div>
 
