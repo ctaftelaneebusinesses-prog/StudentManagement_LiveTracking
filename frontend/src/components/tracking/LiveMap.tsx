@@ -136,7 +136,12 @@ export function LiveMap({ locations, routeStops, viewerLocation, height = "360px
   return (
     <div
       ref={host}
-      className="overflow-hidden rounded-xl border border-black/[0.06] dark:border-white/[0.08]"
+      // `isolate` boxes in Leaflet's own internal z-index scale (its zoom
+      // control corners go up to z-index:1000, popups/markers up to 700) —
+      // without it, those panes paint above any app-level overlay using a
+      // lower z-index (e.g. the mobile sidebar's z-40 backdrop), since
+      // Leaflet's container doesn't establish a stacking context on its own.
+      className="isolate overflow-hidden rounded-xl border border-black/[0.06] dark:border-white/[0.08]"
       style={{ height }}
       aria-label="Live vehicle map"
     />
