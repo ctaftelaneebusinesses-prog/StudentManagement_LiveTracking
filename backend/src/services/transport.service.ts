@@ -468,7 +468,7 @@ export async function listTeacherRouteIds(schoolId: string, teacherId: string): 
 
   const { data, error } = await supabaseAdmin
     .from("student_pickup_points")
-    .select("pickup_points!inner(route_id)")
+    .select("pickup_points!student_pickup_points_pickup_point_id_fkey(route_id)")
     .eq("school_id", schoolId)
     .eq("is_active", true)
     .in("student_id", studentIds);

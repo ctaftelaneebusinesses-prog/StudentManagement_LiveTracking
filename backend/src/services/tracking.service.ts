@@ -25,7 +25,7 @@ async function notifyRouteStudents(schoolId: string, driverId: string, routeId: 
   if (!routeId) return;
   const r = await supabaseAdmin
     .from("student_pickup_points")
-    .select("students!inner(id), pickup_points!inner(route_id)")
+    .select("students!inner(id), pickup_points!student_pickup_points_pickup_point_id_fkey!inner(route_id)")
     .eq("pickup_points.route_id", routeId)
     .eq("is_active", true);
   if (r.error) { logger.error({ err: r.error }, "Failed to look up route students for van notification"); return; }
