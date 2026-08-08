@@ -44,10 +44,21 @@ export function PortalTransportPage() {
   const [locationError, setLocationError] = useState("");
   const lastSentRef = useRef(0);
 
+  // Polled (not just Realtime-pushed) on purpose: this is a plain REST
+  // fallback for the live position, independent of the Supabase Realtime
+  // websocket succeeding at all. Realtime auth for postgres_changes depends
+  // on the client's Supabase session being fully attached to that socket
+  // before subscribing — AuthContext.tsx documents a known supabase-js
+  // session-hydration race/stall — and if that hasn't happened yet, RLS
+  // silently drops every event for that connection with no error surfaced
+  // anywhere. Polling the same already-extended getStudentTransport endpoint
+  // every 12s (matching the driver's own ~10s GPS-send cadence) means the
+  // map stays live even when the websocket path never comes through.
   const transportQuery = useQuery({
     queryKey: ["portal", "transport", studentId],
     queryFn: () => transportService.fetchStudentTransport(studentId),
     enabled: !!studentId,
+    refetchInterval: 12000,
   });
 
   const statusQuery = useQuery({
@@ -66,40 +77,61 @@ export function PortalTransportPage() {
   const vehicle = transportQuery.data?.pickup_points?.routes?.vehicle ?? null;
   const activeTrip = vehicle?.trips.find((t) => t.status === "in_progress") ?? null;
 
-  // Seeds the map with the trip's last known position as soon as it loads —
-  // without this, a trip already in progress before this page opened showed
-  // "No live location yet" until the *next* GPS ping arrived over Realtime,
-  // even though the backend already had a last-known fix for it (see
+  // Realtime pushes and REST polls can arrive in either order — always keep
+  // whichever position is actually newer rather than trusting one channel
+  // over the other, so a slow poll response can never clobber a fresher
+  // Realtime push that landed in between (and vice versa).
+  function applyIfNewer(candidate: LiveLocation) {
+    const time = (loc: LiveLocation) => (loc.updatedAt ? new Date(loc.updatedAt).getTime() : 0);
+    setLive((prev) => (!prev || time(candidate) > time(prev) ? candidate : prev));
+  }
+
+  // Updates the map from the trip's last known position on every load AND
+  // every 12s poll (see transportQuery's refetchInterval above) — without
+  // this, a trip already in progress before this page opened showed "No live
+  // location yet" until Realtime happened to deliver something, even though
+  // the backend already had a last-known fix for it the whole time (see
   // getStudentTransport's comment in transport.service.ts).
   useEffect(() => {
     if (!vehicle || !activeTrip || activeTrip.last_latitude === null || activeTrip.last_longitude === null) return;
-    setLive({
+    applyIfNewer({
       vehicleId: vehicle.id,
       latitude: Number(activeTrip.last_latitude),
       longitude: Number(activeTrip.last_longitude),
       label: vehicle.name || vehicle.vehicle_number,
       updatedAt: activeTrip.last_location_at ?? activeTrip.started_at ?? new Date().toISOString(),
     });
-    // Only re-seed when the trip identity changes (a new trip started) — once
-    // live GPS pings start arriving below, they should keep winning even if
-    // this effect re-runs for an unrelated reason.
+    // `vehicle`/`activeTrip` are recomputed (new object identity) on every
+    // render, including ones unrelated to fresh data (e.g. viewerPosition
+    // ticking from the geolocation watcher below) — depending on the actual
+    // primitive fields instead keeps this effect from re-running on every
+    // one of those.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTrip?.id]);
+  }, [vehicle?.id, activeTrip?.last_latitude, activeTrip?.last_longitude, activeTrip?.last_location_at]);
 
-  // Realtime GPS subscription — untouched from the pre-redesign version, do not restyle away from postgres_changes.
+  // Realtime GPS subscription — the low-latency fast path when the Supabase
+  // websocket's RLS auth is attached correctly; the polling effect above is
+  // what guarantees the map stays live even on the runs where it isn't (see
+  // transportQuery's comment).
   useEffect(() => {
     if (!vehicle) return;
     const channel = supabase
       .channel(`portal-van-${vehicle.id}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "vehicle_locations", filter: `vehicle_id=eq.${vehicle.id}` }, (event) => {
         const row = event.new as { latitude: number; longitude: number; recorded_at: string };
-        setLive({ vehicleId: vehicle.id, latitude: Number(row.latitude), longitude: Number(row.longitude), label: vehicle.name || vehicle.vehicle_number, updatedAt: row.recorded_at });
+        applyIfNewer({ vehicleId: vehicle.id, latitude: Number(row.latitude), longitude: Number(row.longitude), label: vehicle.name || vehicle.vehicle_number, updatedAt: row.recorded_at });
       })
       .subscribe();
     return () => {
       void supabase.removeChannel(channel);
     };
-  }, [vehicle]);
+    // vehicle?.id, not the vehicle object — `vehicle` gets a new object
+    // identity on every 12s poll (transportQuery's refetchInterval above),
+    // and depending on the object itself would tear down and recreate this
+    // channel every single poll instead of only when the assigned vehicle
+    // actually changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicle?.id]);
 
   // Requests location permission as soon as the Transport page is open (not
   // gated on a trip being active yet) so distance/ETA and the 10-min/5-min/
