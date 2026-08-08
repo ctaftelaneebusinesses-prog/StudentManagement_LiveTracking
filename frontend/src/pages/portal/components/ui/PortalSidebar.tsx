@@ -193,7 +193,7 @@ export function PortalSidebar({ isCollapsed, onToggleCollapse, isMobileOpen, onC
 
       <AnimatePresence>
         {isMobileOpen && (
-          <div className="fixed inset-0 z-40 md:hidden">
+          <div className="fixed inset-0 z-40 h-dvh md:hidden">
             <motion.div
               className="absolute inset-0 bg-black/50"
               onClick={onCloseMobile}
@@ -204,7 +204,7 @@ export function PortalSidebar({ isCollapsed, onToggleCollapse, isMobileOpen, onC
             />
             <motion.aside
               style={panelStyle}
-              className="relative flex h-full w-72 flex-col shadow-2xl"
+              className="relative flex h-dvh w-72 flex-col shadow-2xl"
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}

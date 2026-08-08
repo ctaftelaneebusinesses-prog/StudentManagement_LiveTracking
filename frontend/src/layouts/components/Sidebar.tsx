@@ -200,9 +200,9 @@ export function Sidebar({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMo
 
       {/* Mobile: backdrop + slide-in drawer, toggled by the navbar's menu button */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
+        <div className="fixed inset-0 z-40 h-dvh md:hidden">
           <div className="absolute inset-0 bg-black/50 animate-fade-in" onClick={onCloseMobile} aria-hidden="true" />
-          <aside className={`relative flex h-full w-72 animate-slide-up flex-col ${sidebarBg} shadow-2xl`}>
+          <aside className={`relative flex h-dvh w-72 animate-slide-up flex-col ${sidebarBg} shadow-2xl`}>
             <div className="flex items-center justify-between">
               <Brand collapsed={false} />
               <button
