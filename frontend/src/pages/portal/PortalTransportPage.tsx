@@ -75,7 +75,10 @@ export function PortalTransportPage() {
   });
 
   const vehicle = transportQuery.data?.pickup_points?.routes?.vehicle ?? null;
-  const activeTrip = vehicle?.trips.find((t) => t.status === "in_progress") ?? null;
+  // `?.trips?.` (not `?.trips.`) — a client that loaded before a backend
+  // deploy carrying this field would otherwise get `trips: undefined` back
+  // and crash here with no visible error, rather than just showing no trip.
+  const activeTrip = vehicle?.trips?.find((t) => t.status === "in_progress") ?? null;
 
   // Realtime pushes and REST polls can arrive in either order — always keep
   // whichever position is actually newer rather than trusting one channel
