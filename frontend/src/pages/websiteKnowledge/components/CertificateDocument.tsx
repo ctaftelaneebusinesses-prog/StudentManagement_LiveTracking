@@ -1,3 +1,5 @@
+import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
+
 /**
  * Presentational, print-ready certificate plate. Pure Tailwind, no jsPDF —
  * the browser's own "Print / Save as PDF" renders this at full fidelity via
@@ -18,20 +20,9 @@ interface CertificateDocumentProps {
   date: string;
   certificateId: string;
   logoSrc?: string;
-  /** Platform attribution mark — omit to fall back to a plain "Powered by CraftLanee" wordmark in the footer's own type system. */
-  poweredByLogoSrc?: string;
 }
 
-export function CertificateDocument({
-  schoolName,
-  studentName,
-  score,
-  role,
-  date,
-  certificateId,
-  logoSrc,
-  poweredByLogoSrc,
-}: CertificateDocumentProps) {
+export function CertificateDocument({ schoolName, studentName, score, role, date, certificateId, logoSrc }: CertificateDocumentProps) {
   return (
     <div className="wk-certificate relative mx-auto aspect-[297/210] w-full max-w-[1040px] bg-[#f5f6f2] p-3 shadow-[0_30px_60px_-25px_rgba(13,24,38,0.45)] print:aspect-auto print:h-screen print:w-screen print:max-w-none print:p-0 print:shadow-none">
       <style>{`
@@ -102,13 +93,7 @@ export function CertificateDocument({
 
         {/* Footer: platform attribution on the left, signature on the right, certificate ID centered beneath both */}
         <div className="mt-8 flex items-end justify-between">
-          <div className="flex items-center gap-1.5 opacity-70">
-            {poweredByLogoSrc ? (
-              <img src={poweredByLogoSrc} alt="CraftLanee" className="h-4 w-auto object-contain" />
-            ) : (
-              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">Powered by CraftLanee</span>
-            )}
-          </div>
+          <PoweredByCraftLanee className="inline-flex" surface="light" />
           <div className="text-center">
             <div className="h-px w-40 bg-slate-400" />
             <div className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-slate-500">Authorized Signature</div>

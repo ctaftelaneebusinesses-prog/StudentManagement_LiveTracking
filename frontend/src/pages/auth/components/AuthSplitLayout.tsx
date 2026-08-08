@@ -32,8 +32,7 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
         <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
       </div>
 
-      <div className="absolute right-4 top-4 z-20 flex items-center gap-3 lg:right-8 lg:top-8">
-        <PoweredByCraftLanee className="hidden text-slate-400 sm:inline" />
+      <div className="absolute right-4 top-4 z-20 lg:right-8 lg:top-8">
         <LanguageSwitcher />
       </div>
 
@@ -67,7 +66,10 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
           </div>
         </div>
 
-        <p className="text-xs text-slate-400">© {new Date().getFullYear()} Smart School Management System</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs text-slate-400">© {new Date().getFullYear()} Smart School Management System</p>
+          <PoweredByCraftLanee className="inline-flex" surface="dark" />
+        </div>
       </div>
 
       {/* Form panel — the only region that scrolls when a form is taller than the viewport.

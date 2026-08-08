@@ -46,7 +46,7 @@ export function PortalNavbar({ onOpenMobileMenu }: PortalNavbarProps) {
           </div>
         )}
         <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
-        <PoweredByCraftLanee className="hidden text-[var(--ink-muted)] sm:inline" />
+        <PoweredByCraftLanee className="hidden sm:inline-flex" />
       </div>
     </header>
   );

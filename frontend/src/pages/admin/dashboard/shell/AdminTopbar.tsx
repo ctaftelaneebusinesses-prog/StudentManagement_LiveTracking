@@ -32,7 +32,7 @@ export function AdminTopbar({ onOpenMobileMenu }: AdminTopbarProps) {
         <ThemeToggle />
         <NotificationsMenu />
         <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
-        <PoweredByCraftLanee className="hidden text-[var(--ink-muted)] lg:inline" />
+        <PoweredByCraftLanee className="hidden lg:inline-flex" />
         <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
         <ProfileMenu />
       </div>

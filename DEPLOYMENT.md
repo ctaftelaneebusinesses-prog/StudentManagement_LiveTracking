@@ -256,3 +256,10 @@ Found during this pass but intentionally left alone because fixing them either c
 - **Two unrelated, unwired "attendance" implementations exist side by side** in `frontend/src/pages/{parent/ViewAttendance,teacher/DailyAttendance,teacher/MarkAttendance,teacher/EditAttendance,admin/AttendanceAnalytics,principal/AttendanceReports}.tsx` and `frontend/src/api/attendanceApi.ts` / `frontend/src/components/attendance/AttendanceChart.tsx` — none of these are imported from `AppRoutes.tsx`, and they call a different (also-unapplied) draft schema. They don't affect the running app, but they're dead weight in the repo; safe to delete once you've confirmed you don't want to resurrect that version of the UI instead of the currently-wired `TeacherAttendancePage.tsx`.
 - **`backend/src/services/exam.service.ts`** and a couple of other service files rely on `as unknown as T[]` casts around Supabase's `.select()` results (the query builder can't statically type joined-relation shapes without generated `Database` types) — functionally correct, but generating and wiring up Supabase's typed client (`supabase gen types typescript`) would remove the need for manual casts and catch a whole class of "wrong field name" bugs like the attendance one at compile time instead of at 3am in production.
 - **Main frontend JS chunk is ~490KB** (gzip ~148KB) after this phase's route-level code-splitting — further reduction would need `manualChunks` tuning to separate vendor libraries (React, Supabase client, react-query) from application code; not done here since it's a diminishing-returns optimization compared to the route-splitting already in place.
+
+
+
+# Links
+Frontend: https://studentmanagementlivetracking-production-9df7.up.railway.app
+Backend: https://studentmanagementlivetracking-production.up.railway.app
+Both on Railway, auto-deploy enabled, wired to your existing Supabase project.

@@ -11,6 +11,14 @@ interface AuthInputProps extends InputHTMLAttributes<HTMLInputElement> {
  * AuthSplitLayout's header comment). The label sits inline as a placeholder
  * until the field has content or focus, then floats above the border via a
  * peer-* variant, the standard floating-label CSS trick.
+ *
+ * The field itself is a solid white "premium enterprise" surface (not the
+ * translucent glass the rest of the card uses) — deliberate contrast against
+ * AuthGlassCard's dark backdrop, and it keeps this exact DOM shape
+ * (wrapper > input + label, not a separate label row) on purpose:
+ * AuthPasswordInput absolutely-positions its copy/show/generate buttons
+ * against this same wrapper at a fixed top offset, so restructuring to a
+ * static label-above-input layout would misalign those buttons there.
  */
 export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
   ({ label, error, id, className = "", placeholder, ...props }, ref) => {
@@ -23,19 +31,19 @@ export const AuthInput = forwardRef<HTMLInputElement, AuthInputProps>(
             ref={ref}
             id={inputId}
             placeholder=" "
-            className={`auth-input peer w-full rounded-lg border bg-white/5 px-3.5 pb-2 pt-5 text-sm text-white outline-none backdrop-blur transition-colors
-              placeholder:text-transparent hover:border-white/25 focus:border-brand-400 focus:bg-white/[0.08] focus:ring-1 focus:ring-brand-400
+            className={`auth-input peer w-full rounded-lg border bg-white px-3.5 pb-3 pt-5 text-sm text-slate-900 outline-none transition-colors
+              placeholder:text-transparent hover:border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500
               disabled:cursor-not-allowed disabled:opacity-50
-              ${error ? "border-red-400 focus:border-red-400 focus:ring-red-400" : "border-white/15"} ${className}`}
+              ${error ? "border-red-400 focus:border-red-400 focus:ring-red-400" : "border-slate-200"} ${className}`}
             aria-invalid={!!error}
             aria-describedby={error ? `${inputId}-error` : undefined}
             {...props}
           />
           <label
             htmlFor={inputId}
-            className="pointer-events-none absolute left-3.5 top-2 origin-left text-xs text-slate-400 transition-all
+            className="pointer-events-none absolute left-3.5 top-2 origin-left text-xs text-slate-500 transition-all
               peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-placeholder-shown:text-slate-400
-              peer-focus:top-2 peer-focus:text-xs peer-focus:text-brand-300"
+              peer-focus:top-2 peer-focus:text-xs peer-focus:text-blue-600"
           >
             {label}
           </label>

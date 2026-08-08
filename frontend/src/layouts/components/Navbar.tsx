@@ -40,7 +40,7 @@ export function Navbar({ onOpenMobileMenu }: NavbarProps) {
           </div>
         )}
         <div className="mx-0.5 hidden h-6 w-px bg-slate-200 dark:bg-white/[0.1] sm:block" />
-        <PoweredByCraftLanee className="hidden text-slate-500 dark:text-slate-400 sm:inline" />
+        <PoweredByCraftLanee className="hidden sm:inline-flex" />
       </div>
     </header>
   );

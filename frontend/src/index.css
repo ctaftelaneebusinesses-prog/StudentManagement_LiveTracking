@@ -168,20 +168,20 @@ body {
 }
 
 /*
- * Auth glass inputs (AuthInput.tsx) always sit on a dark translucent card
- * (see AuthGlassCard's "dark" variant). Chromium ignores background-color on
- * autofilled inputs and forces its own light blue fill + dark text instead —
- * without this override, any autofilled/saved-credential login blows out the
- * glassmorphism look with a solid light box. The huge transition delay is
- * the standard trick: Chromium lets background-color transition, just not
- * apply instantly, so a very long delay effectively keeps our color.
+ * Auth inputs (AuthInput.tsx) are solid white fields (deliberate contrast
+ * against AuthGlassCard's dark backdrop). Chromium ignores background-color
+ * on autofilled inputs and forces its own light-blue fill instead — without
+ * this override, any autofilled/saved-credential login shows that mismatched
+ * blue box instead of our white one. The huge transition delay is the
+ * standard trick: Chromium lets background-color transition, just not apply
+ * instantly, so a very long delay effectively keeps our color.
  */
 .auth-input:-webkit-autofill,
 .auth-input:-webkit-autofill:hover,
 .auth-input:-webkit-autofill:focus {
-  -webkit-text-fill-color: #fff;
-  caret-color: #fff;
-  -webkit-box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.55) inset;
-  box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.55) inset;
+  -webkit-text-fill-color: #0f172a;
+  caret-color: #0f172a;
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset;
+  box-shadow: 0 0 0px 1000px #fff inset;
   transition: background-color 9999s ease-in-out 0s;
 }
