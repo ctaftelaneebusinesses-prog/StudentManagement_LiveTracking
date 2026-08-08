@@ -89,7 +89,7 @@ export function AcademicYearFormModal({ mode, onClose, onSaved }: AcademicYearFo
   return (
     <Modal isOpen onClose={onClose} title={editing ? "Edit academic year" : "Add academic year"}>
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <DatePicker
             label="Start date"
             value={startDate}

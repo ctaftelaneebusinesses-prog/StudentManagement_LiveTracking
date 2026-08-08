@@ -143,7 +143,7 @@ export function PeriodModal({
       <form className="space-y-4" onSubmit={handleSubmit(handleSave)}>
         <Select label="Period Type" options={PERIOD_TYPE_OPTIONS} {...register("period_type")} />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
             label="Start time"
             type="time"

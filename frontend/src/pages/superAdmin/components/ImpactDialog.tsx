@@ -68,7 +68,7 @@ export function ImpactDialog({
         </div>
       ) : (
         <>
-          <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <ImpactStat icon={Building2} label={isDanger ? "Schools affected" : "Schools restored"} value={affectedSchools} />
             <ImpactStat icon={Users} label={isDanger ? "Users losing access" : "Users regaining access"} value={affectedUsers} />
           </div>

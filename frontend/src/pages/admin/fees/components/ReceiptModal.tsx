@@ -38,7 +38,7 @@ export function ReceiptModal({ paymentId, onClose }: { paymentId: string | null;
             </div>
           </div>
 
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+          <dl className="grid grid-cols-1 gap-x-4 gap-y-3 text-sm sm:grid-cols-2">
             <div>
               <dt className="text-xs text-slate-500 dark:text-slate-400">Student</dt>
               <dd className="font-medium text-slate-800 dark:text-slate-100">{receipt.studentName}</dd>

@@ -22,9 +22,15 @@ const IDENTITY_LOAD_TIMEOUT_MS = 8000;
  * ProtectedRoute is stuck showing "Checking your session..." with no way out
  * short of manually clearing site storage.
  */
+/** Distinguishes a genuine stuck-lock hang (see withTimeout) from any other error thrown while loading identity. */
+class SessionLoadTimeoutError extends Error {}
+
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(new Error("Timed out loading your session")), ms);
+    const timer = setTimeout(
+      () => reject(new SessionLoadTimeoutError("Timed out loading your session")),
+      ms
+    );
     promise.then(
       (value) => {
         clearTimeout(timer);
@@ -111,12 +117,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       try {
         await withTimeout(loadFullIdentity(), IDENTITY_LOAD_TIMEOUT_MS);
-      } catch {
-        // A stuck/expired session should never leave the app hanging on
-        // "Checking your session..." forever — fall back to a clean signed-
-        // out state so ProtectedRoute sends the user to /login instead.
-        clearStuckSession();
-        if (isMounted) resetToSignedOut();
+      } catch (err) {
+        // Only a genuine hang (the stuck navigator.locks issue) justifies
+        // wiping the session — any other error (a transient network/DB blip
+        // while fetching the profile) does NOT mean the session is invalid,
+        // and must not force a sign-out. On first load there's no prior user
+        // to preserve, so this just leaves ProtectedRoute to redirect once
+        // loading finishes, same as before.
+        if (err instanceof SessionLoadTimeoutError) {
+          clearStuckSession();
+          if (isMounted) resetToSignedOut();
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -132,9 +143,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       try {
         await withTimeout(loadFullIdentity(), IDENTITY_LOAD_TIMEOUT_MS);
-      } catch {
-        clearStuckSession();
-        resetToSignedOut();
+      } catch (err) {
+        // Same reasoning as bootstrap above — this fires on every background
+        // token refresh while the user is actively using the app, so a
+        // transient error here must NOT force an already-logged-in user back
+        // to /login. Only the genuine stuck-lock hang does.
+        if (err instanceof SessionLoadTimeoutError) {
+          clearStuckSession();
+          resetToSignedOut();
+        }
       }
     });
 

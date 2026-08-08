@@ -394,11 +394,11 @@ export function TeacherStudentsPage() {
               {...register("email", { required: "Required" })}
             />
           )}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input label="Phone" {...register("phone")} />
             <Input label="Date of birth" type="date" {...register("date_of_birth")} />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {editingStudent === "new" && (
               <Input
                 label="Admission no."

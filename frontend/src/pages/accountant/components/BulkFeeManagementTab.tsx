@@ -183,7 +183,7 @@ export function BulkFeeManagementTab() {
               placeholder="e.g. Tuition Fee"
               {...register("term", action === "assign" ? { required: "Term is required" } : {})}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
                 label={action === "assign" ? "Amount (₹)" : "Amount (₹, optional)"}
                 type="number"
@@ -193,7 +193,7 @@ export function BulkFeeManagementTab() {
               />
               <Input label="Due date (optional)" type="date" {...register("due_date")} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input label="Discount (₹, optional)" type="number" min={0} step="0.01" {...register("discount_amount")} />
               <Input label="Scholarship (₹, optional)" type="number" min={0} step="0.01" {...register("scholarship_amount")} />
             </div>

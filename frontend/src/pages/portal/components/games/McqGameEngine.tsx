@@ -66,7 +66,7 @@ export function McqGameEngine({ questions, onFinish }: McqGameEngineProps) {
           className="rounded-2xl border border-black/[0.06] bg-white p-6 text-center shadow-sm dark:border-white/[0.08] dark:bg-[#17171a]"
         >
           <h3 className="mb-6 text-xl font-bold text-[var(--ink-primary)]">{question.prompt}</h3>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {question.options.map((opt, i) => {
               const isChosen = chosen === i;
               const isCorrectOpt = i === question.correctIndex;

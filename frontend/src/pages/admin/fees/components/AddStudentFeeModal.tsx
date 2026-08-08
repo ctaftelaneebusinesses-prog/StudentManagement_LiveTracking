@@ -85,7 +85,7 @@ export function AddStudentFeeModal({ studentId, studentName, onClose, onSuccess 
           error={errors.amount?.message}
           {...register("amount", { required: "Amount is required", min: { value: 0, message: "Amount must be positive" } })}
         />
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
             label="Discount (₹, optional)"
             type="number"

@@ -193,7 +193,7 @@ export function FeeStructuresTab() {
             error={createForm.formState.errors.amount?.message}
             {...createForm.register("amount", { required: "Amount is required", min: { value: 0, message: "Amount must be 0 or more" } })}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label="Discount (₹, optional)"
               type="number"
@@ -242,7 +242,7 @@ export function FeeStructuresTab() {
             error={editForm.formState.errors.amount?.message}
             {...editForm.register("amount", { required: "Amount is required", min: { value: 0, message: "Amount must be 0 or more" } })}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label="Discount (₹, optional)"
               type="number"

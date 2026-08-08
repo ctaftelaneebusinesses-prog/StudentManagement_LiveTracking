@@ -108,7 +108,7 @@ function DailyView() {
         <ExportButtons title="Teacher Attendance" columns={exportColumns} rows={data} filename={`teacher-attendance-${date}`} />
       </div>
 
-      <div className="grid grid-cols-3 gap-4 text-center">
+      <div className="grid grid-cols-1 gap-4 text-center sm:grid-cols-3">
         <Card>
           <p className="text-xs uppercase tracking-wide text-[var(--ink-muted)]">Present</p>
           <p className="mt-1 text-2xl font-semibold text-[var(--status-good)]">{presentCount}</p>

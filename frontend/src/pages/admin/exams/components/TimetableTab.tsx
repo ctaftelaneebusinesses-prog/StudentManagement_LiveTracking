@@ -215,7 +215,7 @@ export function TimetableTab({ exam, picker }: { exam: Exam | null; picker: Reac
               error={createForm.formState.errors.subject_id?.message}
               {...createForm.register("subject_id", { required: "Subject is required" })}
             />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
                 label="Exam date"
                 type="date"
@@ -257,7 +257,7 @@ export function TimetableTab({ exam, picker }: { exam: Exam | null; picker: Reac
             error={editForm.formState.errors.subject_id?.message}
             {...editForm.register("subject_id", { required: "Subject is required" })}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label="Exam date"
               type="date"

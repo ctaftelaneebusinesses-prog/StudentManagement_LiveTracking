@@ -230,7 +230,7 @@ export function PortalProfilePage() {
               {feesQuery.isLoading ? (
                 <PortalSkeleton className="h-20 w-full" />
               ) : (
-                <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4 text-center">
                   <div>
                     <p className="text-xs uppercase tracking-wide text-[var(--ink-muted)]">Total fee</p>
                     <p className="text-xl font-semibold text-[var(--ink-primary)]">₹{(feesQuery.data?.totalDue ?? 0).toFixed(2)}</p>

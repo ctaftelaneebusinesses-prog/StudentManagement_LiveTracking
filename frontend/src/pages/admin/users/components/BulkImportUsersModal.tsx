@@ -120,7 +120,7 @@ export function BulkImportUsersModal({ isOpen, onClose, onImported }: BulkImport
           )}
 
           {parsed.rows.length > 0 && (
-            <div className="max-h-56 overflow-y-auto rounded-lg border border-black/[0.06] dark:border-white/[0.08]">
+            <div className="max-h-56 overflow-auto rounded-lg border border-black/[0.06] dark:border-white/[0.08]">
               <table className="min-w-full text-xs">
                 <thead className="bg-slate-50 text-left text-[var(--ink-muted)] dark:bg-white/5">
                   <tr>

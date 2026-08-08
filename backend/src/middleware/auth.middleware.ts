@@ -43,6 +43,15 @@ async function loadAuthenticatedUser(req: Request, enforceApproval: boolean): Pr
     .eq("id", userId)
     .single();
 
+  // Only "no matching row" genuinely means the token doesn't correspond to a
+  // real user (401). Any other error here — network blip, PostgREST hiccup,
+  // DB timeout — is a transient failure, not proof the session is invalid,
+  // and must not be reported as 401: the frontend's axios interceptor signs
+  // the user out on every 401, so misclassifying a transient error here was
+  // forcing logged-in users back to /login without ever touching Logout.
+  if (profileError && profileError.code !== "PGRST116") {
+    throw ApiError.internal("Failed to load user profile");
+  }
   if (profileError || !profileRow) {
     throw ApiError.unauthorized("User profile not found");
   }
