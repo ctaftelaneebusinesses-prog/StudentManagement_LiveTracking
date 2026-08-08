@@ -185,7 +185,7 @@ function LeaveRequestsTable({
         />
 
         {total > 0 && (
-          <div className="flex items-center justify-between text-sm text-[var(--ink-muted)]">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--ink-muted)]">
             <p>
               Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}
             </p>

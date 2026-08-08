@@ -110,7 +110,7 @@ export function StudentProfilePage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <Link to="/dashboard/admin/students" className="text-sm text-brand-600 hover:underline">
             ← Back to students
@@ -321,9 +321,9 @@ function PersonalDetailsCard({
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Personal details</h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {!isEditing && (
             <Button variant="secondary" onClick={() => setEditing(true)}>
               Edit
@@ -515,7 +515,7 @@ function ParentContactCard({
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Parent contact details</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -643,7 +643,7 @@ function SiblingsSection({ studentId }: { studentId: string }) {
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Siblings</h2>
         <Button variant="secondary" onClick={() => setLinkOpen(true)}>
           Link sibling
@@ -890,7 +890,7 @@ function MedicalInfoCard({
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Medical information</h2>
         {!isEditing && (
           <Button variant="secondary" onClick={() => setEditing(true)}>
@@ -1012,7 +1012,7 @@ function MarksTable({ studentId }: { studentId: string }) {
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Subject-wise marks</h2>
         <span className="text-xs text-slate-400 dark:text-slate-500">Class rank: —</span>
       </div>
@@ -1050,7 +1050,7 @@ function HomeworkSummaryCard({ studentId }: { studentId: string }) {
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Homework summary</h2>
         {!isLoading && homework.length > 0 && (
           <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -1121,12 +1121,12 @@ function FeeSummaryCard({ studentId }: { studentId: string }) {
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Fee summary</h2>
         <Button onClick={() => setPaymentOpen(true)}>Record payment</Button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 text-center">
+      <div className="grid grid-cols-1 gap-4 text-center sm:grid-cols-3">
         <div>
           <p className="text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">Total due</p>
           <p className="text-xl font-semibold text-slate-800 dark:text-slate-100">₹{summary.totalDue.toFixed(2)}</p>

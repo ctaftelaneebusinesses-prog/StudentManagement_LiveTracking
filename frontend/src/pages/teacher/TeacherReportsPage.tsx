@@ -112,7 +112,7 @@ export function TeacherReportsPage() {
             <p className="text-sm text-slate-500">No data.</p>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="rounded-md border border-slate-100 p-3">
                   <p className="text-xs text-slate-500">Students</p>
                   <p className="text-2xl font-bold text-slate-900">{classPerformanceQuery.data.studentCount}</p>

@@ -130,7 +130,7 @@ export function ExtracurricularEventsPage() {
                   </p>
                   {event.description && <p className="mt-1 max-w-md text-xs text-[var(--ink-secondary)]">{event.description}</p>}
                 </div>
-                <div className="flex items-center gap-4 text-xs text-[var(--ink-secondary)]">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--ink-secondary)]">
                   <span>{new Date(event.event_date).toLocaleDateString()}</span>
                   {event.start_time && (
                     <span>

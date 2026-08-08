@@ -186,7 +186,7 @@ export function DriverDashboardPage() {
       </div>
 
       {trip && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           <Card className="!p-3">
             <p className="text-xs text-slate-500">Next stop</p>
             <p className="mt-1 truncate text-sm font-semibold">{nextStop?.name ?? "—"}</p>

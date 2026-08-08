@@ -132,7 +132,7 @@ export function TeacherDashboardPage() {
       )}
 
       <Card className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold text-[var(--ink-primary)]">My classes</h2>
           <Link to="/dashboard/teacher/students" className="text-sm font-medium text-brand-600 hover:underline">
             View all students →

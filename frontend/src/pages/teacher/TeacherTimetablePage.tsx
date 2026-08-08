@@ -136,7 +136,7 @@ export function TeacherTimetablePage() {
           <p className="text-sm text-[var(--ink-muted)]">
             This sends a suggestion to the admin — it won't change your timetable until they review and apply it.
           </p>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input label="Proposed start time" type="time" {...register("start_time")} />
             <Input label="Proposed end time" type="time" {...register("end_time")} />
           </div>

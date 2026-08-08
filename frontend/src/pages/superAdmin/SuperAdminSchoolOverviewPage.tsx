@@ -74,7 +74,7 @@ export function SuperAdminSchoolOverviewPage() {
       <div>
         <PageHeader title="School Overview" />
         <Skeleton className="mb-4 h-[168px] rounded-2xl" />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-[92px] rounded-2xl" />
           ))}
@@ -193,7 +193,7 @@ export function SuperAdminSchoolOverviewPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((card, i) => (
           <div
             key={card.label}

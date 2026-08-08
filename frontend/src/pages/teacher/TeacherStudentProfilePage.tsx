@@ -273,7 +273,7 @@ export function TeacherStudentProfilePage() {
           </Card>
 
           <Card className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Homework status</h2>
               <span className="text-xs text-[var(--ink-muted)]">
                 {detail.homework.filter((h) => h.submission).length} / {detail.homework.length} submitted
@@ -395,7 +395,7 @@ function PersonalDetailsCard({ student, onSaved }: { student: StudentProfile; on
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Personal details</h2>
         {!isEditing && (
           <Button variant="secondary" onClick={() => setEditing(true)}>
@@ -530,7 +530,7 @@ function MedicalInfoCard({ student, onSaved }: { student: StudentProfile; onSave
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Medical information</h2>
         {!isEditing && (
           <Button variant="secondary" onClick={() => setEditing(true)}>
@@ -635,7 +635,7 @@ function SiblingsSection({ studentId }: { studentId: string }) {
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Siblings</h2>
         <Button variant="secondary" onClick={() => setLinkOpen(true)}>
           Link sibling
@@ -737,7 +737,7 @@ function ParentContactCard({ student, onSaved }: { student: StudentProfile; onSa
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Parent contact details</h2>
           <p className="text-xs text-[var(--ink-muted)]">Quick-capture contact info — not a portal login account.</p>
@@ -840,7 +840,7 @@ function FeeSummaryReadOnlyCard({ studentId }: { studentId: string }) {
         <p className="text-xs text-[var(--ink-muted)]">View-only — fee records can only be edited by the school office.</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 text-center">
+      <div className="grid grid-cols-1 gap-4 text-center sm:grid-cols-3">
         <div>
           <p className="text-xs uppercase tracking-wide text-[var(--ink-muted)]">Total due</p>
           <p className="text-xl font-semibold text-[var(--ink-primary)]">₹{summary.totalDue.toFixed(2)}</p>

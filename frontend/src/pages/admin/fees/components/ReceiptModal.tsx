@@ -27,7 +27,7 @@ export function ReceiptModal({ paymentId, onClose }: { paymentId: string | null;
         <Spinner label="Loading receipt..." />
       ) : (
         <div className="space-y-5">
-          <div className="flex items-start justify-between border-b border-slate-200 pb-4 dark:border-white/10">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4 dark:border-white/10">
             <div>
               <p className="text-sm font-semibold text-slate-900 dark:text-white">{receipt.schoolName}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400">Fee payment receipt</p>

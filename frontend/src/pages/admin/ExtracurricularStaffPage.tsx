@@ -276,7 +276,7 @@ export function ExtracurricularStaffPage() {
         />
 
         {staffPage && staffPage.total > 0 && (
-          <div className="mt-4 flex items-center justify-between text-sm text-[var(--ink-muted)]">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--ink-muted)]">
             <span>
               Page {staffPage.page} of {totalPages}
             </span>

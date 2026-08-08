@@ -454,7 +454,7 @@ export function SchoolsPage() {
             />
 
             {filteredRows.length > 0 && (
-              <div className="mt-4 flex items-center justify-between text-sm text-[var(--ink-muted)]">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--ink-muted)]">
                 <span>
                   Page {page} of {totalPages}
                 </span>
@@ -555,7 +555,7 @@ export function SchoolsPage() {
               </label>
               {createAcademicYear && (
                 <div className="mt-3 space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <DatePicker label="Start date" value={yearStart} onChange={(iso) => setValue("academic_year_start", iso, { shouldValidate: true })} />
                     <DatePicker
                       label="End date"

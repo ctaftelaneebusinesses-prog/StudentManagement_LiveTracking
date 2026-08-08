@@ -198,7 +198,7 @@ export function SuperAdminAuditLogPage() {
       )}
 
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-[var(--ink-muted)]">
             Page {page} of {totalPages}
           </p>

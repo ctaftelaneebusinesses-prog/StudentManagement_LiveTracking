@@ -85,7 +85,7 @@ export function ExtracurricularDashboardPage() {
                     </p>
                     {batch?.name && <p className="mt-0.5 text-xs text-[var(--ink-muted)]">{batch.name}</p>}
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-[var(--ink-secondary)]">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[var(--ink-secondary)]">
                     <span className="inline-flex items-center gap-1">
                       <Clock size={13} strokeWidth={1.75} className="text-[var(--ink-muted)]" />
                       {formatTime(slot.start_time)} – {formatTime(slot.end_time)}

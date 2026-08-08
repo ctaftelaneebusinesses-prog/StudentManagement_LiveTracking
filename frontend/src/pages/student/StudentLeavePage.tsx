@@ -115,7 +115,7 @@ export function StudentLeavePage() {
               It's past 6:00 PM, so today is no longer available — the earliest you can apply for is tomorrow.
             </p>
           )}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <input
               type="hidden"
               {...register("start_date", { required: "Required", validate: (v) => v >= minDate || "Cannot be a past date" })}

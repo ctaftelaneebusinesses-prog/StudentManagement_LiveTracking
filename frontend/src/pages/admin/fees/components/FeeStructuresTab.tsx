@@ -143,7 +143,7 @@ export function FeeStructuresTab() {
 
   return (
     <div className="animate-fade-in space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-[var(--ink-primary)]">Fee structures</h2>
           <p className="text-sm text-[var(--ink-muted)]">Define what's due per class — tuition, transport, exam, annual fees, and any custom amount.</p>

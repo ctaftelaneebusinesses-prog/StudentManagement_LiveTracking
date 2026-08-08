@@ -197,7 +197,7 @@ export function TimetablePage() {
           subtitle="Click any cell to add or edit a period"
           className="print:border-0 print:shadow-none"
           legend={
-            <div className="flex gap-2 print:hidden">
+            <div className="flex flex-wrap gap-2 print:hidden">
               <Button variant="secondary" className="!px-3 !py-1.5 text-xs" onClick={() => window.print()}>
                 <Printer size={14} className="mr-1" />
                 Print
