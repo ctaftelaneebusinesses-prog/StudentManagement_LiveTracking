@@ -249,7 +249,7 @@ export function SuperAdminMergedSidebar({
                 type="button"
                 onClick={onCloseMobile}
                 aria-label="Close menu"
-                className="mr-4 rounded-md p-1.5 text-slate-400 hover:bg-white/10 hover:text-white"
+                className="mr-3 flex min-h-11 min-w-11 items-center justify-center rounded-md p-1.5 text-slate-400 hover:bg-white/10 hover:text-white"
               >
                 <X size={18} />
               </button>

@@ -216,7 +216,7 @@ export function PortalSidebar({ isCollapsed, onToggleCollapse, isMobileOpen, onC
                   type="button"
                   onClick={onCloseMobile}
                   aria-label="Close menu"
-                  className="mr-4 rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+                  className="mr-3 flex min-h-11 min-w-11 items-center justify-center rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
                 >
                   <X size={18} />
                 </button>

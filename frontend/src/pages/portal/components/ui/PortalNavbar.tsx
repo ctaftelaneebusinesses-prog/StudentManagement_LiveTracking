@@ -28,7 +28,7 @@ export function PortalNavbar({ onOpenMobileMenu }: PortalNavbarProps) {
         type="button"
         onClick={onOpenMobileMenu}
         aria-label="Open menu"
-        className="rounded-lg p-2 text-[var(--ink-muted)] hover:bg-black/5 hover:text-[var(--ink-primary)] dark:hover:bg-white/10 md:hidden"
+        className="flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 text-[var(--ink-muted)] hover:bg-black/5 hover:text-[var(--ink-primary)] dark:hover:bg-white/10 md:hidden"
       >
         <Menu size={20} strokeWidth={1.85} />
       </button>

@@ -19,7 +19,7 @@ export function Navbar({ onOpenMobileMenu }: NavbarProps) {
         type="button"
         onClick={onOpenMobileMenu}
         aria-label="Open menu"
-        className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-200 md:hidden"
+        className="flex min-h-11 min-w-11 items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-200 md:hidden"
       >
         <span className="sr-only">Open menu</span>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
