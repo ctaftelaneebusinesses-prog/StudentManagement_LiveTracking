@@ -38,9 +38,47 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+/**
+ * Deduped so N parallel requests that all 401 around the same moment trigger
+ * exactly one refresh, not N of them racing against Supabase's single-use
+ * rotating refresh token (where only the first refresh call would succeed
+ * and the rest would fail with "already used", each looking like a genuine
+ * session loss).
+ */
+let refreshPromise: Promise<boolean> | null = null;
+
+function ensureFreshSession(): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = supabase.auth
+      .refreshSession()
+      .then(({ data, error }) => !error && Boolean(data.session))
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const originalRequest = error.config as (typeof error.config & { _retried?: boolean }) | undefined;
+
+    // A 401 doesn't necessarily mean the session is actually invalid — it
+    // can also mean getSession() handed this request a token that expired
+    // moments before the server saw it, or that this request just lost a
+    // race with an in-flight token refresh. Try refreshing once and retrying
+    // before treating the user as logged out; only a refresh that genuinely
+    // fails (refresh token itself expired/revoked) means the session is
+    // really over.
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retried) {
+      originalRequest._retried = true;
+      const refreshed = await ensureFreshSession();
+      if (refreshed) {
+        return api(originalRequest);
+      }
+    }
+
     if (error.response?.status === 401) {
       // Session is invalid/expired server-side — clear it and send the user
       // back to login. A hard redirect (not react-router) since this file

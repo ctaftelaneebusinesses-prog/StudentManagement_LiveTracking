@@ -8,6 +8,7 @@ router.post("/driver/trips", requireRole("driver"), validate(startTripSchema), c
 router.post("/driver/trips/:tripId/location", requireRole("driver"), validate(locationSchema), controller.recordLocation);
 router.post("/driver/trips/:tripId/end", requireRole("driver"), validate(tripParamSchema), controller.endTrip);
 router.post("/driver/trips/:tripId/students/:studentId/status", requireRole("driver"), validate(markStudentStatusSchema), controller.markStudentStatus);
+router.get("/driver/trips/:tripId/student-status", requireRole("driver"), validate(tripParamSchema), controller.listMyTripStudentStatus);
 router.get("/student/vehicles", requireRole("student"), controller.myVehicles);
 router.get("/admin/active-vehicles", requirePermission("transport.view"), controller.activeVehicles);
 router.get("/trips", requirePermission("transport.manage"), validate(listTripHistorySchema), controller.listTripHistory);

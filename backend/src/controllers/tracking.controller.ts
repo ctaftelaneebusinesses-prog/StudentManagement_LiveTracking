@@ -13,6 +13,7 @@ export const markStudentStatus = wrap(
   201
 );
 export const listTripStudentStatus = wrap((req) => tracking.listTripStudentStatus(resolveSchoolId(req), req.params.tripId));
+export const listMyTripStudentStatus = wrap((req) => tracking.listMyTripStudentStatus(resolveSchoolId(req), req.user!.id, req.params.tripId));
 export const activeVehicles = wrap((req) => tracking.activeVehicles(resolveSchoolId(req), { roles: req.user!.roles, userId: req.user!.id }));
 
 export const listTripHistory = wrap((req) => {

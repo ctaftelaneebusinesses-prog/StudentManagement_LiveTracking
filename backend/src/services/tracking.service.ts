@@ -287,6 +287,14 @@ export async function markStudentStatus(schoolId: string, driverId: string, trip
   return r.data;
 }
 
+/** Same roster+status data as listTripStudentStatus, scoped to a trip this driver actually owns — the driver's own dashboard has no `transport.view` permission (that's a staff/admin grant), so it can't call the route below directly. */
+export async function listMyTripStudentStatus(schoolId: string, driverId: string, tripId: string) {
+  const trip = await supabaseAdmin.from("trips").select("id").eq("id", tripId).eq("school_id", schoolId).eq("driver_id", driverId).maybeSingle();
+  fail(trip.error);
+  if (!trip.data) throw ApiError.forbidden("This is not your trip");
+  return listTripStudentStatus(schoolId, tripId);
+}
+
 /** Roster + live pickup/absent status for a trip — the driver's present/absent list and the monitoring page's per-vehicle counts. */
 export async function listTripStudentStatus(schoolId: string, tripId: string) {
   const r = await supabaseAdmin
