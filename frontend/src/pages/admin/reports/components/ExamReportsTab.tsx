@@ -80,7 +80,7 @@ export function ExamReportsTab() {
         )}
       </ChartCard>
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold text-[var(--ink-primary)]">Exam-wise summary</h3>
         <ExportButtons
           title="Exam Reports — Exam-wise Summary"

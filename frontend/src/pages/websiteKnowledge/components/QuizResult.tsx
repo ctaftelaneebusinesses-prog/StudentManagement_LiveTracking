@@ -84,7 +84,7 @@ export function QuizResult({ attempt, settings, onRetake, onViewCertificate }: Q
         <div className={`mx-auto mt-4 inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-bold ${passed ? "bg-[var(--status-good)]/10 text-[var(--status-good)]" : "bg-[var(--status-serious)]/10 text-[var(--status-serious)]"}`}>
           {passed ? "PASSED" : "NOT YET PASSED"}
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-3 border-t border-black/[0.06] pt-4 text-left dark:border-white/[0.08]">
+        <div className="mt-4 grid grid-cols-3 gap-2 border-t border-black/[0.06] pt-4 text-left dark:border-white/[0.08] sm:gap-3">
           <div>
             <div className="text-xs text-[var(--ink-muted)]">Attempt</div>
             <div className="font-semibold text-[var(--ink-primary)]">#{attempt.attempt_number}</div>

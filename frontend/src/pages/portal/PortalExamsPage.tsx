@@ -85,7 +85,7 @@ export function PortalExamsPage() {
         ) : (
           <ul className="space-y-2">
             {questionPapersQuery.data.map((doc) => (
-              <li key={doc.id} className="flex items-center justify-between rounded-xl border p-3 text-sm" style={{ borderColor: "var(--portal-glass-border)" }}>
+              <li key={doc.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-sm" style={{ borderColor: "var(--portal-glass-border)" }}>
                 <div>
                   <p className="font-medium text-[var(--ink-primary)]">{doc.exams?.name ?? "Exam"}</p>
                   <p className="text-xs text-[var(--ink-muted)]">{doc.exams?.subjects?.name ?? "General"} — {doc.file_name ?? "Written question paper"}</p>
@@ -113,7 +113,7 @@ export function PortalExamsPage() {
         ) : (
           <ul className="space-y-2">
             {scheduleQuery.data.map((entry) => (
-              <li key={entry.id} className="flex items-center justify-between rounded-xl border p-3 text-sm" style={{ borderColor: "var(--portal-glass-border)" }}>
+              <li key={entry.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-sm" style={{ borderColor: "var(--portal-glass-border)" }}>
                 <div>
                   <p className="font-medium text-[var(--ink-primary)]">{entry.subjects?.name ?? "—"}</p>
                   <p className="text-xs text-[var(--ink-muted)]">

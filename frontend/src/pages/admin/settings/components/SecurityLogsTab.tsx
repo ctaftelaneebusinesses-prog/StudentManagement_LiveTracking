@@ -13,11 +13,11 @@ function Pagination({ page, setPage, total }: { page: number; setPage: (updater:
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   if (total === 0) return null;
   return (
-    <div className="mt-3 flex items-center justify-between text-sm text-[var(--ink-muted)]">
+    <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--ink-muted)]">
       <p>
         Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total}
       </p>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button variant="secondary" className="!px-3 !py-1 text-xs" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>
           Previous
         </Button>

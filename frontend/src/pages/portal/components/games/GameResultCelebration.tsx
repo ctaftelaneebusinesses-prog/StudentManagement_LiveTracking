@@ -66,7 +66,7 @@ export function GameResultCelebration({ result, gameTitle, onPlayAgain, onExit }
         </div>
       )}
 
-      <div className="flex justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-3">
         <Button onClick={onPlayAgain}>
           <RotateCcw size={16} className="mr-1.5" /> Play Again
         </Button>

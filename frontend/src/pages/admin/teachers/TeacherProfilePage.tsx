@@ -236,7 +236,7 @@ function PersonalDetailsCard({ teacher, onSaved }: { teacher: Teacher; onSaved: 
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <TeacherPhotoUpload teacher={teacher} onUploaded={onSaved} />
           <div>
@@ -362,7 +362,7 @@ function ClassTeacherCard({ teacher, onChanged }: { teacher: Teacher; onChanged:
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Class teacher assignment</h2>
         {!teacher.homeroom && (
           <Button variant="secondary" onClick={() => setPickerOpen(true)}>
@@ -530,7 +530,7 @@ function AssignSubjectsCard({ teacherId }: { teacherId: string }) {
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Subjects Assigned</h2>
         <Button variant="secondary" onClick={openAddModal}>
           <Plus size={14} className="mr-1" />
@@ -660,7 +660,7 @@ function LeaveRequestsCard({ teacherId }: { teacherId: string }) {
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Leave requests</h2>
         <Button onClick={() => setLogOpen(true)}>Log leave</Button>
       </div>

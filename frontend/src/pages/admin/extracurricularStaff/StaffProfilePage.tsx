@@ -162,7 +162,7 @@ export function StaffProfilePage() {
             <p className="text-2xl font-semibold text-slate-900 dark:text-white">{staff.studentCount}</p>
           </div>
         </Card>
-        <Card className="grid grid-cols-2 gap-4">
+        <Card className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <p className="text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">Sessions run</p>
             <p className="text-2xl font-semibold text-slate-900 dark:text-white">{staff.attendanceSummary.sessionsRun}</p>
@@ -296,7 +296,7 @@ function BatchesCard({
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Class assignments</h2>
         <Button variant="secondary" onClick={openModal}>
           <Plus size={14} className="mr-1" />
@@ -483,7 +483,7 @@ function ScheduleCard({ staffId, batches }: { staffId: string; batches: Extracur
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Weekly schedule</h2>
         <Button
           variant="secondary"
@@ -560,7 +560,7 @@ function ScheduleCard({ staffId, batches }: { staffId: string; batches: Extracur
             options={DAY_LABELS.map((d, i) => ({ value: String(i), label: d }))}
             {...register("day_of_week", { required: true })}
           />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Input label="Start time" type="time" error={errors.start_time?.message} {...register("start_time", { required: "Required" })} />
             <Input label="End time" type="time" error={errors.end_time?.message} {...register("end_time", { required: "Required" })} />
           </div>
@@ -653,7 +653,7 @@ function AchievementsCard({ staffId, schoolId }: { staffId: string; schoolId: st
 
   return (
     <Card className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Achievements</h2>
         <Button
           variant="secondary"

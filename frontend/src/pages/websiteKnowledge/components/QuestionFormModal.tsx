@@ -75,7 +75,7 @@ export function QuestionFormModal({ isOpen, onClose, onSave, initial, defaultRol
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={initial ? "Edit Question" : "New Question"} size="lg">
       <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Select label="Role" value={role} onChange={(e) => setRole(e.target.value as QuizRole)} options={ROLE_OPTIONS} disabled={!!initial} />
           <Input label="Category" placeholder="e.g. Attendance" value={category} onChange={(e) => setCategory(e.target.value)} />
         </div>

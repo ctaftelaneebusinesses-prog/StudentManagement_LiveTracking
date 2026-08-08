@@ -81,7 +81,7 @@ export function PortalReportsPage() {
             reportQuery.data.marks.exams.map((exam) => (
               <motion.div key={exam.examId} variants={fadeSlideUp}>
                 <PortalGlassCard noHover className="space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <h3 className="text-base font-semibold text-[var(--ink-primary)]">{exam.examName}</h3>
                       {exam.examDate && <p className="text-xs text-[var(--ink-muted)]">{exam.examDate}</p>}

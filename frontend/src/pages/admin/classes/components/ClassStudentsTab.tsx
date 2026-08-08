@@ -134,7 +134,7 @@ export function ClassStudentsTab({ classId, klass }: { classId: string; klass: C
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <SummaryPill label="Students" value={klass?.student_count ?? 0} />
         <SummaryPill label="Present today" value={attendanceTally.present} accent="good" />
         <SummaryPill label="Absent today" value={attendanceTally.absent} accent="bad" />

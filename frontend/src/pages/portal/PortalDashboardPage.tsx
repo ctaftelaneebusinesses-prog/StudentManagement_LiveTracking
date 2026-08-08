@@ -171,7 +171,7 @@ export function PortalDashboardPage() {
                   className="rounded-xl border p-3 text-sm"
                   style={{ borderColor: "var(--portal-glass-border)" }}
                 >
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-medium text-[var(--ink-primary)]">{hw.title}</span>
                     <span className="text-xs text-[var(--ink-muted)]">Due {hw.due_date}</span>
                   </div>
@@ -229,7 +229,7 @@ export function PortalDashboardPage() {
             <p className="text-sm text-[var(--ink-muted)]">No exam results published yet.</p>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-medium text-[var(--ink-secondary)]">{marks.data.latestExam.examName}</p>
                 <p className="text-lg font-bold text-[var(--ink-primary)]">
                   {marks.data.latestExam.percentage !== null ? `${marks.data.latestExam.percentage}%` : "—"}
@@ -258,7 +258,7 @@ export function PortalDashboardPage() {
           ) : (
             <ul className="space-y-2">
               {questionPapers.data.map((doc) => (
-                <li key={doc.id} className="flex items-center justify-between rounded-xl border p-3 text-sm" style={{ borderColor: "var(--portal-glass-border)" }}>
+                <li key={doc.id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border p-3 text-sm" style={{ borderColor: "var(--portal-glass-border)" }}>
                   <div>
                     <p className="font-medium text-[var(--ink-primary)]">{doc.exams?.name ?? "Exam"}</p>
                     <p className="text-xs text-[var(--ink-muted)]">{doc.exams?.subjects?.name ?? "General"}</p>

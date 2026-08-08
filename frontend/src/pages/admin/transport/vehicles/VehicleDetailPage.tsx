@@ -127,7 +127,7 @@ export function VehicleDetailPage() {
       </Card>
 
       <Card className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Maintenance history</h2>
           <Button className="!px-3 !py-1.5 text-xs" onClick={() => setMaintenanceFormOpen(true)}>
             <Plus size={14} /> Add record

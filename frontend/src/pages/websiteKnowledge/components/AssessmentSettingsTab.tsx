@@ -58,7 +58,7 @@ export function AssessmentSettingsTab() {
         These settings apply platform-wide to every school's Website Knowledge Assessment.
       </p>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Select label="Questions per Attempt" value={questionCount} onChange={(e) => setQuestionCount(e.target.value)} options={QUESTION_COUNT_OPTIONS} />
         <Select label="Passing Percentage" value={passingPercentage} onChange={(e) => setPassingPercentage(e.target.value)} options={PASSING_PERCENTAGE_OPTIONS} />
       </div>

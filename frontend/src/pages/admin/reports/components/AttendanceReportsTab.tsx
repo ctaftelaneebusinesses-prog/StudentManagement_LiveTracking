@@ -136,7 +136,7 @@ export function AttendanceReportsTab() {
         </ChartCard>
       </div>
 
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-semibold text-[var(--ink-primary)]">Student-wise breakdown</h3>
         <ExportButtons
           title="Attendance — Student-wise"

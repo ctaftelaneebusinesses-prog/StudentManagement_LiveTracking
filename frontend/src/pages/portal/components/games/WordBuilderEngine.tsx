@@ -61,11 +61,11 @@ export function WordBuilderEngine({ words, onFinish }: WordBuilderEngineProps) {
         animate={{ opacity: 1, y: 0 }}
         className="rounded-2xl border border-black/[0.06] bg-white p-6 shadow-sm dark:border-white/[0.08] dark:bg-[#17171a]"
       >
-        <div className="mb-4 flex justify-center gap-2">
+        <div className="mb-4 flex flex-wrap justify-center gap-1.5 sm:gap-2">
           {scrambled.split("").map((letter, i) => (
             <span
               key={i}
-              className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-accent-300 bg-accent-500/10 text-lg font-extrabold text-accent-700 dark:border-accent-700 dark:text-accent-300"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border-2 border-accent-300 bg-accent-500/10 text-base font-extrabold text-accent-700 dark:border-accent-700 dark:text-accent-300 sm:h-11 sm:w-11 sm:text-lg"
             >
               {letter}
             </span>
