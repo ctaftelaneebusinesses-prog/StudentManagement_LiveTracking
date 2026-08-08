@@ -22,12 +22,6 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const demoModeEnabled = import.meta.env.VITE_DEMO_MODE === "true" || import.meta.env.DEV;
-  const demoAccounts = [
-    { label: "Teacher", email: "teacher@school.local", password: "demo123456" },
-    { label: "Driver", email: "driver@school.local", password: "demo123456" },
-    { label: "Admin", email: "admin@school.local", password: "demo123456" },
-  ];
 
   const {
     register,
@@ -50,67 +44,58 @@ export function LoginPage() {
     <AuthSplitLayout>
       <div className="mx-auto max-w-md">
         <AuthGlassCard>
-          <div className="mb-6">
-            <h1 className="text-xl font-semibold text-white">Welcome back</h1>
-            <p className="mt-1 text-sm text-slate-300">Sign in to your account</p>
+          <div className="mb-8 text-center">
+            <h1 className="text-2xl font-semibold text-white">Welcome back</h1>
+            <p className="mt-1.5 text-sm text-slate-300">Sign in to your account</p>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <AuthInput
-              label="Email"
-              type="email"
-              autoComplete="email"
-              error={errors.email?.message}
-              {...register("email")}
-            />
-            <div className="relative">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
+            <div className="space-y-4">
               <AuthInput
-                label="Password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                error={errors.password?.message}
-                className="pr-11"
-                {...register("password")}
+                label="Email"
+                type="email"
+                autoComplete="email"
+                error={errors.email?.message}
+                {...register("email")}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2.5 top-3 rounded p-1.5 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+              <div className="relative">
+                <AuthInput
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  error={errors.password?.message}
+                  className="pr-11"
+                  {...register("password")}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-2.5 top-3 rounded p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+
+              {serverError && (
+                <p role="alert" className="text-sm text-red-300">
+                  {serverError}
+                </p>
+              )}
             </div>
 
-            {serverError && (
-              <p role="alert" className="text-sm text-red-300">
-                {serverError}
-              </p>
-            )}
-
-            {demoModeEnabled && (
-              <div className="rounded-lg border border-brand-400/20 bg-brand-500/10 px-3 py-2 text-sm text-brand-200">
-                <p className="font-semibold">Demo sign-in accounts</p>
-                <ul className="mt-2 space-y-1">
-                  {demoAccounts.map((account) => (
-                    <li key={account.email}>
-                      <span className="font-medium">{account.label}:</span> {account.email} / {account.password}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <Button type="submit" className="w-full" isLoading={isSubmitting}>
-              Sign in
-            </Button>
-            <Link to="/forgot-password" className="block text-center text-sm font-medium text-brand-300 hover:underline">
-              Forgot password?
-            </Link>
+            <div className="space-y-4 text-center">
+              <Button type="submit" className="w-full" isLoading={isSubmitting}>
+                Sign in
+              </Button>
+              <Link to="/forgot-password" className="block text-sm font-medium text-brand-300 hover:underline">
+                Forgot password?
+              </Link>
+            </div>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-400">
+          <p className="mt-10 text-center text-sm text-slate-400">
             Don't have an account?{" "}
             <Link to="/register" className="font-medium text-brand-300 hover:underline">
               Register here

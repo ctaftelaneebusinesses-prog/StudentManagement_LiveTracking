@@ -5,13 +5,14 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: ReactNode;
-  size?: "md" | "lg" | "xl";
+  size?: "md" | "lg" | "xl" | "2xl";
 }
 
 const SIZE_CLASSES = {
   md: "max-w-md",
   lg: "max-w-lg",
   xl: "max-w-2xl",
+  "2xl": "max-w-5xl",
 };
 
 export function Modal({ isOpen, onClose, title, children, size = "lg" }: ModalProps) {

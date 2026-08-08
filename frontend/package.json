@@ -27,6 +27,7 @@
     "canvas-confetti": "^1.9.4",
     "country-state-city": "^3.2.1",
     "framer-motion": "^13.0.0",
+    "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "leaflet": "^1.9.4",
