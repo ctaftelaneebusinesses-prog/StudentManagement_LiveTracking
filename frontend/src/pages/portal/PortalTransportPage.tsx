@@ -64,6 +64,27 @@ export function PortalTransportPage() {
   });
 
   const vehicle = transportQuery.data?.pickup_points?.routes?.vehicle ?? null;
+  const activeTrip = vehicle?.trips.find((t) => t.status === "in_progress") ?? null;
+
+  // Seeds the map with the trip's last known position as soon as it loads —
+  // without this, a trip already in progress before this page opened showed
+  // "No live location yet" until the *next* GPS ping arrived over Realtime,
+  // even though the backend already had a last-known fix for it (see
+  // getStudentTransport's comment in transport.service.ts).
+  useEffect(() => {
+    if (!vehicle || !activeTrip || activeTrip.last_latitude === null || activeTrip.last_longitude === null) return;
+    setLive({
+      vehicleId: vehicle.id,
+      latitude: Number(activeTrip.last_latitude),
+      longitude: Number(activeTrip.last_longitude),
+      label: vehicle.name || vehicle.vehicle_number,
+      updatedAt: activeTrip.last_location_at ?? activeTrip.started_at ?? new Date().toISOString(),
+    });
+    // Only re-seed when the trip identity changes (a new trip started) — once
+    // live GPS pings start arriving below, they should keep winning even if
+    // this effect re-runs for an unrelated reason.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTrip?.id]);
 
   // Realtime GPS subscription — untouched from the pre-redesign version, do not restyle away from postgres_changes.
   useEffect(() => {

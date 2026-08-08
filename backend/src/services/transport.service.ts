@@ -134,19 +134,37 @@ interface StudentTransportRow {
       id: string;
       name: string;
       route_code: string;
-      vehicle: { id: string; vehicle_number: string; name: string | null; make_model: string | null } | null;
+      vehicle:
+        | {
+            id: string;
+            vehicle_number: string;
+            name: string | null;
+            make_model: string | null;
+            trips: { id: string; status: string; last_latitude: number | null; last_longitude: number | null; last_location_at: string | null; direction: string; started_at: string | null }[];
+          }
+        | null;
       primary_driver: { users: { full_name: string; phone: string | null } } | null;
     } | null;
   } | null;
 }
 
+/**
+ * Includes each vehicle's active trip (if any) with its last known GPS fix —
+ * without this, the student portal's live map (PortalTransportPage.tsx) had
+ * nothing to show until the *next* postgres_changes INSERT arrived over
+ * Realtime, even when the driver had already been broadcasting location for
+ * a while: a trip already in progress before the student opened the page
+ * looked exactly like "no live location yet" for however long it took the
+ * next GPS ping to land.
+ */
 export async function getStudentTransport(schoolId: string, studentId: string) {
   const assignment = await supabaseAdmin
     .from("student_pickup_points")
     .select(
       "pickup_point_id, is_active, transport_direction, " +
         "pickup_points!student_pickup_points_pickup_point_id_fkey(id, name, address, stop_order, pickup_time, " +
-        "routes(id, name, route_code, vehicle:vehicles!routes_vehicle_id_fkey(id, vehicle_number, name, make_model), " +
+        "routes(id, name, route_code, vehicle:vehicles!routes_vehicle_id_fkey(id, vehicle_number, name, make_model, " +
+        "trips(id, status, last_latitude, last_longitude, last_location_at, direction, started_at)), " +
         "primary_driver:drivers!routes_primary_driver_id_fkey(users(full_name, phone))))"
     )
     .eq("school_id", schoolId)

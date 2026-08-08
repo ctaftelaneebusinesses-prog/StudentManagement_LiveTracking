@@ -99,7 +99,11 @@ export function LiveMap({ locations, routeStops, viewerLocation, height = "360px
     validLocations.forEach((item) => {
       const timeLine = item.updatedAt ? new Date(item.updatedAt).toLocaleTimeString() : "Live";
       const etaLine = item.etaMinutes != null ? `<br/>ETA to next stop: ${item.etaMinutes} min` : "";
-      L.marker([item.latitude, item.longitude], { icon: busIcon })
+      // zIndexOffset keeps the bus marker on top even when it's drawn at (or
+      // very near) the viewer's own coordinates — e.g. the ETA card reading
+      // "0 km away" — where Leaflet would otherwise stack whichever marker
+      // was added last (the viewer pin, below) above the bus.
+      L.marker([item.latitude, item.longitude], { icon: busIcon, zIndexOffset: 1000 })
         .bindPopup(`<b>${item.label}</b><br/>${timeLine}${etaLine}`)
         .addTo(vehicleLayer.current!);
     });

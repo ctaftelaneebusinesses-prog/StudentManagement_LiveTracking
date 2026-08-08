@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Award, Download, Eye, Printer } from "lucide-react";
 import * as wkService from "@/services/websiteKnowledge.service";
@@ -11,26 +11,17 @@ import { AttemptSummary } from "@/types/websiteKnowledge.types";
 import { useAuth } from "@/hooks/useAuth";
 import { useSchool } from "@/hooks/useSchool";
 import { formatDateTime, formatPercentage, ROLE_LABELS } from "../utils";
-import { downloadWebsiteKnowledgeCertificate } from "@/utils/websiteKnowledgeCertificate";
-import { useToast } from "@/components/ui/Toast";
 import { CertificateDocument } from "./CertificateDocument";
 
 // Light-surface variant (original icon color + black wordmark) — matches the
 // certificate's fixed ivory paper, same reasoning as CertificateDocument's
 // own footer (<PoweredByCraftLanee surface="light" />).
 const CERTIFICATE_LOGO_SRC = "/craftlanee-logo-dark.png";
-// Fixed capture width for the off-screen render below — decouples the
-// downloaded PDF's resolution from whatever width the on-screen preview
-// happens to be at (e.g. a narrow phone viewport), so it's always crisp.
-const CERTIFICATE_CAPTURE_WIDTH = 1040;
 
 export function MyAttemptsTab() {
   const { user } = useAuth();
-  const toast = useToast();
   const { schools, selectedSchool } = useSchool();
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const captureRef = useRef<HTMLDivElement>(null);
   const attemptsQuery = useQuery({ queryKey: ["website-knowledge", "my-attempts"], queryFn: wkService.listMyAttempts });
   const certificateQuery = useQuery({ queryKey: ["website-knowledge", "my-certificate"], queryFn: wkService.getMyCertificate });
 
@@ -43,22 +34,24 @@ export function MyAttemptsTab() {
   const certificateSchoolName =
     schools.find((s) => s.id === certificateQuery.data?.school_id)?.name ?? selectedSchool.name;
 
-  async function handleDownload() {
-    const cert = certificateQuery.data;
-    const node = captureRef.current;
-    if (!cert || !node) return;
-    setDownloading(true);
-    try {
-      // Rasterizes the same <CertificateDocument> rendered below — see
-      // utils/websiteKnowledgeCertificate.ts for why this replaced a
-      // separately hand-drawn jsPDF layout (it had drifted out of sync with
-      // this on-screen design).
-      await downloadWebsiteKnowledgeCertificate(node, cert);
-    } catch {
-      toast.error("Could not generate the certificate PDF.");
-    } finally {
-      setDownloading(false);
-    }
+  /**
+   * "Download" and "Preview" both land on the same <CertificateDocument> and
+   * the same browser print pipeline — there is no second, independently
+   * generated PDF. An earlier version rasterized the preview via
+   * html2canvas + jsPDF for a one-click file download, but html2canvas
+   * reimplements text layout itself (rather than using the browser's real
+   * text engine) and produced subtle rendering artifacts — e.g. a phantom
+   * underline slicing through a heading — that never appeared on screen.
+   * `window.print()`'s "Save as PDF" destination has no such gap: it's the
+   * same engine painting the same DOM, so the output is guaranteed to match
+   * what's on screen, at the cost of one extra click in the print dialog.
+   */
+  function handleDownload() {
+    setPreviewOpen(true);
+    // Let the modal actually mount and paint before invoking print — a
+    // synchronous window.print() right after setPreviewOpen(true) can fire
+    // before React has committed the DOM update.
+    requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
   }
 
   const columns: Column<AttemptSummary>[] = [
@@ -100,7 +93,7 @@ export function MyAttemptsTab() {
             <Button variant="ghost" onClick={() => setPreviewOpen(true)}>
               <Eye size={16} className="mr-1.5" /> Preview
             </Button>
-            <Button variant="secondary" isLoading={downloading} onClick={handleDownload}>
+            <Button variant="secondary" onClick={handleDownload}>
               <Download size={16} className="mr-1.5" /> Download Certificate
             </Button>
           </div>
@@ -120,42 +113,12 @@ export function MyAttemptsTab() {
               logoSrc={CERTIFICATE_LOGO_SRC}
             />
             <div className="flex justify-end gap-2 print:hidden">
-              <Button variant="secondary" onClick={() => window.print()}>
+              <Button onClick={() => window.print()}>
                 <Printer size={16} className="mr-1.5" /> Print / Save as PDF
-              </Button>
-              <Button isLoading={downloading} onClick={handleDownload}>
-                <Download size={16} className="mr-1.5" /> Download Certificate
               </Button>
             </div>
           </div>
         </Modal>
-      )}
-
-      {/*
-        Off-screen twin of the certificate above, always mounted at a fixed
-        1040px width whenever a certificate exists — the actual source
-        html2canvas rasterizes for the "Download Certificate" button (see
-        handleDownload), so the downloaded PDF is byte-for-byte the same
-        design as the preview regardless of what width the preview modal
-        happens to be rendered at (narrow phone vs. wide desktop).
-      */}
-      {certificateQuery.data && user && (
-        // Moved off-screen via a large negative offset, NOT opacity-0 or
-        // visibility:hidden — html2canvas renders exactly what the browser
-        // would paint, so either of those would capture a blank canvas.
-        <div aria-hidden className="pointer-events-none fixed -left-[10000px] top-0" style={{ width: CERTIFICATE_CAPTURE_WIDTH }}>
-          <div ref={captureRef}>
-            <CertificateDocument
-              schoolName={certificateSchoolName}
-              studentName={user.full_name}
-              score={`${certificateQuery.data.percentage}%`}
-              role={ROLE_LABELS[certificateQuery.data.role_name]}
-              date={new Date(certificateQuery.data.issued_at).toLocaleDateString(undefined, { dateStyle: "long" })}
-              certificateId={certificateQuery.data.certificate_number}
-              logoSrc={CERTIFICATE_LOGO_SRC}
-            />
-          </div>
-        </div>
       )}
 
       <div>

@@ -308,7 +308,23 @@ export interface PickupPointInfo {
     id: string;
     name: string;
     route_code: string;
-    vehicle: { id: string; vehicle_number: string; name: string | null; make_model: string | null } | null;
+    vehicle:
+      | {
+          id: string;
+          vehicle_number: string;
+          name: string | null;
+          make_model: string | null;
+          trips: {
+            id: string;
+            status: string;
+            last_latitude: number | null;
+            last_longitude: number | null;
+            last_location_at: string | null;
+            direction: string;
+            started_at: string | null;
+          }[];
+        }
+      | null;
     primary_driver: { users: { full_name: string; phone: string | null } } | null;
   } | null;
 }
