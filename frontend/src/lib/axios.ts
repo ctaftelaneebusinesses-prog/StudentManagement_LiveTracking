@@ -39,18 +39,29 @@ api.interceptors.request.use(async (config) => {
 });
 
 /**
- * Deduped so N parallel requests that all 401 around the same moment trigger
- * exactly one refresh, not N of them racing against Supabase's single-use
- * rotating refresh token (where only the first refresh call would succeed
- * and the rest would fail with "already used", each looking like a genuine
- * session loss).
+ * Deduped so N parallel requests that all 401 around the same moment share
+ * exactly one of these calls, not N of them racing against Supabase's
+ * single-use rotating refresh token.
+ *
+ * Deliberately `getSession()`, not `refreshSession()`. `refreshSession()`
+ * forces a brand-new refresh unconditionally, regardless of whether the
+ * current session is actually expired — so when it happened to fire around
+ * the same moment as supabase-js's own `autoRefreshToken` background timer
+ * (see supabaseClient.ts), both ended up consuming the same rotating
+ * refresh token, one of them got rejected as "already used", and supabase-js
+ * treated that as fatal: it cleared a perfectly valid session and fired
+ * SIGNED_OUT, forcing already-logged-in users back to /login with no 401
+ * actually indicating their session was invalid. `getSession()` only
+ * refreshes when the session is genuinely expired, through the SDK's own
+ * coordinated (locked) refresh path — the same one the background timer
+ * uses — instead of forcing a second, competing refresh call.
  */
 let refreshPromise: Promise<boolean> | null = null;
 
 function ensureFreshSession(): Promise<boolean> {
   if (!refreshPromise) {
     refreshPromise = supabase.auth
-      .refreshSession()
+      .getSession()
       .then(({ data, error }) => !error && Boolean(data.session))
       .finally(() => {
         refreshPromise = null;

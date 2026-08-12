@@ -96,7 +96,14 @@ export function PortalTransportPage() {
   // the backend already had a last-known fix for it the whole time (see
   // getStudentTransport's comment in transport.service.ts).
   useEffect(() => {
-    if (!vehicle || !activeTrip || activeTrip.last_latitude === null || activeTrip.last_longitude === null) return;
+    // No in-progress trip (driver hasn't started one, or just ended one) —
+    // close the student's view of the last-known position immediately
+    // rather than leaving the previous marker on the map indefinitely.
+    if (!vehicle || !activeTrip) {
+      setLive(null);
+      return;
+    }
+    if (activeTrip.last_latitude === null || activeTrip.last_longitude === null) return;
     applyIfNewer({
       vehicleId: vehicle.id,
       latitude: Number(activeTrip.last_latitude),

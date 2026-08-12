@@ -340,7 +340,15 @@ export async function myVehicles(schoolId: string, studentId: string) {
     .eq("student_id", studentId)
     .eq("is_active", true);
   fail(r.error);
-  return r.data ?? [];
+  const rows = r.data ?? [];
+  // Same rationale as getStudentTransport in transport.service.ts: a
+  // completed/cancelled trip's last-known GPS fix must not still be
+  // servable to the student once the driver has ended it.
+  for (const row of rows) {
+    const vehicle = (row as { pickup_points?: { routes?: { vehicle?: { trips?: { status: string }[] } } } }).pickup_points?.routes?.vehicle;
+    if (vehicle?.trips) vehicle.trips = vehicle.trips.filter((t) => t.status === "in_progress");
+  }
+  return rows;
 }
 /** Staff (school_admin/principal/super_admin) see every in-progress trip; a `transport.view`-only teacher only sees trips on a route carrying at least one of their own students. `viewer` is omitted by trusted internal callers (e.g. the admin dashboard aggregator) that always want the unscoped, full-school result. */
 export async function activeVehicles(schoolId: string, viewer?: { roles: string[]; userId: string }) {

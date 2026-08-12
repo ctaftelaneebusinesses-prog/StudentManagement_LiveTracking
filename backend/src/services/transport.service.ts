@@ -171,7 +171,14 @@ export async function getStudentTransport(schoolId: string, studentId: string) {
     .eq("student_id", studentId)
     .maybeSingle();
   check(assignment.error);
-  return (assignment.data as unknown as StudentTransportRow) ?? null;
+  const row = (assignment.data as unknown as StudentTransportRow) ?? null;
+  // Only the currently in-progress trip (if any) should be visible to the
+  // student — once a driver ends a trip, its last-known fix must stop being
+  // servable here too, or the portal's client-side "activeTrip" filter is
+  // the only thing hiding it and a stale position keeps leaking through.
+  const vehicle = row?.pickup_points?.routes?.vehicle;
+  if (vehicle) vehicle.trips = vehicle.trips.filter((t) => t.status === "in_progress");
+  return row;
 }
 
 export async function getDriverDashboard(schoolId: string, driverId: string) {
