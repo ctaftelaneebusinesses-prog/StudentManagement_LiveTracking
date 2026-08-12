@@ -104,6 +104,15 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
           if (incoming.type === "homework") {
             queryClient.invalidateQueries({ queryKey: ["student-dashboard"] });
           }
+          // A driver ending a trip must close the live map immediately, not
+          // whenever PortalTransportPage's own 12s poll next happens to fire
+          // (see its transportQuery comment). Invalidating here forces that
+          // refetch right away; the page's existing "no active trip -> clear
+          // the map" effect does the rest.
+          if (incoming.type === "van" && (incoming.metadata as { event?: string } | null)?.event === "trip_ended") {
+            queryClient.invalidateQueries({ queryKey: ["portal", "transport"] });
+            queryClient.invalidateQueries({ queryKey: ["portal", "transport-status"] });
+          }
         }
       )
       .subscribe();

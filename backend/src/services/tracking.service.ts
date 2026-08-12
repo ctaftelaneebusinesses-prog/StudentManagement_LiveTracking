@@ -101,22 +101,45 @@ async function notifyPickupStatus(schoolId: string, driverId: string, studentId:
   }
 }
 
-/** Fired once a trip ends — tells every student marked picked-up on that trip they've arrived (school for a pickup leg, home for a drop leg). Students marked absent or never marked are not notified. */
+/**
+ * Fired once a trip ends. Two things happen:
+ *  - Every student on the route (the same set that could have had the live
+ *    map open — trip_student_status is seeded for the whole route at
+ *    startTrip, not just those later marked picked-up) gets a "Trip ended"
+ *    notice. The frontend's notifications listener (useNotifications.tsx)
+ *    reacts to this by invalidating the portal transport query, which closes
+ *    the live map right away instead of leaving it open until the next poll.
+ *  - Students actually marked picked-up on this trip additionally get the
+ *    more specific "reached school/dropped home safely" message — that one
+ *    doesn't apply to a student marked absent or never marked at all.
+ */
 async function notifyTripCompleted(schoolId: string, driverId: string, tripId: string, direction: "pickup" | "drop") {
-  const r = await supabaseAdmin.from("trip_student_status").select("student_id").eq("trip_id", tripId).eq("status", "picked_up");
+  const r = await supabaseAdmin.from("trip_student_status").select("student_id, status").eq("trip_id", tripId);
   if (r.error) {
-    logger.error({ err: r.error }, "Failed to look up picked-up students for trip-completed notification");
+    logger.error({ err: r.error }, "Failed to look up students for trip-completed notification");
     return;
   }
-  const studentIds = (r.data ?? []).map((row) => row.student_id as string);
-  if (studentIds.length === 0) return;
+  const rows = r.data ?? [];
+  if (rows.length === 0) return;
 
-  await notificationService.notifyStudents(schoolId, driverId, studentIds, {
-    title: direction === "pickup" ? "Reached school safely" : "Dropped home safely",
-    message: direction === "pickup" ? "Your child has reached school safely." : "Your child has been dropped home safely.",
+  const allStudentIds = Array.from(new Set(rows.map((row) => row.student_id as string)));
+  const pickedUpIds = rows.filter((row) => row.status === "picked_up").map((row) => row.student_id as string);
+
+  await notificationService.notifyStudents(schoolId, driverId, allStudentIds, {
+    title: "Trip ended",
+    message: "The driver has ended the trip. Live tracking is no longer available.",
     type: "van",
-    metadata: { trip_id: tripId, direction },
+    metadata: { trip_id: tripId, direction, event: "trip_ended" },
   });
+
+  if (pickedUpIds.length > 0) {
+    await notificationService.notifyStudents(schoolId, driverId, pickedUpIds, {
+      title: direction === "pickup" ? "Reached school safely" : "Dropped home safely",
+      message: direction === "pickup" ? "Your child has reached school safely." : "Your child has been dropped home safely.",
+      type: "van",
+      metadata: { trip_id: tripId, direction },
+    });
+  }
 }
 
 const ETA_ARRIVED_DISTANCE_KM = 0.2;

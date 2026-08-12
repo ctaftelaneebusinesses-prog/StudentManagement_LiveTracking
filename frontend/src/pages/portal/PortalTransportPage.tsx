@@ -244,27 +244,6 @@ export function PortalTransportPage() {
         </p>
       )}
 
-      {/* TEMPORARY diagnostic — remove once the live-bus-marker investigation is closed.
-          Shows exactly what the frontend received/computed, so a screenshot answers
-          "did the API return trips data" without needing DevTools. */}
-      <details className="rounded-lg border border-dashed border-amber-400 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-300" open>
-        <summary className="cursor-pointer font-semibold">Debug: live tracking state (temporary)</summary>
-        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-all">
-          {JSON.stringify(
-            {
-              vehicle: vehicle ? { id: vehicle.id, name: vehicle.name, vehicle_number: vehicle.vehicle_number, tripsCount: vehicle.trips?.length ?? "trips field MISSING" } : "vehicle is null",
-              activeTrip,
-              live,
-              viewerPosition,
-              transportQueryStatus: transportQuery.status,
-              transportQueryUpdatedAt: transportQuery.dataUpdatedAt ? new Date(transportQuery.dataUpdatedAt).toISOString() : null,
-            },
-            null,
-            2
-          )}
-        </pre>
-      </details>
-
       {live || viewerPosition ? (
         <LiveMap
           locations={live ? [live] : []}
