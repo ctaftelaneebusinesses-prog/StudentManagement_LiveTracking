@@ -78,10 +78,9 @@ api.interceptors.response.use(
     // A 401 doesn't necessarily mean the session is actually invalid — it
     // can also mean getSession() handed this request a token that expired
     // moments before the server saw it, or that this request just lost a
-    // race with an in-flight token refresh. Try refreshing once and retrying
-    // before treating the user as logged out; only a refresh that genuinely
-    // fails (refresh token itself expired/revoked) means the session is
-    // really over.
+    // race with an in-flight token refresh. Try once via getSession() (which
+    // only refreshes if genuinely needed, through the SDK's own coordinated
+    // path) and retry before giving up.
     if (error.response?.status === 401 && originalRequest && !originalRequest._retried) {
       originalRequest._retried = true;
       const refreshed = await ensureFreshSession();
@@ -90,15 +89,16 @@ api.interceptors.response.use(
       }
     }
 
-    if (error.response?.status === 401) {
-      // Session is invalid/expired server-side — clear it and send the user
-      // back to login. A hard redirect (not react-router) since this file
-      // lives outside the component tree.
-      await supabase.auth.signOut();
-      if (window.location.pathname !== "/login") {
-        window.location.assign("/login");
-      }
-    }
+    // Deliberately no forced sign-out / redirect here, even after a 401 that
+    // survives the retry above. This file sits outside the component tree
+    // and used to hard-navigate to /login on the app's behalf whenever it
+    // decided the session looked dead — but "looked dead" included false
+    // positives (a rejected refresh racing the SDK's own background timer,
+    // a transient backend hiccup misreported as 401, ...), and each one
+    // logged an active user out with no click on Logout. The only thing that
+    // signs a user out now is the user clicking Logout (see
+    // AuthContext.tsx's logout()). A request that's genuinely unauthorized
+    // just surfaces as a rejected promise for the caller to handle/show.
     return Promise.reject(error);
   }
 );

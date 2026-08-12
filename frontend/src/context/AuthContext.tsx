@@ -118,15 +118,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         await withTimeout(loadFullIdentity(), IDENTITY_LOAD_TIMEOUT_MS);
       } catch (err) {
-        // Only a genuine hang (the stuck navigator.locks issue) justifies
-        // wiping the session — any other error (a transient network/DB blip
-        // while fetching the profile) does NOT mean the session is invalid,
-        // and must not force a sign-out. On first load there's no prior user
-        // to preserve, so this just leaves ProtectedRoute to redirect once
-        // loading finishes, same as before.
+        // No automatic sign-out here, ever — not for a transient network/DB
+        // blip while fetching the profile, and not even for the genuine
+        // stuck navigator.locks hang this timeout exists to catch. The only
+        // thing that may clear a session is the user clicking Logout
+        // (logout() below). On a hang we just stop the "Checking your
+        // session..." spinner (finally, below) and leave storage untouched
+        // — if the lock frees up later (e.g. after a reload), the session is
+        // still there.
         if (err instanceof SessionLoadTimeoutError) {
-          clearStuckSession();
-          if (isMounted) resetToSignedOut();
+          console.warn("Session load timed out; leaving stored session untouched.", err);
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -135,22 +136,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     bootstrap();
 
-    // Keeps identity in sync across tabs and on token refresh/expiry/sign-out.
+    // Keeps identity in sync across tabs and on token refresh/sign-in.
     const { data: subscription } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (!session) {
-        resetToSignedOut();
+        // The SDK itself can report a null session (e.g. a background
+        // refresh failing) without the user ever touching Logout. That must
+        // not force a sign-out here — only logout() does. Leave local
+        // identity state as-is; if the session is genuinely gone, the next
+        // API call simply fails and the user can retry.
         return;
       }
       try {
         await withTimeout(loadFullIdentity(), IDENTITY_LOAD_TIMEOUT_MS);
       } catch (err) {
-        // Same reasoning as bootstrap above — this fires on every background
-        // token refresh while the user is actively using the app, so a
-        // transient error here must NOT force an already-logged-in user back
-        // to /login. Only the genuine stuck-lock hang does.
+        // Same reasoning as bootstrap above — never force sign-out from here.
         if (err instanceof SessionLoadTimeoutError) {
-          clearStuckSession();
-          resetToSignedOut();
+          console.warn("Session load timed out; leaving stored session untouched.", err);
         }
       }
     });
