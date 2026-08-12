@@ -38,7 +38,7 @@ export function DriverDashboardPage() {
   const trip = activeTrip ?? (todaysActiveTrip as unknown as LiveTrip | null);
 
   const start = useMutation({
-    mutationFn: () => tracking.startTrip(),
+    mutationFn: (direction: "pickup" | "drop") => tracking.startTrip(direction),
     onSuccess: (newTrip) => {
       setActiveTrip(newTrip);
       setGpsError("");
@@ -175,13 +175,32 @@ export function DriverDashboardPage() {
           <p className="text-sm text-slate-500">Use a secure HTTPS mobile browser and keep this page open during the trip.</p>
         </div>
         {trip ? (
-          <Button variant="danger" onClick={() => end.mutate()} isLoading={end.isPending}>
-            End trip
-          </Button>
+          <div className="flex items-center gap-3">
+            <Badge variant={trip.direction === "drop" ? "info" : "success"}>
+              {trip.direction === "drop" ? "Evening · Drop" : "Morning · Pickup"} trip in progress
+            </Badge>
+            <Button variant="danger" onClick={() => end.mutate()} isLoading={end.isPending}>
+              End trip
+            </Button>
+          </div>
         ) : (
-          <Button onClick={() => start.mutate()} isLoading={start.isPending}>
-            Start trip & share GPS
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={() => start.mutate("pickup")}
+              isLoading={start.isPending && start.variables === "pickup"}
+              disabled={start.isPending}
+            >
+              Morning · Pick up from home, drop at school
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => start.mutate("drop")}
+              isLoading={start.isPending && start.variables === "drop"}
+              disabled={start.isPending}
+            >
+              Evening · Pick up from school, drop at home
+            </Button>
+          </div>
         )}
       </div>
 

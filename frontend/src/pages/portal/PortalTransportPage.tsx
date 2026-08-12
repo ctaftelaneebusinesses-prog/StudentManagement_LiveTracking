@@ -244,9 +244,9 @@ export function PortalTransportPage() {
         </p>
       )}
 
-      {live || viewerPosition ? (
+      {live ? (
         <LiveMap
-          locations={live ? [live] : []}
+          locations={[live]}
           viewerLocation={viewerPosition ? { latitude: viewerPosition.latitude, longitude: viewerPosition.longitude, label: "You" } : null}
         />
       ) : (

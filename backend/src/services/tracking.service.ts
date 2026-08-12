@@ -2,6 +2,7 @@ import { supabaseAdmin } from "../config/supabase";
 import { ApiError } from "../utils/ApiError";
 import { logger } from "../config/logger";
 import * as notificationService from "./notification.service";
+import * as pushService from "./push.service";
 import { isStaff } from "../utils/teacherAccess";
 import { listTeacherRouteIds } from "./transport.service";
 import { ROLE_ID } from "../config/roles";
@@ -31,12 +32,10 @@ async function notifyRouteStudents(schoolId: string, driverId: string, routeId: 
   if (r.error) { logger.error({ err: r.error }, "Failed to look up route students for van notification"); return; }
   const studentIds = Array.from(new Set((r.data ?? []).map((row: any) => row.students?.id).filter(Boolean)));
   if (studentIds.length === 0) return;
-  await notificationService.notifyStudents(schoolId, driverId, studentIds, {
-    title: direction === "pickup" ? "Van is on the way" : "Van has started the drop route",
-    message: direction === "pickup" ? "Your school van has started its pickup route." : "Your school van has started its drop route.",
-    type: "van",
-    metadata: { route_id: routeId, direction },
-  });
+  const title = direction === "pickup" ? "Van is on the way" : "Van has started the drop route";
+  const message = direction === "pickup" ? "Your school van has started its pickup route." : "Your school van has started its drop route.";
+  await notificationService.notifyStudents(schoolId, driverId, studentIds, { title, message, type: "van", metadata: { route_id: routeId, direction } });
+  void pushService.sendToUserIds(studentIds, { title, body: message });
 }
 /** Every user holding a given role at this school — mirrors leaveRequest.service.ts's resolveUserIdsByRole (duplicated locally rather than shared, matching this codebase's per-domain-helper convention). */
 async function resolveUserIdsByRole(schoolId: string, roleId: number): Promise<string[]> {
@@ -96,8 +95,10 @@ async function notifyPickupStatus(schoolId: string, driverId: string, studentId:
   }
 
   await notificationService.notifyStudents(schoolId, driverId, [studentId], { title, message, type: "van", metadata: { student_id: studentId, status, direction } });
+  void pushService.sendToUserIds([studentId], { title, body: message });
   if (staffRecipients.length > 0) {
     await notificationService.notifyUsers(schoolId, driverId, staffRecipients, { title, message, type: "van", metadata: { student_id: studentId, status, direction } });
+    void pushService.sendToUserIds(staffRecipients, { title, body: message });
   }
 }
 
@@ -125,20 +126,26 @@ async function notifyTripCompleted(schoolId: string, driverId: string, tripId: s
   const allStudentIds = Array.from(new Set(rows.map((row) => row.student_id as string)));
   const pickedUpIds = rows.filter((row) => row.status === "picked_up").map((row) => row.student_id as string);
 
+  const endedTitle = "Trip ended";
+  const endedMessage = "The driver has ended the trip. Live tracking is no longer available.";
   await notificationService.notifyStudents(schoolId, driverId, allStudentIds, {
-    title: "Trip ended",
-    message: "The driver has ended the trip. Live tracking is no longer available.",
+    title: endedTitle,
+    message: endedMessage,
     type: "van",
     metadata: { trip_id: tripId, direction, event: "trip_ended" },
   });
+  void pushService.sendToUserIds(allStudentIds, { title: endedTitle, body: endedMessage });
 
   if (pickedUpIds.length > 0) {
+    const arrivedTitle = direction === "pickup" ? "Reached school safely" : "Dropped home safely";
+    const arrivedMessage = direction === "pickup" ? "Your child has reached school safely." : "Your child has been dropped home safely.";
     await notificationService.notifyStudents(schoolId, driverId, pickedUpIds, {
-      title: direction === "pickup" ? "Reached school safely" : "Dropped home safely",
-      message: direction === "pickup" ? "Your child has reached school safely." : "Your child has been dropped home safely.",
+      title: arrivedTitle,
+      message: arrivedMessage,
       type: "van",
       metadata: { trip_id: tripId, direction },
     });
+    void pushService.sendToUserIds(pickedUpIds, { title: arrivedTitle, body: arrivedMessage });
   }
 }
 
@@ -191,6 +198,7 @@ async function notifyStudentThreshold(
   if ((r.data ?? []).length === 0) return;
 
   await notificationService.notifyStudents(schoolId, driverId, [studentId], { title, message, type: "van", metadata: { trip_id: tripId } });
+  void pushService.sendToUserIds([studentId], { title, body: message });
 }
 
 /** Checks every student still awaiting pickup/drop on this trip against the vehicle's current position — measured against that student's own live location when fresh, else their stop — firing the 10-min/5-min/arrived notifications as each threshold is first crossed. Runs on every recordLocation ping — cheap (only pending students are considered) and safe to call repeatedly thanks to notifyStudentThreshold's dedup guard. */

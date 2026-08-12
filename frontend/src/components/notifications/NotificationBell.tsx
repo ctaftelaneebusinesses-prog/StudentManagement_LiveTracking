@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "@/hooks/useNotifications";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { AppNotification, NOTIFICATION_TYPE_LABEL } from "@/types/notification.types";
 
@@ -23,7 +24,16 @@ function timeAgo(isoDate: string): string {
 }
 
 export function NotificationBell() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, permission, requestBrowserPermission } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, permission } = useNotifications();
+  // requestBrowserPermission() (useNotifications) only grants foreground
+  // `new Notification()` popups while a tab is open. subscribe() here does
+  // that AND registers the service worker + creates the real push
+  // subscription row, so alerts still arrive with the app closed. This bell
+  // is the only notification-permission UI the Portal/Driver/Teacher shells
+  // ever render (the true subscribe flow otherwise only existed on the
+  // admin-only NotificationsPage/NotificationsMenu) — so those roles had no
+  // way to ever get a real push before this used it too.
+  const { subscribe, isSubscribing, error: pushError } = usePushNotifications();
   const { roleNames } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setOpen] = useState(false);
@@ -77,10 +87,11 @@ export function NotificationBell() {
               {permission === "default" && (
                 <button
                   type="button"
-                  onClick={requestBrowserPermission}
-                  className="text-xs font-medium text-brand-600 hover:underline"
+                  onClick={() => void subscribe()}
+                  disabled={isSubscribing}
+                  className="text-xs font-medium text-brand-600 hover:underline disabled:opacity-60"
                 >
-                  Enable alerts
+                  {isSubscribing ? "Enabling…" : "Enable alerts"}
                 </button>
               )}
               {unreadCount > 0 && (
@@ -94,6 +105,7 @@ export function NotificationBell() {
               )}
             </div>
           </div>
+          {pushError && <p className="border-b border-slate-100 px-4 py-2 text-xs text-red-600 dark:border-white/10">{pushError}</p>}
 
           <div className="max-h-96 overflow-y-auto">
             {notifications.length === 0 ? (
