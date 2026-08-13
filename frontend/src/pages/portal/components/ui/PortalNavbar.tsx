@@ -21,7 +21,7 @@ export function PortalNavbar({ onOpenMobileMenu }: PortalNavbarProps) {
 
   return (
     <header
-      className="flex h-16 items-center justify-between border-b px-4 backdrop-blur-xl sm:px-6"
+      className="relative z-20 flex h-16 items-center justify-between border-b px-4 backdrop-blur-xl sm:px-6"
       style={{ background: "var(--portal-glass-bg)", borderColor: "var(--portal-glass-border)" }}
     >
       <button
