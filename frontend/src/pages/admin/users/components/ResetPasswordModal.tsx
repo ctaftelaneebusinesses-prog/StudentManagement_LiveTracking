@@ -7,13 +7,19 @@ import { PasswordField } from "@/components/ui/PasswordField";
 import * as usersService from "@/services/admin/users.service";
 import { generateDefaultPassword } from "@/utils/password";
 import { getApiErrorMessage } from "@/lib/axios";
-import { AdminUser } from "@/types/admin.types";
+
+/** Just the fields this modal actually needs — lets callers pass a student/teacher record (or the fuller AdminUser row) interchangeably. */
+export interface ResetPasswordTarget {
+  id: string;
+  full_name: string;
+  phone?: string | null;
+}
 
 export function ResetPasswordModal({
   user,
   onClose,
 }: {
-  user: AdminUser | null;
+  user: ResetPasswordTarget | null;
   onClose: () => void;
 }) {
   const [password, setPassword] = useState("");

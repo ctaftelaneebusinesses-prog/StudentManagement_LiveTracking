@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import { GraduationCap, Pencil, Plus, Trash2 } from "lucide-react";
+import { GraduationCap, KeyRound, Pencil, Plus, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -25,6 +25,7 @@ import { resolveClassId } from "@/utils/classPicker";
 import { digitsOnly, PHONE_PATTERN } from "@/utils/formHelpers";
 import { ClassSectionSelects, ClassSectionValue } from "./components/ClassSectionSelects";
 import { AttendanceReportCard } from "./components/AttendanceReportCard";
+import { ResetPasswordModal } from "@/pages/admin/users/components/ResetPasswordModal";
 
 const DOC_TYPE_OPTIONS: { value: TeacherDocumentType; label: string }[] = [
   { value: "resume", label: "Resume / CV" },
@@ -195,6 +196,7 @@ function TeacherPhotoUpload({ teacher, onUploaded }: { teacher: Teacher; onUploa
 function PersonalDetailsCard({ teacher, onSaved }: { teacher: Teacher; onSaved: () => void }) {
   const toast = useToast();
   const [isEditing, setEditing] = useState(false);
+  const [isResettingPassword, setResettingPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -250,6 +252,9 @@ function PersonalDetailsCard({ teacher, onSaved }: { teacher: Teacher; onSaved: 
               Edit
             </Button>
           )}
+          <Button variant="secondary" onClick={() => setResettingPassword(true)}>
+            <KeyRound size={16} /> Reset password
+          </Button>
           {teacher.users.is_active && (
             <Button variant="danger" onClick={() => deactivateMutation.mutate()} isLoading={deactivateMutation.isPending}>
               Deactivate
@@ -257,6 +262,11 @@ function PersonalDetailsCard({ teacher, onSaved }: { teacher: Teacher; onSaved: 
           )}
         </div>
       </div>
+
+      <ResetPasswordModal
+        user={isResettingPassword ? { id: teacher.id, full_name: teacher.users.full_name, phone: teacher.users.phone } : null}
+        onClose={() => setResettingPassword(false)}
+      />
 
       {isEditing ? (
         <form

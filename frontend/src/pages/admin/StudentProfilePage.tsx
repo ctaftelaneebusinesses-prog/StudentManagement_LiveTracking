@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { User, Users, GraduationCap, Wallet, Bus, FileText, History, Trash2 } from "lucide-react";
+import { User, Users, GraduationCap, Wallet, Bus, FileText, History, Trash2, KeyRound } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -18,6 +18,7 @@ import { useToast } from "@/components/ui/Toast";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ReceiptModal } from "@/pages/admin/fees/components/ReceiptModal";
 import { FeeStructureSection } from "@/pages/admin/fees/components/FeeStructureSection";
+import { ResetPasswordModal } from "@/pages/admin/users/components/ResetPasswordModal";
 import * as studentsService from "@/services/admin/students.service";
 import * as classesService from "@/services/admin/classes.service";
 import * as documentsService from "@/services/admin/studentDocuments.service";
@@ -260,6 +261,7 @@ function PersonalDetailsCard({
   onSaved: () => void;
 }) {
   const [isEditing, setEditing] = useState(false);
+  const [isResettingPassword, setResettingPassword] = useState(false);
   const toast = useToast();
   const isCustomNationality = !!student.nationality && !NATIONALITY_OPTIONS.some((o) => o.value === student.nationality);
   const isCustomReligion = !!student.religion && !RELIGION_OPTIONS.some((o) => o.value === student.religion);
@@ -329,6 +331,9 @@ function PersonalDetailsCard({
               Edit
             </Button>
           )}
+          <Button variant="secondary" onClick={() => setResettingPassword(true)}>
+            <KeyRound size={16} /> Reset password
+          </Button>
           {student.users.is_active && (
             <Button variant="danger" onClick={() => deactivateMutation.mutate()} isLoading={deactivateMutation.isPending}>
               Deactivate
@@ -336,6 +341,11 @@ function PersonalDetailsCard({
           )}
         </div>
       </div>
+
+      <ResetPasswordModal
+        user={isResettingPassword ? { id: student.id, full_name: student.users.full_name, phone: student.users.phone } : null}
+        onClose={() => setResettingPassword(false)}
+      />
 
       {isEditing ? (
         <form

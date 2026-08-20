@@ -124,7 +124,10 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   },
   {
     label: "Learning",
-    items: [{ label: "Website Knowledge", to: "/dashboard/admin/website-knowledge", icon: BadgeCheck, roles: ADMIN_ONLY }],
+    // school_admin and super_admin run the platform, they don't need the
+    // learner-facing knowledge assessment — only principal (who takes it
+    // alongside teachers/students) sees it here.
+    items: [{ label: "Website Knowledge", to: "/dashboard/admin/website-knowledge", icon: BadgeCheck, roles: ["principal"] }],
   },
   {
     label: "Platform",
