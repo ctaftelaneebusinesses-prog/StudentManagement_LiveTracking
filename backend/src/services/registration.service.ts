@@ -260,12 +260,13 @@ export async function registerTeacher(input: RegisterTeacherInput) {
 export async function registerStudent(input: RegisterStudentInput) {
   const school = await schoolService.lookupSchoolByCode(input.school_code);
 
-  // Self-registration's default password scheme is parent name + roll
-  // number (not the student's own name — studentService.createStudent's own
-  // fallback uses full_name, which is right for the admin-created "Add
-  // Student" flow but not what was specified for self-registration), so it's
-  // computed explicitly here rather than left to that generic fallback.
-  const password = input.password || generateDefaultPassword(input.father_name, input.roll_no);
+  // Self-registration's default password is the student's own name + roll
+  // number — computed explicitly here (rather than left to
+  // studentService.createStudent's own full_name + admission_no fallback)
+  // so it's guaranteed to use roll_no specifically, even if the caller
+  // omitted admission_no (self-registration's admission_no is a generated
+  // SELF-<timestamp> placeholder, not something a student would know).
+  const password = input.password || generateDefaultPassword(input.full_name, input.roll_no);
 
   const student = await studentService.createStudent(school.id, {
     email: input.email,

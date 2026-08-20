@@ -101,7 +101,7 @@ export function StudentForm({ meta, onSuccess }: { meta: RegistrationMeta; onSuc
         <PasswordField
           value={password}
           onChange={setPassword}
-          onGenerate={() => setPassword(generateDefaultPassword(watch("father_name"), watch("roll_no")))}
+          onGenerate={() => setPassword(generateDefaultPassword(watch("full_name"), watch("roll_no")))}
         />
       </div>
 
