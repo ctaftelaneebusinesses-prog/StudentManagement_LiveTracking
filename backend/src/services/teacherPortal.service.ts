@@ -258,10 +258,11 @@ export async function listMyStudents(schoolId: string, classId: string) {
     .from("students")
     .select(
       "id, admission_no, roll_no, class_id, father_name, father_phone, mother_name, mother_phone, " +
-        "users(full_name, email, phone, avatar_url)"
+        "users!inner(full_name, email, phone, avatar_url)"
     )
     .eq("school_id", schoolId)
     .eq("class_id", classId)
+    .eq("users.status", "approved")
     .order("roll_no");
   if (error) throw ApiError.internal(error.message);
   const students = (data ?? []) as unknown as MyStudentRow[];
@@ -325,9 +326,10 @@ export async function getTodayTimetable(schoolId: string, teacherId: string) {
 export async function listStudentsForClass(schoolId: string, classId: string) {
   const { data, error } = await supabaseAdmin
     .from("students")
-    .select("id, admission_no, roll_no, date_of_birth, gender, users(full_name, email, phone, avatar_url)")
+    .select("id, admission_no, roll_no, date_of_birth, gender, users!inner(full_name, email, phone, avatar_url)")
     .eq("school_id", schoolId)
     .eq("class_id", classId)
+    .eq("users.status", "approved")
     .order("roll_no");
   if (error) throw ApiError.internal(error.message);
   return data;
