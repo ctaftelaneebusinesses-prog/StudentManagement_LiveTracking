@@ -191,42 +191,26 @@ export function PortalSidebar({ isCollapsed, onToggleCollapse, isMobileOpen, onC
         </button>
       </motion.aside>
 
-      <AnimatePresence>
-        {isMobileOpen && (
-          <div className="fixed inset-0 z-40 h-dvh md:hidden">
-            <motion.div
-              className="absolute inset-0 bg-black/50"
-              onClick={onCloseMobile}
-              aria-hidden="true"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            />
-            <motion.aside
-              style={panelStyle}
-              className="relative flex h-dvh w-72 flex-col shadow-2xl"
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 320, damping: 34 }}
-            >
-              <div className="flex items-center justify-between">
-                <Brand collapsed={false} />
-                <button
-                  type="button"
-                  onClick={onCloseMobile}
-                  aria-label="Close menu"
-                  className="mr-3 flex min-h-11 min-w-11 items-center justify-center rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-              <NavGroups collapsed={false} onNavigate={onCloseMobile} />
-              <UserCard collapsed={false} />
-            </motion.aside>
-          </div>
-        )}
-      </AnimatePresence>
+      {isMobileOpen && (
+        <div className="fixed inset-0 z-40 h-dvh md:hidden">
+          <div className="absolute inset-0 bg-black/50 animate-fade-in" onClick={onCloseMobile} aria-hidden="true" />
+          <aside style={panelStyle} className="relative flex h-dvh w-72 animate-slide-in-left flex-col shadow-2xl">
+            <div className="flex items-center justify-between">
+              <Brand collapsed={false} />
+              <button
+                type="button"
+                onClick={onCloseMobile}
+                aria-label="Close menu"
+                className="mr-3 flex min-h-11 min-w-11 items-center justify-center rounded-lg p-1.5 text-white/60 hover:bg-white/10 hover:text-white"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <NavGroups collapsed={false} onNavigate={onCloseMobile} />
+            <UserCard collapsed={false} />
+          </aside>
+        </div>
+      )}
     </>
   );
 }

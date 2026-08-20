@@ -71,12 +71,14 @@ export default {
       keyframes: {
         "fade-in": { from: { opacity: 0 }, to: { opacity: 1 } },
         "slide-up": { from: { opacity: 0, transform: "translateY(8px)" }, to: { opacity: 1, transform: "translateY(0)" } },
+        "slide-in-left": { from: { transform: "translateX(-100%)" }, to: { transform: "translateX(0)" } },
         shimmer: { "100%": { transform: "translateX(100%)" } },
         float: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-6px)" } },
       },
       animation: {
         "fade-in": "fade-in 0.25s ease-out both",
         "slide-up": "slide-up 0.35s cubic-bezier(0.16,1,0.3,1) both",
+        "slide-in-left": "slide-in-left 0.3s cubic-bezier(0.16,1,0.3,1) both",
         shimmer: "shimmer 1.6s infinite",
         float: "float 3.2s ease-in-out infinite",
       },
