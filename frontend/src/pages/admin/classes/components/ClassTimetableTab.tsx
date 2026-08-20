@@ -8,6 +8,8 @@ import { ErrorState } from "@/pages/admin/dashboard/components/states/ErrorState
 import * as classesService from "@/services/admin/classes.service";
 import * as teachersService from "@/services/admin/teachers.service";
 import * as timetableService from "@/services/admin/timetable.service";
+import * as schoolService from "@/services/admin/school.service";
+import { DefaultPeriodTiming } from "@/services/admin/school.service";
 import { SCHOOL_WEEK_DAYS, TimetablePeriodEntry, TimetablePeriodType, WEEKDAY_NAMES } from "@/types/timetable.types";
 import { PeriodModal } from "@/pages/admin/timetable/components/PeriodModal";
 import { TimetableGrid, TimetableGridSkeleton } from "@/pages/admin/timetable/components/TimetableGrid";
@@ -58,6 +60,9 @@ export function ClassTimetableTab({ classId, className }: { classId: string; cla
     queryFn: () => timetableService.fetchTimetableForClass(classId),
     enabled: !!classId,
   });
+
+  const { data: school } = useQuery({ queryKey: ["admin", "school"], queryFn: schoolService.fetchMySchool });
+  const defaultPeriodTimings = (school?.settings?.defaultPeriodTimings as DefaultPeriodTiming[] | undefined) ?? [];
 
   const periods = useMemo(() => periodsQuery.data ?? [], [periodsQuery.data]);
   const maxExistingPeriodNo = periods.reduce((max, p) => Math.max(max, p.period_no), 0);
@@ -112,13 +117,14 @@ export function ClassTimetableTab({ classId, className }: { classId: string; cla
   function openCell(periodNo: number, dayOfWeek: number) {
     const existing = getCell(periodNo, dayOfWeek) ?? null;
     const sibling = periods.find((p) => p.period_no === periodNo);
+    const masterDefault = defaultPeriodTimings.find((t) => t.period_no === periodNo);
     setSaveError(null);
     setSelectedCell({
       periodNo,
       dayOfWeek,
       existing,
-      defaultStartTime: sibling?.start_time?.slice(0, 5),
-      defaultEndTime: sibling?.end_time?.slice(0, 5),
+      defaultStartTime: sibling?.start_time?.slice(0, 5) ?? masterDefault?.start_time,
+      defaultEndTime: sibling?.end_time?.slice(0, 5) ?? masterDefault?.end_time,
     });
   }
 

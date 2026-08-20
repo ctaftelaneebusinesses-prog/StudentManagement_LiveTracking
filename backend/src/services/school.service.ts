@@ -1,20 +1,15 @@
 import { supabaseAdmin } from "../config/supabase";
 import { ApiError } from "../utils/ApiError";
 import { logger } from "../config/logger";
+import { createClass } from "./class.service";
 
 // ---------------------------------------------------------------------------
 // Schools (platform-level, super_admin only for create/list-all)
 // ---------------------------------------------------------------------------
 
-/** Seeded into every new school's subject list; principal/admin can rename/add more afterward via subject management. */
-const DEFAULT_SUBJECTS = [
-  { name: "Telugu", code: "TEL" },
-  { name: "Hindi", code: "HIN" },
-  { name: "English", code: "ENG" },
-  { name: "Math", code: "MAT" },
-  { name: "Science", code: "SCI" },
-  { name: "Social", code: "SOC" },
-];
+/** Seeded into every new school; each entry gets section "A" and the default subject set (via createClass). Admin/principal can add more sections/classes afterward via class management. */
+const DEFAULT_CLASS_NAMES = ["Pre-KG", "LKG", "UKG", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+
 export async function listAllSchools() {
   const { data, error } = await supabaseAdmin.from("schools").select("*").order("created_at");
   if (error) throw ApiError.internal(error.message);
@@ -99,16 +94,38 @@ export async function createSchool(input: {
     throw ApiError.internal(error.message);
   }
 
-  if (academicYear) {
-    await createAcademicYear(data.id, { ...academicYear, is_current: true });
+  let academicYearId: string | undefined;
+  try {
+    const year = academicYear ?? defaultAcademicYearInput();
+    const createdYear = await createAcademicYear(data.id, { ...year, is_current: true });
+    academicYearId = createdYear.id;
+  } catch (err) {
+    logger.error({ err, schoolId: data.id }, "Failed to create academic year for new school");
   }
 
-  const { error: subjectsError } = await supabaseAdmin
-    .from("subjects")
-    .insert(DEFAULT_SUBJECTS.map((subject) => ({ ...subject, school_id: data.id })));
-  if (subjectsError) logger.error({ err: subjectsError, schoolId: data.id }, "Failed to seed default subjects");
+  if (academicYearId) {
+    for (const className of DEFAULT_CLASS_NAMES) {
+      try {
+        await createClass(data.id, { name: className, section: "A", academic_year_id: academicYearId });
+      } catch (err) {
+        logger.error({ err, schoolId: data.id, className }, "Failed to seed default class");
+      }
+    }
+  }
 
   return data;
+}
+
+/** June 1 – May 31, the common Indian school academic year, used when the caller doesn't supply one. */
+function defaultAcademicYearInput(): { name: string; start_date: string; end_date: string } {
+  const now = new Date();
+  const startYear = now.getUTCMonth() >= 5 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
+  const endYear = startYear + 1;
+  return {
+    name: `${startYear}-${endYear}`,
+    start_date: `${startYear}-06-01`,
+    end_date: `${endYear}-05-31`,
+  };
 }
 
 export async function getSchool(schoolId: string) {
@@ -407,7 +424,15 @@ export async function deactivateBranch(schoolId: string, branchId: string) {
 // School settings (jsonb) — namespaced keys (email/notifications/backup/
 // workingDays), read-merge-write so one key's update can't clobber another's.
 // ---------------------------------------------------------------------------
-const SETTINGS_KEYS = ["email", "notifications", "backup", "workingDays", "leavePolicy", "attendance"] as const;
+export const SETTINGS_KEYS = [
+  "email",
+  "notifications",
+  "backup",
+  "workingDays",
+  "leavePolicy",
+  "attendance",
+  "defaultPeriodTimings",
+] as const;
 export type SchoolSettingsKey = (typeof SETTINGS_KEYS)[number];
 
 export function isSchoolSettingsKey(key: string): key is SchoolSettingsKey {

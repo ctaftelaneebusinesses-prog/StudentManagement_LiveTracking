@@ -23,6 +23,9 @@ const SyllabusPage = lazy(() => import("@/pages/admin/syllabus/SyllabusPage").th
 const TeacherRegistrationApprovalsPage = lazy(() =>
   import("@/pages/teacher/TeacherRegistrationApprovalsPage").then((m) => ({ default: m.TeacherRegistrationApprovalsPage }))
 );
+const ProfileApprovalPage = lazy(() =>
+  import("@/pages/teacher/ProfileApprovalPage").then((m) => ({ default: m.ProfileApprovalPage }))
+);
 const TeacherSyllabusPage = lazy(() =>
   import("@/pages/teacher/TeacherSyllabusPage").then((m) => ({ default: m.TeacherSyllabusPage }))
 );
@@ -164,6 +167,7 @@ const PortalHomeworkPage = lazy(() =>
 );
 const PortalMarksPage = lazy(() => import("@/pages/portal/PortalMarksPage").then((m) => ({ default: m.PortalMarksPage })));
 const PortalExamsPage = lazy(() => import("@/pages/portal/PortalExamsPage").then((m) => ({ default: m.PortalExamsPage })));
+const PortalEventsPage = lazy(() => import("@/pages/portal/PortalEventsPage").then((m) => ({ default: m.PortalEventsPage })));
 const PortalFeesPage = lazy(() => import("@/pages/portal/PortalFeesPage").then((m) => ({ default: m.PortalFeesPage })));
 const PortalReportsPage = lazy(() =>
   import("@/pages/portal/PortalReportsPage").then((m) => ({ default: m.PortalReportsPage }))
@@ -210,6 +214,9 @@ const LeaveRequestsPage = lazy(() =>
   import("@/pages/admin/LeaveRequestsPage").then((m) => ({ default: m.LeaveRequestsPage }))
 );
 const MyLeavePage = lazy(() => import("@/pages/admin/MyLeavePage").then((m) => ({ default: m.MyLeavePage })));
+const LeaveSettingsPage = lazy(() =>
+  import("@/pages/admin/leave/LeaveSettingsPage").then((m) => ({ default: m.LeaveSettingsPage }))
+);
 const AccountantDashboardPage = lazy(() =>
   import("@/pages/accountant/AccountantDashboardPage").then((m) => ({ default: m.AccountantDashboardPage }))
 );
@@ -353,6 +360,10 @@ export function AppRoutes() {
             <Route element={<ProtectedRoute allowedRoles={["principal"]} />}>
               <Route path="/dashboard/admin/my-leave" element={<MyLeavePage />} />
             </Route>
+            {/* School admin only — sets the policy that principal/teacher leave balances are bound by, so they don't set it themselves. */}
+            <Route element={<ProtectedRoute allowedRoles={["school_admin", "super_admin"]} />}>
+              <Route path="/dashboard/admin/leave-settings" element={<LeaveSettingsPage />} />
+            </Route>
             {/* Transport also opens to teachers (matches the transport.manage permission grant) — everything else in the Admin Console stays admin/principal only. */}
             <Route element={<ProtectedRoute allowedRoles={["school_admin", "super_admin", "principal", "teacher"]} />}>
               <Route path="/dashboard/admin/transport" element={<TransportPage />} />
@@ -380,6 +391,7 @@ export function AppRoutes() {
               <Route path="/dashboard/portal/homework" element={<PortalHomeworkPage />} />
               <Route path="/dashboard/portal/marks" element={<PortalMarksPage />} />
               <Route path="/dashboard/portal/exams" element={<PortalExamsPage />} />
+              <Route path="/dashboard/portal/events" element={<PortalEventsPage />} />
               <Route path="/dashboard/portal/fees" element={<PortalFeesPage />} />
               <Route path="/dashboard/portal/reports" element={<PortalReportsPage />} />
               <Route path="/dashboard/portal/evaluated-papers" element={<PortalEvaluatedPapersPage />} />
@@ -423,6 +435,7 @@ export function AppRoutes() {
               <Route path="/dashboard/teacher/leave" element={<TeacherLeavePage />} />
               <Route path="/dashboard/teacher/transport" element={<TransportMonitoringPage />} />
               <Route path="/dashboard/teacher/registration-approvals" element={<TeacherRegistrationApprovalsPage />} />
+              <Route path="/dashboard/teacher/profile-approval" element={<ProfileApprovalPage />} />
               <Route path="/dashboard/teacher/syllabus" element={<TeacherSyllabusPage />} />
               <Route path="/dashboard/teacher/website-knowledge" element={<WebsiteKnowledgePage />} />
             </Route>

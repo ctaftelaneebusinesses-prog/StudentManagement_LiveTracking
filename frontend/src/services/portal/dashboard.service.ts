@@ -37,6 +37,12 @@ export async function fetchAnnouncements(studentId: string): Promise<StudentNoti
   return data.data;
 }
 
+/** Full notification history for the Student Events page — same endpoint as fetchAnnouncements, just without the dashboard widget's 20-row cap. */
+export async function fetchEvents(studentId: string): Promise<StudentNotification[]> {
+  const { data } = await api.get(`/students/${studentId}/notifications`, { params: { limit: 200 } });
+  return data.data;
+}
+
 export async function markAnnouncementRead(studentId: string, notificationId: string): Promise<void> {
   await api.post(`/students/${studentId}/notifications/${notificationId}/read`);
 }

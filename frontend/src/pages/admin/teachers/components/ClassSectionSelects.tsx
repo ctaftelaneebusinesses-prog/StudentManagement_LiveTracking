@@ -13,6 +13,7 @@ interface ClassSectionSelectsProps {
   value: ClassSectionValue;
   onChange: (next: ClassSectionValue) => void;
   disabled?: boolean;
+  errors?: { academicYearId?: string; className?: string; section?: string };
 }
 
 /**
@@ -21,7 +22,7 @@ interface ClassSectionSelectsProps {
  * no wrapping grid, so callers can lay them out alongside other fields (e.g.
  * a 4th "Subject" select) in their own grid.
  */
-export function ClassSectionSelects({ classes, value, onChange, disabled }: ClassSectionSelectsProps) {
+export function ClassSectionSelects({ classes, value, onChange, disabled, errors }: ClassSectionSelectsProps) {
   const yearOptions = academicYearOptions(classes);
   const gradeOptions = value.academicYearId ? classNameOptions(classes, value.academicYearId) : [];
   const secOptions =
@@ -35,6 +36,7 @@ export function ClassSectionSelects({ classes, value, onChange, disabled }: Clas
         options={yearOptions}
         value={value.academicYearId}
         disabled={disabled}
+        error={errors?.academicYearId}
         onChange={(e) => onChange({ academicYearId: e.target.value, className: "", section: "" })}
       />
       <Select
@@ -43,6 +45,7 @@ export function ClassSectionSelects({ classes, value, onChange, disabled }: Clas
         options={gradeOptions}
         value={value.className}
         disabled={disabled || !value.academicYearId}
+        error={errors?.className}
         onChange={(e) => onChange({ ...value, className: e.target.value, section: "" })}
       />
       <Select
@@ -51,6 +54,7 @@ export function ClassSectionSelects({ classes, value, onChange, disabled }: Clas
         options={secOptions}
         value={value.section}
         disabled={disabled || !value.className}
+        error={errors?.section}
         onChange={(e) => onChange({ ...value, section: e.target.value })}
       />
     </>

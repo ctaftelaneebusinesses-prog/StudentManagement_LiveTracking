@@ -37,6 +37,7 @@ export function SyllabusPage() {
   const [editTarget, setEditTarget] = useState<SyllabusEntry | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SyllabusEntry | null>(null);
   const [uploadClassSection, setUploadClassSection] = useState<ClassSectionValue>({ academicYearId: "", className: "", section: "" });
+  const [classSectionErrors, setClassSectionErrors] = useState<{ academicYearId?: string; className?: string; section?: string }>({});
   const [file, setFile] = useState<File | null>(null);
 
   const { data: classes = [] } = useQuery({ queryKey: ["classes"], queryFn: classesService.fetchClasses });
@@ -58,9 +59,19 @@ export function SyllabusPage() {
 
   async function onUpload(values: FormValues) {
     if (!user?.school_id) return;
+    const fieldErrors: typeof classSectionErrors = {};
+    if (!uploadClassSection.academicYearId) fieldErrors.academicYearId = "Required";
+    if (!uploadClassSection.className) fieldErrors.className = "Required";
+    if (!uploadClassSection.section) fieldErrors.section = "Required";
+    if (Object.keys(fieldErrors).length > 0) {
+      setClassSectionErrors(fieldErrors);
+      toast.error("Select an Academic Year, Class, and Section.");
+      return;
+    }
+    setClassSectionErrors({});
     const class_id = resolveClassId(classes, uploadClassSection.academicYearId, uploadClassSection.className, uploadClassSection.section);
     if (!class_id) {
-      toast.error("Select an Academic Year, Class, and Section.");
+      toast.error("That class/section combination doesn't exist.");
       return;
     }
     if (!file) {
@@ -84,6 +95,7 @@ export function SyllabusPage() {
       reset();
       setFile(null);
       setUploadClassSection({ academicYearId: "", className: "", section: "" });
+      setClassSectionErrors({});
     } catch (err) {
       toast.error(getApiErrorMessage(err, "Couldn't upload syllabus."));
     }
@@ -167,11 +179,27 @@ export function SyllabusPage() {
         <DataTable columns={columns} rows={entries} rowKey={(e) => e.id} isLoading={isLoading} emptyMessage="No syllabus uploaded yet." />
       </Card>
 
-      <Modal isOpen={isUploadOpen} onClose={() => setUploadOpen(false)} title="Upload Syllabus" size="lg">
+      <Modal
+        isOpen={isUploadOpen}
+        onClose={() => {
+          setUploadOpen(false);
+          setClassSectionErrors({});
+        }}
+        title="Upload Syllabus"
+        size="lg"
+      >
         <form className="space-y-4" onSubmit={handleSubmit(onUpload)} noValidate>
           <Input label="Title" error={errors.title?.message} {...register("title", { required: "Title is required" })} />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <ClassSectionSelects classes={classes} value={uploadClassSection} onChange={setUploadClassSection} />
+            <ClassSectionSelects
+              classes={classes}
+              value={uploadClassSection}
+              onChange={(next) => {
+                setUploadClassSection(next);
+                setClassSectionErrors({});
+              }}
+              errors={classSectionErrors}
+            />
           </div>
           <Controller
             name="subject_id"
@@ -202,7 +230,14 @@ export function SyllabusPage() {
             <Checkbox {...register("is_published")} /> Publish immediately
           </label>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="secondary" onClick={() => setUploadOpen(false)}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setUploadOpen(false);
+                setClassSectionErrors({});
+              }}
+            >
               Cancel
             </Button>
             <Button type="submit" isLoading={isSubmitting}>

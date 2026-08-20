@@ -24,6 +24,13 @@ export const createNotificationSchema = z.object({
   params: z.object({}).optional(),
 });
 
+/** GET /students/:id/notifications — `limit` lets the Student Events page ask for the full history instead of the dashboard widget's default 20. */
+export const listStudentNotificationsSchema = z.object({
+  body: z.object({}).optional(),
+  query: z.object({ limit: z.coerce.number().int().min(1).max(200).optional() }).optional(),
+  params: z.object({ id: z.string().uuid() }),
+});
+
 export const markReadSchema = z.object({
   body: z.object({}).optional(),
   query: z.object({}).optional(),

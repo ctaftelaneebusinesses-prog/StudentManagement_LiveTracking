@@ -56,7 +56,36 @@ interface LeavePolicy {
   other: number;
 }
 
+/** Per-role yearly leave policy, settable by the school admin via the Leave Settings page. */
+interface RoleLeavePolicy {
+  teacher: LeavePolicy;
+  principal: LeavePolicy;
+}
+
 const DEFAULT_LEAVE_POLICY: LeavePolicy = { casual: 12, sick: 10, other: 5 };
+const DEFAULT_ROLE_LEAVE_POLICY: RoleLeavePolicy = {
+  teacher: DEFAULT_LEAVE_POLICY,
+  principal: DEFAULT_LEAVE_POLICY,
+};
+
+/**
+ * `schools.settings.leavePolicy` used to be a single flat {casual,sick,other}
+ * shared by every applicant. It's now per-role ({teacher: {...}, principal:
+ * {...}}), set via the Leave Settings page. A school that hasn't re-saved its
+ * policy since the change still has the old flat shape on disk — treat that
+ * as the same policy for both roles rather than requiring a data migration.
+ */
+function resolveRolePolicy(stored: unknown, role: ApplicantRole): LeavePolicy {
+  const settings = (stored as Partial<RoleLeavePolicy & LeavePolicy> | undefined) ?? {};
+  const rolePolicy = settings[role];
+  if (rolePolicy && typeof rolePolicy === "object") {
+    return { ...DEFAULT_LEAVE_POLICY, ...(rolePolicy as Partial<LeavePolicy>) };
+  }
+  if (typeof settings.casual === "number" || typeof settings.sick === "number" || typeof settings.other === "number") {
+    return { ...DEFAULT_LEAVE_POLICY, ...(settings as Partial<LeavePolicy>) };
+  }
+  return DEFAULT_ROLE_LEAVE_POLICY[role];
+}
 
 function inclusiveDayCount(startDate: string, endDate: string): number {
   const start = new Date(`${startDate}T00:00:00Z`);
@@ -276,7 +305,7 @@ export async function applyForLeave(
  * down by leave_type; teachers can apply but never change these numbers
  * themselves.
  */
-export async function getLeaveSummary(schoolId: string, teacherId: string) {
+export async function getLeaveSummary(schoolId: string, teacherId: string, role: ApplicantRole) {
   const yearStart = `${new Date().getFullYear()}-01-01`;
 
   const [{ data: school, error: schoolError }, { data: requests, error: requestsError }] = await Promise.all([
@@ -292,7 +321,7 @@ export async function getLeaveSummary(schoolId: string, teacherId: string) {
   if (requestsError) throw ApiError.internal(requestsError.message);
 
   const settings = (school?.settings as Record<string, unknown> | null) ?? {};
-  const policy: LeavePolicy = { ...DEFAULT_LEAVE_POLICY, ...(settings.leavePolicy as Partial<LeavePolicy> | undefined) };
+  const policy: LeavePolicy = resolveRolePolicy(settings.leavePolicy, role);
 
   const used: LeavePolicy = { casual: 0, sick: 0, other: 0 };
   let pendingCount = 0;

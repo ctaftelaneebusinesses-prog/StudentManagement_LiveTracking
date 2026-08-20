@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { optionalPassword, optionalPhone, optionalAadhaar, optionalDate, optionalGender } from "./common";
+import { optionalPassword, optionalPhone, optionalAadhaar, optionalDate, optionalGender, requiredPhone, requiredGender } from "./common";
 
 /**
  * Self-registration — one schema per role, each mirroring its admin-side
@@ -20,7 +20,7 @@ const baseAccountFields = {
   school_code: schoolCode,
   email: z.string().email(),
   full_name: z.string().min(2),
-  phone: optionalPhone,
+  phone: requiredPhone,
   password: optionalPassword,
 };
 
@@ -68,14 +68,11 @@ const teacherClassAssignment = z.object({
 });
 
 /**
- * Mirrors the admin's actual "Add teacher" form (TeacherFormModal.tsx)
- * exactly: "Is class teacher?" is a single independent toggle (+ homeroom
- * class picker when Yes) — it does NOT restrict which classes/subjects can
- * appear in Subjects Assigned. A class teacher may still teach a subject in
- * a different class than the one they're homeroom of, so `assignments` is
- * always the same free-form class+subject repeater either way, always
- * required (matches the admin form's unconditional "Add at least one
- * subject assignment" check).
+ * Simplified self-registration collects only Name/Email/Mobile/Employee ID/
+ * Password — subject assignments and the "is class teacher" homeroom pick
+ * (which the admin's "Add teacher" form, TeacherFormModal.tsx, still
+ * requires) are assigned afterward by the Admin/Principal, so both are
+ * optional here.
  */
 export const registerTeacherSchema = z.object({
   body: z
@@ -85,9 +82,9 @@ export const registerTeacherSchema = z.object({
       qualification: z.string().optional(),
       experience_years: z.coerce.number().int().min(0).max(80).optional(),
       joining_date: optionalDate,
-      is_class_teacher: z.boolean(),
+      is_class_teacher: z.boolean().optional().default(false),
       homeroom_class_id: z.string().uuid().optional(),
-      assignments: z.array(teacherClassAssignment).min(1, "Add at least one subject assignment"),
+      assignments: z.array(teacherClassAssignment).optional().default([]),
     })
     .superRefine((body, ctx) => {
       if (body.is_class_teacher && !body.homeroom_class_id) {
@@ -105,53 +102,43 @@ export const registerTeacherSchema = z.object({
  * the Parent role/portal has been removed from this codebase).
  */
 export const registerStudentSchema = z.object({
-  body: z
-    .object({
-      school_code: schoolCode,
-      email: z.string().email(),
-      full_name: z.string().min(2),
-      phone: optionalPhone,
-      password: optionalPassword,
-      admission_no: z.string().optional(),
-      roll_no: z.string().optional(),
-      class_id: z.string().uuid(),
-      date_of_birth: optionalDate,
-      gender: optionalGender,
-      blood_group: z.string().max(10).optional(),
-      aadhaar_number: optionalAadhaar,
-      address: z.string().optional(),
-      religion: z.string().optional(),
-      category: z.string().optional(),
-      state: z.string().optional(),
-      district: z.string().optional(),
-      city: z.string().optional(),
-      pin_code: z.string().optional(),
-      // Parent contact fields — same shape as createStudentSchema.
-      father_name: z.string().optional(),
-      father_phone: optionalPhone,
-      father_email: z.string().email().optional().or(z.literal("")),
-      father_occupation: z.string().optional(),
-      mother_name: z.string().optional(),
-      mother_phone: optionalPhone,
-      mother_email: z.string().email().optional().or(z.literal("")),
-      mother_occupation: z.string().optional(),
-      guardian_name: z.string().optional(),
-      guardian_phone: optionalPhone,
-      guardian_email: z.string().email().optional().or(z.literal("")),
-      guardian_occupation: z.string().optional(),
-    })
-    .superRefine((body, ctx) => {
-      const hasFather = !!body.father_name && !!body.father_phone;
-      const hasMother = !!body.mother_name && !!body.mother_phone;
-      const hasGuardian = !!body.guardian_name && !!body.guardian_phone;
-      if (!hasFather && !hasMother && !hasGuardian) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["father_name"],
-          message: "Provide at least one parent/guardian's name and mobile number",
-        });
-      }
-    }),
+  body: z.object({
+    school_code: schoolCode,
+    email: z.string().email(),
+    full_name: z.string().min(2),
+    phone: requiredPhone,
+    password: optionalPassword,
+    admission_no: z.string().optional(),
+    roll_no: z.string().optional(),
+    class_id: z.string().uuid(),
+    date_of_birth: optionalDate,
+    gender: requiredGender,
+    blood_group: z.string().max(10).optional(),
+    aadhaar_number: optionalAadhaar,
+    address: z.string().optional(),
+    religion: z.string().optional(),
+    category: z.string().optional(),
+    state: z.string().optional(),
+    district: z.string().optional(),
+    city: z.string().optional(),
+    pin_code: z.string().optional(),
+    // Parent contact fields — same shape as createStudentSchema. The simplified
+    // registration form only collects one "Parent Name" + "Mobile Number" pair
+    // (submitted as father_name/father_phone); mother/guardian stay available
+    // for completion later via My Profile.
+    father_name: z.string().min(2),
+    father_phone: requiredPhone,
+    father_email: z.string().email().optional().or(z.literal("")),
+    father_occupation: z.string().optional(),
+    mother_name: z.string().optional(),
+    mother_phone: optionalPhone,
+    mother_email: z.string().email().optional().or(z.literal("")),
+    mother_occupation: z.string().optional(),
+    guardian_name: z.string().optional(),
+    guardian_phone: optionalPhone,
+    guardian_email: z.string().email().optional().or(z.literal("")),
+    guardian_occupation: z.string().optional(),
+  }),
   query: z.object({}).optional(),
   params: z.object({}).optional(),
 });

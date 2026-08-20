@@ -36,6 +36,7 @@ export function ExtracurricularStudentsPage() {
         <BatchClassPicker batches={batches} value={picker} onChange={setPicker} />
         {selectedBatch && (
           <p className="text-xs text-[var(--ink-muted)]">
+            Academic Year: <span className="font-medium text-[var(--ink-primary)]">{selectedBatch.academic_years?.name ?? "—"}</span> ·{" "}
             {selectedBatch.studentCount ?? selectedBatch.student_count ?? "—"} student(s) in this class
           </p>
         )}
@@ -51,6 +52,7 @@ export function ExtracurricularStudentsPage() {
             rowKey={(s) => s.id}
             emptyMessage="No students in this batch yet."
             columns={[
+              { header: "Academic Year", cell: () => selectedBatch?.academic_years?.name ?? "—" },
               { header: "Admission No", cell: (s) => s.admission_no },
               { header: "Roll No", cell: (s) => s.roll_no ?? "—" },
               { header: "Name", cell: (s) => <span className="font-medium text-[var(--ink-primary)]">{s.users.full_name}</span> },

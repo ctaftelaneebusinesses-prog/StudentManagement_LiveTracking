@@ -1,30 +1,22 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
-import { DatePicker } from "@/components/ui/DatePicker";
-import { Textarea } from "@/components/ui/Textarea";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { Button } from "@/components/ui/Button";
 import { getApiErrorMessage } from "@/lib/axios";
 import { digitsOnly, PHONE_PATTERN } from "@/utils/formHelpers";
 import { generateDefaultPassword } from "@/utils/password";
 import { RegistrationMeta, RegistrationResult, submitRegistration } from "@/services/registration.service";
-import { GENDER_OPTIONS } from "./formShared";
 
 interface FormValues {
   full_name: string;
   email: string;
   phone: string;
   staff_type_activity_id: string;
-  qualification: string;
-  experience_years: string;
-  date_of_birth: string;
-  gender: string;
-  address: string;
 }
 
+/** Gender, date of birth, qualification, experience, and address move to My Profile after login — not collected here. */
 export function ExtracurricularStaffForm({ meta, onSuccess }: { meta: RegistrationMeta; onSuccess: (r: RegistrationResult) => void }) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
@@ -45,14 +37,9 @@ export function ExtracurricularStaffForm({ meta, onSuccess }: { meta: Registrati
         school_code: meta.school.code,
         full_name: values.full_name,
         email: values.email,
-        phone: values.phone || undefined,
+        phone: values.phone,
         password: password || undefined,
         staff_type_activity_id: values.staff_type_activity_id,
-        qualification: values.qualification || undefined,
-        experience_years: values.experience_years ? Number(values.experience_years) : undefined,
-        date_of_birth: values.date_of_birth || undefined,
-        gender: values.gender || undefined,
-        address: values.address || undefined,
       });
       onSuccess(result);
     } catch (err) {
@@ -63,16 +50,18 @@ export function ExtracurricularStaffForm({ meta, onSuccess }: { meta: Registrati
   return (
     <form className="space-y-1" onSubmit={handleSubmit(onSubmit)} noValidate>
       <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Extracurricular Staff registration</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400">Sent to your Principal for approval.</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        Sent to your Principal for approval. Qualification, experience, and other details can be added to your profile afterward.
+      </p>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input label="Full name" error={errors.full_name?.message} {...register("full_name", { required: "Full name is required" })} />
         <Input label="Email" type="email" error={errors.email?.message} {...register("email", { required: "Email is required" })} />
         <Input
-          label="Mobile number (optional)"
+          label="Mobile number"
           inputMode="numeric"
           error={errors.phone?.message}
-          {...digitsOnly(register("phone", { pattern: PHONE_PATTERN }), 10)}
+          {...digitsOnly(register("phone", { required: "Mobile number is required", pattern: PHONE_PATTERN }), 10)}
         />
         <Controller
           name="staff_type_activity_id"
@@ -89,17 +78,6 @@ export function ExtracurricularStaffForm({ meta, onSuccess }: { meta: Registrati
             />
           )}
         />
-        <Select label="Gender (optional)" options={GENDER_OPTIONS} placeholder="Select gender" {...register("gender")} />
-        <Controller
-          name="date_of_birth"
-          control={control}
-          render={({ field }) => <DatePicker label="Date of birth (optional)" value={field.value ?? ""} onChange={field.onChange} />}
-        />
-        <Input label="Qualification (optional)" {...register("qualification")} />
-        <Input label="Experience (years, optional)" type="number" min={0} max={80} {...register("experience_years")} />
-      </div>
-      <div className="mt-4">
-        <Textarea label="Address (optional)" rows={2} {...register("address")} />
       </div>
 
       <div className="mt-4">

@@ -618,7 +618,7 @@ export async function listEvents(staffId: string) {
     .from("extracurricular_events")
     .select(
       "id, staff_id, activity_id, batch_id, title, description, event_date, start_time, end_time, venue, " +
-        "activities(name), extracurricular_batches(name, classes(name, section))"
+        "activities(name), extracurricular_batches(name, classes(name, section), academic_years(name))"
     )
     .eq("staff_id", staffId)
     .order("event_date", { ascending: false });

@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Avatar } from "@/components/ui/Avatar";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { SidebarTour } from "@/components/quickTour/SidebarTour";
 import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
 import { ROLE_LABEL } from "@/utils/roles";
 
@@ -34,6 +35,7 @@ export function PortalNavbar({ onOpenMobileMenu }: PortalNavbarProps) {
       </button>
       <div className="hidden md:block" />
       <div className="flex items-center gap-2 sm:gap-4">
+        <SidebarTour />
         <LanguageSwitcher />
         {user && <NotificationBell />}
         {user && (

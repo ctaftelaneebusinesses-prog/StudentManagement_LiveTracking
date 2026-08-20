@@ -117,6 +117,21 @@ body {
 }
 
 /*
+ * Dashboard story carousel (StoryCarousel.tsx) progress segments — a plain
+ * CSS keyframe rather than a framer-motion tween because animation-play-state
+ * lets the browser pause/resume a segment's fill exactly where it left off
+ * (on hover or manual nav) without extra state to track the paused offset.
+ */
+@keyframes story-progress-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/*
  * Thin, on-brand scrollbar for the dark sidebar chrome (Sidebar.tsx /
  * AdminSidebar.tsx nav panels) — without this, Chrome/Edge/Firefox render
  * their bulky default light-grey OS scrollbar, which clashes hard against a

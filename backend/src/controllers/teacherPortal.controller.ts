@@ -139,7 +139,7 @@ export async function enhanceHomework(req: Request, res: Response, next: NextFun
 export async function getLeaveSummary(req: Request, res: Response, next: NextFunction) {
   try {
     const schoolId = resolveSchoolId(req);
-    return sendSuccess(res, await leaveRequestService.getLeaveSummary(schoolId, req.user!.id));
+    return sendSuccess(res, await leaveRequestService.getLeaveSummary(schoolId, req.user!.id, "teacher"));
   } catch (err) {
     return next(err);
   }

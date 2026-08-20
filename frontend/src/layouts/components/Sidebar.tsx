@@ -73,6 +73,8 @@ function NavGroups({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?:
                 onClick={onNavigate}
                 end={item.to === "/dashboard/teacher" || item.to === "/dashboard/student" || item.to === "/dashboard/driver"}
                 title={collapsed ? item.label : undefined}
+                data-tour-id={item.to}
+                data-tour-label={item.label}
                 className={({ isActive }) =>
                   `group relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-medium transition-colors ${
                     collapsed ? "justify-center px-2" : "px-3"
@@ -91,12 +93,16 @@ function NavGroups({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?:
         </div>
       ))}
 
-      {/* Teachers manage everything (profile, password, address, avatar) from
-          their own "My Profile" page (My Class group, above) — a second
-          "Account Settings" entry pointing at the generic profile editor
-          would just be a duplicate. Every other role has no dedicated
-          profile page yet, so they still need this link. */}
-      {!roleNames.includes("teacher") && !alreadyLinksToGenericProfile && (
+      {/* Teachers and extracurricular staff manage everything (profile,
+          password, address, avatar) from their own role-specific
+          "My Profile" page (above) — a second "Account Settings" entry
+          pointing at the generic profile editor would just be a duplicate.
+          Every other role's "My Profile" item already links straight to the
+          generic profile editor (alreadyLinksToGenericProfile), so this
+          block never actually renders for anyone anymore — kept only as a
+          safety net for a role that's added to PORTAL_NAV_GROUPS without a
+          profile entry of its own. */}
+      {!roleNames.includes("teacher") && !roleNames.includes("extracurricular_staff") && !alreadyLinksToGenericProfile && (
         <div>
           {!collapsed && (
             <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Account</p>
@@ -105,6 +111,8 @@ function NavGroups({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?:
             to="/dashboard/profile"
             onClick={onNavigate}
             title={collapsed ? "Profile" : undefined}
+            data-tour-id="/dashboard/profile"
+            data-tour-label="Account Settings"
             className={({ isActive }) =>
               `group relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-medium transition-colors ${
                 collapsed ? "justify-center px-2" : "px-3"

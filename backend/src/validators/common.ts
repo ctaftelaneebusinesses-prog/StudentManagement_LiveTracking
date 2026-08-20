@@ -36,3 +36,9 @@ export const optionalAadhaar = z.preprocess(
 export const optionalDate = z.preprocess(emptyToUndefined, z.string().date().optional());
 
 export const optionalGender = z.preprocess(emptyToUndefined, z.enum(["male", "female", "other"]).optional());
+
+/** Self-registration's Mobile Number field is mandatory (unlike the admin-side "Add X" forms, which keep it optional). */
+export const requiredPhone = z.string().regex(/^\d{10}$/, "Phone number must be exactly 10 digits");
+
+/** Student self-registration's Gender field is mandatory — the student dashboard theme is derived from it (see PortalThemeContext.tsx). */
+export const requiredGender = z.enum(["male", "female", "other"], { errorMap: () => ({ message: "Select a gender" }) });

@@ -1,5 +1,7 @@
 import { Menu } from "lucide-react";
 import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { SidebarTour } from "@/components/quickTour/SidebarTour";
 import { CommandSearch } from "./CommandSearch";
 import { SchoolSelectorMenu } from "./SchoolSelectorMenu";
 import { NotificationsMenu } from "./NotificationsMenu";
@@ -29,6 +31,8 @@ export function AdminTopbar({ onOpenMobileMenu }: AdminTopbarProps) {
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
         <SchoolSelectorMenu />
         <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />
+        <SidebarTour />
+        <LanguageSwitcher />
         <ThemeToggle />
         <NotificationsMenu />
         <div className="mx-0.5 hidden h-6 w-px bg-black/[0.08] dark:bg-white/[0.1] sm:block" />

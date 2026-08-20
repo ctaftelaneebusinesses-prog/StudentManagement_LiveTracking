@@ -15,12 +15,27 @@ export type NotificationType =
   | "principal_leave_approved"
   | "principal_leave_rejected"
   | "timetable_change_suggested"
+  | "profile_change_submitted"
+  | "profile_change_approved"
+  | "profile_change_rejected"
+  | "activity_assigned"
+  | "activity_completed"
+  | "fee_due"
+  | "fee_updated"
+  | "fee_removed"
+  | "payment_received"
+  | "activity_practice_scheduled"
+  | "activity_practice_work_assigned"
+  | "activity_event"
+  | "activity_certificate"
+  | "activity_schedule_updated"
   | "registration_submitted"
   | "registration_approved"
   | "registration_rejected"
   | "school_request_submitted"
   | "school_request_approved"
-  | "school_request_rejected";
+  | "school_request_rejected"
+  | "website_knowledge_completed";
 export type NotificationPriority = "normal" | "high" | "critical";
 export type NotificationAudienceScope = "school" | "class" | "student" | "role" | "user";
 
@@ -58,10 +73,25 @@ export const NOTIFICATION_TYPE_LABEL: Record<NotificationType, string> = {
   principal_leave_approved: "Leave Approved",
   principal_leave_rejected: "Leave Rejected",
   timetable_change_suggested: "Timetable Suggestion",
+  profile_change_submitted: "Profile Change Request",
+  profile_change_approved: "Profile Change Approved",
+  profile_change_rejected: "Profile Change Rejected",
+  activity_assigned: "Activity Assigned",
+  activity_completed: "Activity Completed",
+  fee_due: "Fee Due",
+  fee_updated: "Fee Updated",
+  fee_removed: "Fee Removed",
+  payment_received: "Payment Received",
+  activity_practice_scheduled: "Practice Scheduled",
+  activity_practice_work_assigned: "Practice Work Assigned",
+  activity_event: "Activity Event",
+  activity_certificate: "Activity Certificate",
+  activity_schedule_updated: "Activity Schedule Updated",
   registration_submitted: "Registration",
   registration_approved: "Registration Approved",
   registration_rejected: "Registration Rejected",
   school_request_submitted: "School Request",
   school_request_approved: "School Request Approved",
   school_request_rejected: "School Request Rejected",
+  website_knowledge_completed: "Website Knowledge Updated",
 };

@@ -3,7 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Bell, BellRing, ShieldAlert } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useAuth } from "@/hooks/useAuth";
 import { AppNotification, NOTIFICATION_TYPE_LABEL } from "@/types/notification.types";
+import { resolveNotificationRoute } from "@/utils/notificationNavigation";
 
 function timeAgo(isoDate: string): string {
   const seconds = Math.floor((Date.now() - new Date(isoDate).getTime()) / 1000);
@@ -18,6 +20,7 @@ function timeAgo(isoDate: string): string {
 export function NotificationsMenu() {
   const { notifications, unreadCount, markAsRead } = useNotifications();
   const { subscribe, isSubscribing, error: pushError } = usePushNotifications();
+  const { roleNames } = useAuth();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const notificationsPageUrl = pathname.startsWith("/dashboard/super-admin")
@@ -40,8 +43,8 @@ export function NotificationsMenu() {
   function handleItemClick(notification: AppNotification) {
     if (!notification.isRead) markAsRead(notification.id);
     setOpen(false);
-    const url = notification.metadata?.url;
-    if (typeof url === "string" && url) navigate(url);
+    const route = resolveNotificationRoute(notification, roleNames);
+    if (route) navigate(route);
   }
 
   async function handleEnableNotifications() {

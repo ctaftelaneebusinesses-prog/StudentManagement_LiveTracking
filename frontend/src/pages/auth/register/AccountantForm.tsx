@@ -31,7 +31,7 @@ export function AccountantForm({ meta, onSuccess }: { meta: RegistrationMeta; on
         school_code: meta.school.code,
         full_name: values.full_name,
         email: values.email,
-        phone: values.phone || undefined,
+        phone: values.phone,
         password: password || undefined,
       });
       onSuccess(result);
@@ -49,10 +49,10 @@ export function AccountantForm({ meta, onSuccess }: { meta: RegistrationMeta; on
         <Input label="Full name" error={errors.full_name?.message} {...register("full_name", { required: "Full name is required" })} />
         <Input label="Email" type="email" error={errors.email?.message} {...register("email", { required: "Email is required" })} />
         <Input
-          label="Mobile number (optional)"
+          label="Mobile number"
           inputMode="numeric"
           error={errors.phone?.message}
-          {...digitsOnly(register("phone", { pattern: PHONE_PATTERN }), 10)}
+          {...digitsOnly(register("phone", { required: "Mobile number is required", pattern: PHONE_PATTERN }), 10)}
         />
       </div>
 

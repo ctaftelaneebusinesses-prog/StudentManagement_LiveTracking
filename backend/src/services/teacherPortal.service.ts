@@ -108,7 +108,7 @@ export async function getDashboard(schoolId: string, teacherId: string) {
     getTodayTimetable(schoolId, teacherId),
     countPendingHomework(schoolId, classIds, teacherId),
     examService.listUpcomingAssessmentsForClasses(schoolId, classIds),
-    leaveRequestService.getLeaveSummary(schoolId, teacherId),
+    leaveRequestService.getLeaveSummary(schoolId, teacherId, "teacher"),
   ]);
 
   return {

@@ -16,6 +16,23 @@ const STUDENT_SELECT =
 
 const STUDENT_PROFILE_SELECT = STUDENT_SELECT;
 
+/**
+ * Same as STUDENT_SELECT but with an inner join hint (`users!inner`) plus
+ * `status` — lets listStudents filter on `users.status` directly in the
+ * query. A self-registered student's `students` row exists as soon as they
+ * submit (registration.service.ts::registerStudent creates it before
+ * markPending flips users.status to 'pending'), so without this filter the
+ * Student Management table showed pending/rejected registrations as if they
+ * were already active. getStudent/getStudentProfile deliberately keep using
+ * STUDENT_SELECT's plain (non-inner) `users(...)` — those are single-record
+ * lookups (e.g. the student's own profile pages) that must keep resolving
+ * regardless of approval status.
+ */
+const STUDENT_LIST_SELECT = STUDENT_SELECT.replace(
+  "users(full_name, email, phone, avatar_url, is_active)",
+  "users!inner(full_name, email, phone, avatar_url, is_active, status)"
+);
+
 interface ListStudentsFilters {
   classId?: string;
   search?: string;
@@ -26,8 +43,9 @@ interface ListStudentsFilters {
 export async function listStudents(schoolId: string, filters: ListStudentsFilters) {
   let query = supabaseAdmin
     .from("students")
-    .select(STUDENT_SELECT, { count: "exact" })
+    .select(STUDENT_LIST_SELECT, { count: "exact" })
     .eq("school_id", schoolId)
+    .eq("users.status", "approved")
     .order("admission_no");
 
   if (filters.classId) query = query.eq("class_id", filters.classId);

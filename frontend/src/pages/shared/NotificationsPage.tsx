@@ -2,10 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { Bell, BellRing, CheckCheck, ShieldAlert } from "lucide-react";
 import { useNotifications } from "@/hooks/useNotifications";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useAuth } from "@/hooks/useAuth";
 import { AppNotification, NOTIFICATION_TYPE_LABEL } from "@/types/notification.types";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { resolveNotificationRoute } from "@/utils/notificationNavigation";
 
 function timeAgo(isoDate: string): string {
   const seconds = Math.floor((Date.now() - new Date(isoDate).getTime()) / 1000);
@@ -32,6 +34,7 @@ function timeAgo(isoDate: string): string {
 export function NotificationsPage() {
   const { notifications, unreadCount, isLoading, markAsRead, markAllAsRead } = useNotifications();
   const { subscribe, isSubscribing, error: pushError } = usePushNotifications();
+  const { roleNames } = useAuth();
   const navigate = useNavigate();
 
   const permission: NotificationPermission =
@@ -43,8 +46,8 @@ export function NotificationsPage() {
 
   function handleClick(notification: AppNotification) {
     if (!notification.isRead) markAsRead(notification.id);
-    const url = notification.metadata?.url;
-    if (typeof url === "string" && url) navigate(url);
+    const route = resolveNotificationRoute(notification, roleNames);
+    if (route) navigate(route);
   }
 
   return (
@@ -99,7 +102,7 @@ export function NotificationsPage() {
       ) : (
         <ul className="space-y-2">
           {notifications.map((notification) => {
-            const hasLink = typeof notification.metadata?.url === "string" && notification.metadata.url;
+            const hasLink = resolveNotificationRoute(notification, roleNames) !== null;
             return (
               <li key={notification.id}>
                 <button

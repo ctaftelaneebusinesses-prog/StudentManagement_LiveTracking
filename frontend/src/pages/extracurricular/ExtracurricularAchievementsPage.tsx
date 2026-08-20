@@ -35,9 +35,10 @@ export function ExtracurricularAchievementsPage() {
     enabled: isModalOpen,
   });
   const batches = batchesQuery.data ?? [];
-  const batchId = awardToStudents
-    ? (resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId)?.id ?? "")
-    : "";
+  const selectedBatch = awardToStudents
+    ? resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId)
+    : null;
+  const batchId = selectedBatch?.id ?? "";
 
   const rosterQuery = useQuery({
     queryKey: ["extracurricular", "batch-students", batchId],
@@ -182,6 +183,7 @@ export function ExtracurricularAchievementsPage() {
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     Recipients ({selectedStudentIds.size} selected)
                   </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Academic Year: {selectedBatch?.academic_years?.name ?? "—"}</p>
                   {rosterQuery.isLoading ? (
                     <Skeleton className="h-20 w-full" />
                   ) : (

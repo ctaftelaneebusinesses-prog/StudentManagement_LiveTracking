@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { CalendarDays, FileText } from "lucide-react";
@@ -15,6 +16,7 @@ import { staggerContainer, fadeSlideUp } from "./components/ui/portalMotion";
 
 export function PortalExamsPage() {
   const studentId = usePortalStudentId();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [scheduleExamId, setScheduleExamId] = useState<string | null>(null);
   const [viewingDoc, setViewingDoc] = useState<QuestionPaperRecord | null>(null);
 
@@ -23,6 +25,19 @@ export function PortalExamsPage() {
     queryFn: () => examsService.fetchExams(studentId),
     enabled: !!studentId,
   });
+
+  useEffect(() => {
+    const linkedExamId = searchParams.get("examId");
+    if (linkedExamId && (examsQuery.data ?? []).some((e) => e.id === linkedExamId)) {
+      setScheduleExamId(linkedExamId);
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("examId");
+        return next;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [examsQuery.data, searchParams]);
   const questionPapersQuery = useQuery({
     queryKey: ["portal", "question-papers", studentId],
     queryFn: () => homeworkService.fetchQuestionPapers(studentId),

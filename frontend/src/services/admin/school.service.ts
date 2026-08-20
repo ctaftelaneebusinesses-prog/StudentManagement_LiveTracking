@@ -198,6 +198,24 @@ export const updateBackupSettings = (value: BackupSettings) => updateSchoolSetti
 export const updateWorkingDays = (value: number[]) => updateSchoolSettings("workingDays", value);
 export const updateAttendanceSettings = (value: { teacherCheckinCutoff?: string }) => updateSchoolSettings("attendance", value);
 
+export interface DefaultPeriodTiming {
+  period_no: number;
+  start_time: string;
+  end_time: string;
+}
+export const updateDefaultPeriodTimings = (value: DefaultPeriodTiming[]) => updateSchoolSettings("defaultPeriodTimings", value);
+
+export interface LeaveTypeLimits {
+  casual: number;
+  sick: number;
+  other: number;
+}
+export interface RoleLeavePolicy {
+  teacher: LeaveTypeLimits;
+  principal: LeaveTypeLimits;
+}
+export const updateLeavePolicy = (value: RoleLeavePolicy) => updateSchoolSettings("leavePolicy", value);
+
 // ----------------------------------------------------------------------------
 // Departments
 // ----------------------------------------------------------------------------

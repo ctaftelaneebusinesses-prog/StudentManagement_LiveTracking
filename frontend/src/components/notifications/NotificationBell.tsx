@@ -4,13 +4,7 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { AppNotification, NOTIFICATION_TYPE_LABEL } from "@/types/notification.types";
-
-/** Where clicking a notification of this type should take the viewer, based on their role. Only "van" is wired up for now — other types just mark-as-read as before. */
-function vanNotificationRoute(roleNames: string[]): string {
-  if (roleNames.includes("driver")) return "/dashboard/driver";
-  if (roleNames.includes("student")) return "/dashboard/portal/transport";
-  return "/dashboard/admin/transport?tab=monitoring";
-}
+import { resolveNotificationRoute } from "@/utils/notificationNavigation";
 
 function timeAgo(isoDate: string): string {
   const seconds = Math.floor((Date.now() - new Date(isoDate).getTime()) / 1000);
@@ -51,9 +45,10 @@ export function NotificationBell() {
 
   function handleItemClick(notification: AppNotification) {
     if (!notification.isRead) markAsRead(notification.id);
-    if (notification.type === "van") {
+    const route = resolveNotificationRoute(notification, roleNames);
+    if (route) {
       setOpen(false);
-      navigate(vanNotificationRoute(roleNames));
+      navigate(route);
     }
   }
 

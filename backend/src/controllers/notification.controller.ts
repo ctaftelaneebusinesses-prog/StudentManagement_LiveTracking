@@ -65,7 +65,8 @@ export async function listForStudent(req: Request, res: Response, next: NextFunc
   try {
     await assertStudentAccess(req, req.params.id);
     const schoolId = resolveSchoolId(req);
-    return sendSuccess(res, await notificationService.listForStudent(schoolId, req.params.id, req.user!.id));
+    const { limit } = req.query as { limit?: number };
+    return sendSuccess(res, await notificationService.listForStudent(schoolId, req.params.id, req.user!.id, limit));
   } catch (err) {
     return next(err);
   }

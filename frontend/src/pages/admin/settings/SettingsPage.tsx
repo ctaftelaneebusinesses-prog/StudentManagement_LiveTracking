@@ -1,20 +1,22 @@
 import { useState } from "react";
-import { Bell, Building2, CalendarDays, DatabaseBackup, ShieldCheck, UserCircle } from "lucide-react";
+import { Bell, Building2, CalendarClock, CalendarDays, DatabaseBackup, ShieldCheck, UserCircle } from "lucide-react";
 import { GraduationCap } from "lucide-react";
 import { SchoolProfileTab } from "./components/SchoolProfileTab";
 import { AcademicStructureTab } from "./components/AcademicStructureTab";
 import { CalendarTab } from "./components/CalendarTab";
+import { TimetableSettingsTab } from "./components/TimetableSettingsTab";
 import { NotificationsTab } from "./components/NotificationsTab";
 import { BackupTab } from "./components/BackupTab";
 import { AdminAccountTab } from "./components/AdminAccountTab";
 import { SecurityLogsTab } from "./components/SecurityLogsTab";
 
-type TabKey = "profile" | "academic" | "calendar" | "notifications" | "backup" | "account" | "security";
+type TabKey = "profile" | "academic" | "calendar" | "timetable" | "notifications" | "backup" | "account" | "security";
 
 const TABS: { key: TabKey; label: string; icon: typeof Building2 }[] = [
   { key: "profile", label: "School Profile", icon: Building2 },
   { key: "academic", label: "Academic Structure", icon: GraduationCap },
   { key: "calendar", label: "Calendar", icon: CalendarDays },
+  { key: "timetable", label: "Timetable", icon: CalendarClock },
   { key: "notifications", label: "Notifications", icon: Bell },
   { key: "backup", label: "Backup", icon: DatabaseBackup },
   { key: "account", label: "Admin Account", icon: UserCircle },
@@ -54,6 +56,7 @@ export function SettingsPage() {
       {tab === "profile" && <SchoolProfileTab />}
       {tab === "academic" && <AcademicStructureTab />}
       {tab === "calendar" && <CalendarTab />}
+      {tab === "timetable" && <TimetableSettingsTab />}
       {tab === "notifications" && <NotificationsTab />}
       {tab === "backup" && <BackupTab />}
       {tab === "account" && <AdminAccountTab />}

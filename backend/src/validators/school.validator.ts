@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SETTINGS_KEYS } from "../services/school.service";
 
 export const schoolLookupQuerySchema = z.object({
   body: z.object({}).optional(),
@@ -126,9 +127,10 @@ export const updateBranchSchema = z.object({
   params: z.object({ id: z.string().uuid() }),
 });
 
+/** `key` is validated against the same SETTINGS_KEYS the service/controller use — kept as one source of truth so a new settings key can't be added in one place and silently 400 here. */
 export const updateSchoolSettingsSchema = z.object({
   body: z.object({
-    key: z.enum(["email", "notifications", "backup", "workingDays"]),
+    key: z.enum(SETTINGS_KEYS),
     value: z.unknown(),
   }),
   query: z.object({}).optional(),

@@ -29,7 +29,8 @@ export function ExtracurricularPracticeWorkPage() {
 
   const batchesQuery = useQuery({ queryKey: ["extracurricular", "batches"], queryFn: portalService.fetchMyBatches });
   const batches = batchesQuery.data ?? [];
-  const batchId = resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId)?.id ?? "";
+  const selectedBatch = resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId);
+  const batchId = selectedBatch?.id ?? "";
 
   const rosterQuery = useQuery({
     queryKey: ["extracurricular", "batch-students", batchId],
@@ -162,6 +163,7 @@ export function ExtracurricularPracticeWorkPage() {
               <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Notify students ({selectedStudentIds.size} selected)
               </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Academic Year: {selectedBatch?.academic_years?.name ?? "—"}</p>
               {rosterQuery.isLoading ? (
                 <Skeleton className="h-20 w-full" />
               ) : (

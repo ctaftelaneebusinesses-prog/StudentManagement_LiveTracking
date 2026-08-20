@@ -59,6 +59,7 @@ const PORTAL_SHARED_NAV: PortalNavGroup[] = [
     label: "Extracurricular",
     items: [{ label: "Extracurricular Activities", to: "/dashboard/portal/extracurricular", icon: Sparkles }],
   },
+  { label: "Events", items: [{ label: "Events", to: "/dashboard/portal/events", icon: CalendarDays }] },
   {
     label: "Fees & Reports",
     items: [
@@ -92,6 +93,7 @@ export const PORTAL_NAV_GROUPS: Record<RoleName, PortalNavGroup[]> = {
         { label: "Students", to: "/dashboard/teacher/students", icon: Users },
         { label: "Timetable", to: "/dashboard/teacher/timetable", icon: CalendarClock },
         { label: "Student Registrations", to: "/dashboard/teacher/registration-approvals", icon: ClipboardCheck },
+        { label: "Profile Approval", to: "/dashboard/teacher/profile-approval", icon: ClipboardCheck },
       ],
     },
     {
@@ -118,6 +120,7 @@ export const PORTAL_NAV_GROUPS: Record<RoleName, PortalNavGroup[]> = {
   driver: [
     { label: "Overview", items: [{ label: "Dashboard", to: "/dashboard/driver", icon: LayoutDashboard }] },
     { label: "Learning", items: [{ label: "Website Knowledge", to: "/dashboard/driver/website-knowledge", icon: BadgeCheck }] },
+    { label: "Profile", items: [{ label: "My Profile", to: "/dashboard/profile", icon: IdCard }] },
   ],
   extracurricular_staff: [
     { label: "Overview", items: [{ label: "Dashboard", to: "/dashboard/extracurricular", icon: LayoutDashboard }] },

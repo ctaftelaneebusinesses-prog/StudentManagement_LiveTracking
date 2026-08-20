@@ -40,9 +40,10 @@ export function ExtracurricularEventsPage() {
 
   const batchesQuery = useQuery({ queryKey: ["extracurricular", "batches"], queryFn: portalService.fetchMyBatches });
   const batches = batchesQuery.data ?? [];
-  const batchId = targetClass
-    ? (resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId)?.id ?? "")
-    : "";
+  const selectedBatch = targetClass
+    ? resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId)
+    : null;
+  const batchId = selectedBatch?.id ?? "";
 
   const rosterQuery = useQuery({
     queryKey: ["extracurricular", "batch-students", batchId],
@@ -127,6 +128,7 @@ export function ExtracurricularEventsPage() {
                     {event.extracurricular_batches?.classes
                       ? ` · ${event.extracurricular_batches.classes.name} - ${event.extracurricular_batches.classes.section}`
                       : ""}
+                    {event.extracurricular_batches?.academic_years?.name ? ` · AY ${event.extracurricular_batches.academic_years.name}` : ""}
                   </p>
                   {event.description && <p className="mt-1 max-w-md text-xs text-[var(--ink-secondary)]">{event.description}</p>}
                 </div>
@@ -188,6 +190,7 @@ export function ExtracurricularEventsPage() {
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     Notify students ({selectedStudentIds.size} selected)
                   </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Academic Year: {selectedBatch?.academic_years?.name ?? "—"}</p>
                   {rosterQuery.isLoading ? (
                     <Skeleton className="h-20 w-full" />
                   ) : (

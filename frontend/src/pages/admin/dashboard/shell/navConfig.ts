@@ -110,6 +110,12 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
         roles: ["school_admin", "super_admin", "principal"],
       },
       { label: "My Leave", to: "/dashboard/admin/my-leave", icon: CalendarCheck, roles: ["principal"] },
+      {
+        label: "Leave Settings",
+        to: "/dashboard/admin/leave-settings",
+        icon: CalendarCheck,
+        roles: ["school_admin", "super_admin"],
+      },
     ],
   },
   {

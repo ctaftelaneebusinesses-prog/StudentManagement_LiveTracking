@@ -1,12 +1,14 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, MapPin, Search } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, ArrowRight, MapPin, Search, UserPlus } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/Card";
 import { DataTable } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Avatar } from "@/components/ui/Avatar";
 import { Spinner } from "@/components/ui/Spinner";
+import { Button } from "@/components/ui/Button";
+import { AssignStudentsModal } from "@/pages/admin/transport/components/AssignStudentsModal";
 import * as transportService from "@/services/transport.service";
 import { RouteStudentAssignment } from "@/types/transport.types";
 
@@ -41,6 +43,8 @@ function StopTimeline({ stops, fromLabel, toLabel, reversed }: { stops: { id: st
 export function RouteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [search, setSearch] = useState("");
+  const [isAssignOpen, setAssignOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const routeQuery = useQuery({ queryKey: ["transport", "route", id], queryFn: () => transportService.fetchRoute(id!), enabled: !!id });
   const studentsQuery = useQuery({ queryKey: ["transport", "route-students", id], queryFn: () => transportService.fetchRouteStudents(id!), enabled: !!id });
@@ -122,14 +126,19 @@ export function RouteDetailPage() {
       <Card className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Assigned students</h2>
-          <div className="relative max-w-sm">
-            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)]" />
-            <input
-              placeholder="Search students..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-white/15 dark:bg-white/5 dark:text-white"
-            />
+          <div className="flex items-center gap-3">
+            <div className="relative max-w-sm">
+              <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-muted)]" />
+              <input
+                placeholder="Search students..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-white/15 dark:bg-white/5 dark:text-white"
+              />
+            </div>
+            <Button onClick={() => setAssignOpen(true)}>
+              <UserPlus size={16} strokeWidth={2} /> Add Student
+            </Button>
           </div>
         </div>
         <DataTable<RouteStudentAssignment>
@@ -150,8 +159,9 @@ export function RouteDetailPage() {
                 </div>
               ),
             },
-            { header: "Class", cell: (r) => (r.students.classes ? `${r.students.classes.name} - ${r.students.classes.section}` : "—") },
-            { header: "Stop", cell: (r) => r.pickup_points?.name ?? "—" },
+            { header: "Class", cell: (r) => r.students.classes?.name ?? "—" },
+            { header: "Section", cell: (r) => r.students.classes?.section ?? "—" },
+            { header: "Pickup Stop", cell: (r) => r.pickup_points?.name ?? "—" },
             { header: "When", cell: (r) => DIRECTION_LABEL[r.transport_direction] ?? "—" },
             {
               header: "Parent contact",
@@ -164,6 +174,15 @@ export function RouteDetailPage() {
           ]}
         />
       </Card>
+
+      <AssignStudentsModal
+        isOpen={isAssignOpen}
+        route={route}
+        onClose={() => {
+          setAssignOpen(false);
+          void queryClient.invalidateQueries({ queryKey: ["transport", "route-students", id] });
+        }}
+      />
     </div>
   );
 }

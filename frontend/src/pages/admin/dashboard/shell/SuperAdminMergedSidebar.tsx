@@ -187,6 +187,8 @@ function NavGroups({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?:
                 end={item.to === "/dashboard/super-admin"}
                 onClick={onNavigate}
                 title={collapsed ? item.label : undefined}
+                data-tour-id={item.to}
+                data-tour-label={item.label}
                 className={({ isActive }) =>
                   `group relative flex items-center gap-2.5 rounded-lg py-2 text-sm font-medium
                   before:absolute before:-left-3 before:top-1/2 before:h-5 before:w-[3px] before:-translate-y-1/2

@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
 import { PasswordField } from "@/components/ui/PasswordField";
 import { Button } from "@/components/ui/Button";
-import { Textarea } from "@/components/ui/Textarea";
 import { getApiErrorMessage } from "@/lib/axios";
 import { digitsOnly, PHONE_PATTERN } from "@/utils/formHelpers";
 import { generateDefaultPassword } from "@/utils/password";
@@ -14,11 +13,9 @@ interface FormValues {
   email: string;
   phone: string;
   license_number: string;
-  license_expiry: string;
-  address: string;
-  emergency_contact_phone: string;
 }
 
+/** License expiry / address / emergency contact move to My Profile after login — not collected here. */
 export function DriverForm({ meta, onSuccess }: { meta: RegistrationMeta; onSuccess: (r: RegistrationResult) => void }) {
   const [serverError, setServerError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
@@ -36,12 +33,9 @@ export function DriverForm({ meta, onSuccess }: { meta: RegistrationMeta; onSucc
         school_code: meta.school.code,
         full_name: values.full_name,
         email: values.email,
-        phone: values.phone || undefined,
+        phone: values.phone,
         password: password || undefined,
         license_number: values.license_number,
-        license_expiry: values.license_expiry || undefined,
-        address: values.address || undefined,
-        emergency_contact_phone: values.emergency_contact_phone || undefined,
       });
       onSuccess(result);
     } catch (err) {
@@ -52,32 +46,24 @@ export function DriverForm({ meta, onSuccess }: { meta: RegistrationMeta; onSucc
   return (
     <form className="space-y-1" onSubmit={handleSubmit(onSubmit)} noValidate>
       <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Driver registration</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-400">Sent to your Principal for approval.</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        Sent to your Principal for approval. License expiry, address, and other details can be added to your profile afterward.
+      </p>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input label="Full name" error={errors.full_name?.message} {...register("full_name", { required: "Full name is required" })} />
         <Input label="Email" type="email" error={errors.email?.message} {...register("email", { required: "Email is required" })} />
         <Input
-          label="Mobile number (optional)"
+          label="Mobile number"
           inputMode="numeric"
           error={errors.phone?.message}
-          {...digitsOnly(register("phone", { pattern: PHONE_PATTERN }), 10)}
+          {...digitsOnly(register("phone", { required: "Mobile number is required", pattern: PHONE_PATTERN }), 10)}
         />
         <Input
           label="Driver license number"
           error={errors.license_number?.message}
           {...register("license_number", { required: "License number is required" })}
         />
-        <Input label="License expiry (optional)" type="date" {...register("license_expiry")} />
-        <Input
-          label="Emergency contact number (optional)"
-          inputMode="numeric"
-          error={errors.emergency_contact_phone?.message}
-          {...digitsOnly(register("emergency_contact_phone", { pattern: PHONE_PATTERN }), 10)}
-        />
-      </div>
-      <div className="mt-4">
-        <Textarea label="Address (optional)" rows={2} {...register("address")} />
       </div>
 
       <div className="mt-4">

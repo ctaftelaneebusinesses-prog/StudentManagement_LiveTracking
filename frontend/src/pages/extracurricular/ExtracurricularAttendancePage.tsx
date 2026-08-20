@@ -35,7 +35,8 @@ export function ExtracurricularAttendancePage() {
 
   const batchesQuery = useQuery({ queryKey: ["extracurricular", "batches"], queryFn: portalService.fetchMyBatches });
   const batches = batchesQuery.data ?? [];
-  const batchId = resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId)?.id ?? "";
+  const selectedBatch = resolveBatch(batches, picker.academicYear, picker.className, picker.section, picker.activityId);
+  const batchId = selectedBatch?.id ?? "";
 
   const studentsQuery = useQuery({
     queryKey: ["extracurricular", "batch-students", batchId],
@@ -118,6 +119,11 @@ export function ExtracurricularAttendancePage() {
 
       <Card className="space-y-4">
         <BatchClassPicker batches={batches} value={picker} onChange={setPicker} />
+        {selectedBatch && (
+          <p className="text-xs text-[var(--ink-muted)]">
+            Academic Year: <span className="font-medium text-[var(--ink-primary)]">{selectedBatch.academic_years?.name ?? "—"}</span>
+          </p>
+        )}
         <div className="flex flex-wrap items-end gap-4">
           <Input label="Session date" type="date" max={todayIso()} value={date} onChange={(e) => setDate(e.target.value)} />
           {!!batchId && roster.length > 0 && (
@@ -140,6 +146,7 @@ export function ExtracurricularAttendancePage() {
                 <thead className="bg-black/[0.02] dark:bg-white/[0.04]">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium text-[var(--ink-muted)]">Student</th>
+                    <th className="px-4 py-3 text-left font-medium text-[var(--ink-muted)]">Academic Year</th>
                     <th className="px-4 py-3 text-left font-medium text-[var(--ink-muted)]">Status</th>
                     <th className="px-4 py-3 text-left font-medium text-[var(--ink-muted)]">Remarks</th>
                   </tr>

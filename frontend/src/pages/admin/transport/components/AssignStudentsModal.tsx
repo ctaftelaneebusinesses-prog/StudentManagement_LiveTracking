@@ -6,9 +6,16 @@ import { Select } from "@/components/ui/Select";
 import { SearchableSelect } from "@/components/ui/SearchableSelect";
 import { Button } from "@/components/ui/Button";
 import { Badge, BadgeVariant } from "@/components/ui/Badge";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import * as transportService from "@/services/transport.service";
 import * as classesService from "@/services/admin/classes.service";
+import { getApiErrorMessage } from "@/lib/axios";
 import { Route, RouteStudentAssignment, TransportDirection, TransportPaymentStatus } from "@/types/transport.types";
+
+/** Key a class by name+section, ignoring which academic year it's under. */
+function classKey(name: string, section: string): string {
+  return `${name}␟${section}`;
+}
 
 const PAYMENT_STATUS_OPTIONS: { value: TransportPaymentStatus; label: string }[] = [
   { value: "unpaid", label: "Unpaid" },
@@ -32,17 +39,40 @@ const DIRECTION_LABEL: Record<TransportDirection, string> = { both: "Morning & E
 
 export function AssignStudentsModal({ isOpen, route, onClose }: { isOpen: boolean; route: Route | null; onClose: () => void }) {
   const queryClient = useQueryClient();
-  const [classId, setClassId] = useState("");
+  const [selectedClassKey, setSelectedClassKey] = useState("");
   const [studentId, setStudentId] = useState("");
   const [stopId, setStopId] = useState("");
   const [direction, setDirection] = useState<TransportDirection>("both");
+  const [showRouteChangeConfirm, setShowRouteChangeConfirm] = useState(false);
 
   const classesQuery = useQuery({ queryKey: ["admin", "classes"], queryFn: classesService.fetchClasses, enabled: isOpen });
+  const classes = classesQuery.data ?? [];
+
+  // A school can have more than one class row sharing the same name+section
+  // (e.g. two "10 - A"s, one per academic year) — assigning transport doesn't
+  // care which academic year a student's class happens to be under, so the
+  // picker keys on name+section and searches every matching class row rather
+  // than guessing which single one is "the right year" (that guess was wrong
+  // often enough to hide real students). The assign action itself only needs
+  // the student's id, never a class_id, so merging is safe.
+  const classOptionsByKey = new Map<string, { name: string; section: string }>();
+  for (const c of classes) classOptionsByKey.set(classKey(c.name, c.section), { name: c.name, section: c.section });
+  const classOptions = Array.from(classOptionsByKey, ([value, c]) => ({ value, label: `${c.name} - ${c.section}` }));
+
+  const matchingClassIds = selectedClassKey
+    ? classes.filter((c) => classKey(c.name, c.section) === selectedClassKey).map((c) => c.id)
+    : [];
 
   const classStudentsQuery = useQuery({
-    queryKey: ["admin", "classes", classId, "students"],
-    queryFn: () => classesService.fetchClassStudents(classId, { pageSize: 500 }),
-    enabled: !!classId,
+    queryKey: ["admin", "classes", matchingClassIds.slice().sort(), "students"],
+    queryFn: async () => {
+      // pageSize is capped at 100 server-side (getClassStudentsSchema) — asking
+      // for more than that 400s the whole request, which silently looked
+      // identical to "this class has 0 students" in the UI below.
+      const results = await Promise.all(matchingClassIds.map((id) => classesService.fetchClassStudents(id, { pageSize: 100 })));
+      return results.flatMap((r) => r.items);
+    },
+    enabled: matchingClassIds.length > 0,
   });
 
   const rosterQuery = useQuery({
@@ -52,21 +82,43 @@ export function AssignStudentsModal({ isOpen, route, onClose }: { isOpen: boolea
   });
 
   function resetForm() {
-    setClassId("");
+    setSelectedClassKey("");
     setStudentId("");
     setStopId("");
     setDirection("both");
   }
 
-  const selectedStudent = (classStudentsQuery.data?.items ?? []).find((s) => s.id === studentId) ?? null;
+  const selectedStudent = (classStudentsQuery.data ?? []).find((s) => s.id === studentId) ?? null;
+
+  // Looks up whatever route the selected student is currently on (if any) so
+  // assigning them to a different route can warn first instead of silently
+  // overwriting their existing stop — a student may only ever have one active
+  // transport route (student_pickup_points.student_id is the table's PK).
+  const currentTransportQuery = useQuery({
+    queryKey: ["transport", "student-transport", studentId],
+    queryFn: () => transportService.fetchStudentTransport(studentId),
+    enabled: !!studentId,
+  });
+  const currentRoute = currentTransportQuery.data?.pickup_points.routes ?? null;
+  const isRouteChange = !!currentRoute && currentRoute.id !== route?.id;
 
   const assignMutation = useMutation({
     mutationFn: () => transportService.assignStudentTransport(studentId, { pickup_point_id: stopId, transport_direction: direction }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["transport", "route-students", route?.id] });
+      void queryClient.invalidateQueries({ queryKey: ["transport", "student-transport", studentId] });
+      setShowRouteChangeConfirm(false);
       resetForm();
     },
   });
+
+  function handleAssignClick() {
+    if (isRouteChange) {
+      setShowRouteChangeConfirm(true);
+      return;
+    }
+    assignMutation.mutate();
+  }
 
   const unassignMutation = useMutation({
     mutationFn: (studentId: string) => transportService.unassignStudentTransport(studentId),
@@ -86,18 +138,18 @@ export function AssignStudentsModal({ isOpen, route, onClose }: { isOpen: boolea
             <Select
               label="Class"
               placeholder="Select a class"
-              options={(classesQuery.data ?? []).map((c) => ({ value: c.id, label: `${c.name} - ${c.section}` }))}
-              value={classId}
+              options={classOptions}
+              value={selectedClassKey}
               onChange={(e) => {
-                setClassId(e.target.value);
+                setSelectedClassKey(e.target.value);
                 setStudentId("");
               }}
             />
             <SearchableSelect
               label="Student"
-              placeholder={classId ? "Select a student" : "Select a class first"}
-              disabled={!classId}
-              options={(classStudentsQuery.data?.items ?? []).map((s) => ({
+              placeholder={selectedClassKey ? "Select a student" : "Select a class first"}
+              disabled={!selectedClassKey}
+              options={(classStudentsQuery.data ?? []).map((s) => ({
                 value: s.id,
                 label: `${s.users.full_name} · ${s.admission_no}`,
               }))}
@@ -105,9 +157,17 @@ export function AssignStudentsModal({ isOpen, route, onClose }: { isOpen: boolea
               onChange={setStudentId}
             />
           </div>
-          {classId && !classStudentsQuery.isLoading && (classStudentsQuery.data?.items ?? []).length === 0 && (
-            <p className="text-sm text-slate-500 dark:text-slate-400">No students in this class yet.</p>
+          {classStudentsQuery.isError && (
+            <p className="text-sm text-[var(--delta-bad)]">
+              {getApiErrorMessage(classStudentsQuery.error, "Failed to load students for this class.")}
+            </p>
           )}
+          {selectedClassKey &&
+            !classStudentsQuery.isLoading &&
+            !classStudentsQuery.isError &&
+            (classStudentsQuery.data ?? []).length === 0 && (
+              <p className="text-sm text-slate-500 dark:text-slate-400">No students in this class yet.</p>
+            )}
 
           {selectedStudent && (
             <div className="grid gap-3 sm:grid-cols-2">
@@ -118,7 +178,12 @@ export function AssignStudentsModal({ isOpen, route, onClose }: { isOpen: boolea
                 value={direction}
                 onChange={(e) => setDirection(e.target.value as TransportDirection)}
               />
-              <Button className="sm:col-span-2" disabled={!stopId} isLoading={assignMutation.isPending} onClick={() => assignMutation.mutate()}>
+              {isRouteChange && (
+                <p className="text-sm text-amber-600 dark:text-amber-400 sm:col-span-2">
+                  Already assigned to {currentRoute!.name}. Assigning here will move them to {route.name}.
+                </p>
+              )}
+              <Button className="sm:col-span-2" disabled={!stopId} isLoading={assignMutation.isPending} onClick={handleAssignClick}>
                 Assign {selectedStudent.users.full_name}
               </Button>
             </div>
@@ -146,6 +211,16 @@ export function AssignStudentsModal({ isOpen, route, onClose }: { isOpen: boolea
           </ul>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showRouteChangeConfirm}
+        title="Change transport route?"
+        message={`This student is already assigned to ${currentRoute?.name ?? "another route"}. Do you want to change the transport route?`}
+        confirmLabel="Yes, Change Route"
+        isLoading={assignMutation.isPending}
+        onConfirm={() => assignMutation.mutate()}
+        onCancel={() => setShowRouteChangeConfirm(false)}
+      />
     </Modal>
   );
 }

@@ -82,17 +82,32 @@ async function getStudentCountsByClass(schoolId: string): Promise<Map<string, nu
 // ---------------------------------------------------------------------------
 // Classes
 // ---------------------------------------------------------------------------
+
+/** Pre-KG/LKG/UKG, then numbered grades in numeric order — a plain text sort puts "10" before "2". Anything else (a custom class name) sorts alphabetically after the numbered grades. */
+const NAMED_CLASS_RANK: Record<string, number> = { "pre-kg": 0, lkg: 1, ukg: 2 };
+
+function classSortRank(name: string): number {
+  const key = name.trim().toLowerCase();
+  if (key in NAMED_CLASS_RANK) return NAMED_CLASS_RANK[key];
+  const asNumber = Number(name.trim());
+  if (name.trim() !== "" && Number.isFinite(asNumber)) return 100 + asNumber;
+  return 100000;
+}
+
+function sortClasses<T extends { name: string; section: string }>(classes: T[]): T[] {
+  return [...classes].sort((a, b) => {
+    const rankDiff = classSortRank(a.name) - classSortRank(b.name);
+    if (rankDiff !== 0) return rankDiff;
+    return a.name.localeCompare(b.name) || a.section.localeCompare(b.section);
+  });
+}
+
 export async function listClasses(schoolId: string) {
-  const { data, error } = await supabaseAdmin
-    .from("classes")
-    .select(CLASS_SELECT)
-    .eq("school_id", schoolId)
-    .order("name")
-    .order("section");
+  const { data, error } = await supabaseAdmin.from("classes").select(CLASS_SELECT).eq("school_id", schoolId);
   if (error) throw ApiError.internal(error.message);
 
   const counts = await getStudentCountsByClass(schoolId);
-  return (data ?? []).map((klass) => ({ ...klass, student_count: counts.get(klass.id) ?? 0 }));
+  return sortClasses(data ?? []).map((klass) => ({ ...klass, student_count: counts.get(klass.id) ?? 0 }));
 }
 
 export async function getClass(schoolId: string, classId: string) {

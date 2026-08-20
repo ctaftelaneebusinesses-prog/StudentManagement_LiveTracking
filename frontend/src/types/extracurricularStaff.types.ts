@@ -159,7 +159,11 @@ export interface ExtracurricularEvent {
   venue: string | null;
   /** Joined names — present on rows from GET /extracurricular-portal/events (listEvents). */
   activities?: { name: string } | null;
-  extracurricular_batches?: { name: string | null; classes?: { name: string; section: string } | null } | null;
+  extracurricular_batches?: {
+    name: string | null;
+    classes?: { name: string; section: string } | null;
+    academic_years?: { name: string } | null;
+  } | null;
 }
 
 export interface ExtracurricularAchievement {

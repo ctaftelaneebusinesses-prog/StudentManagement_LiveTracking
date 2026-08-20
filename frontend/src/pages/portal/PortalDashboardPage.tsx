@@ -11,6 +11,7 @@ import { PortalGlassCard } from "./components/ui/PortalGlassCard";
 import { PortalStatCard } from "./components/ui/PortalStatCard";
 import { PortalSkeleton } from "./components/ui/PortalSkeleton";
 import { staggerContainer, fadeSlideUp } from "./components/ui/portalMotion";
+import { StoryCarousel } from "./components/story/StoryCarousel";
 import { DAY_NAMES } from "@/types/dashboard.types";
 
 function pad(n: number) {
@@ -104,6 +105,8 @@ export function PortalDashboardPage() {
           <p className="text-sm text-white/80">Here's what's happening today.</p>
         </div>
       </motion.div>
+
+      <StoryCarousel />
 
       <motion.div
         variants={staggerContainer}

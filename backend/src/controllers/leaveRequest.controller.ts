@@ -79,7 +79,8 @@ function selfApplicantRole(roleName: string): "teacher" | "principal" {
 export async function getMySummary(req: Request, res: Response, next: NextFunction) {
   try {
     const schoolId = resolveSchoolId(req);
-    return sendSuccess(res, await leaveRequestService.getLeaveSummary(schoolId, req.user!.id));
+    const role = selfApplicantRole(req.user!.roleName);
+    return sendSuccess(res, await leaveRequestService.getLeaveSummary(schoolId, req.user!.id, role));
   } catch (err) {
     return next(err);
   }

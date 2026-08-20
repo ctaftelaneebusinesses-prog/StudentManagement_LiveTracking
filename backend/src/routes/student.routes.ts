@@ -35,7 +35,7 @@ import {
 } from "../validators/evaluatedPaper.validator";
 import { listStudentAttendanceSchema } from "../validators/attendance.validator";
 import { studentIdParamSchema, studentExamParamSchema } from "../validators/exam.validator";
-import { markReadSchema } from "../validators/notification.validator";
+import { markReadSchema, listStudentNotificationsSchema } from "../validators/notification.validator";
 import {
   recordPaymentSchema,
   studentIdParamSchema as feeStudentIdParamSchema,
@@ -225,7 +225,7 @@ router.get("/:id/homework", validate(studentIdParamSchema), homeworkController.l
 router.get("/:id/homework/all", validate(studentIdParamSchema), homeworkController.listAllForStudent);
 router.get("/:id/timetable", validate(studentIdParamSchema), timetableController.getWeeklyForStudent);
 router.get("/:id/extracurricular", validate(studentIdParamSchema), studentExtracurricularController.getOverview);
-router.get("/:id/notifications", validate(studentIdParamSchema), notificationController.listForStudent);
+router.get("/:id/notifications", validate(listStudentNotificationsSchema), notificationController.listForStudent);
 router.post(
   "/:id/notifications/:notificationId/read",
   validate(markReadSchema),

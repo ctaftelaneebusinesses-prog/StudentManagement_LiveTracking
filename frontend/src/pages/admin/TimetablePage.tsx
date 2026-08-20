@@ -10,6 +10,8 @@ import { ErrorState } from "@/pages/admin/dashboard/components/states/ErrorState
 import * as classesService from "@/services/admin/classes.service";
 import * as teachersService from "@/services/admin/teachers.service";
 import * as timetableService from "@/services/admin/timetable.service";
+import * as schoolService from "@/services/admin/school.service";
+import { DefaultPeriodTiming } from "@/services/admin/school.service";
 import { SCHOOL_WEEK_DAYS, TimetablePeriodEntry, TimetablePeriodType, WEEKDAY_NAMES } from "@/types/timetable.types";
 import { PeriodModal } from "./timetable/components/PeriodModal";
 import { TimetableGrid, TimetableGridSkeleton } from "./timetable/components/TimetableGrid";
@@ -48,6 +50,9 @@ export function TimetablePage() {
     queryKey: ["admin", "classes"],
     queryFn: classesService.fetchClasses,
   });
+
+  const { data: school } = useQuery({ queryKey: ["admin", "school"], queryFn: schoolService.fetchMySchool });
+  const defaultPeriodTimings = (school?.settings?.defaultPeriodTimings as DefaultPeriodTiming[] | undefined) ?? [];
 
   const classNames = useMemo(() => Array.from(new Set(classes.map((c) => c.name))), [classes]);
   const sectionsForName = useMemo(
@@ -127,13 +132,14 @@ export function TimetablePage() {
   function openCell(periodNo: number, dayOfWeek: number) {
     const existing = getCell(periodNo, dayOfWeek) ?? null;
     const sibling = periods.find((p) => p.period_no === periodNo);
+    const masterDefault = defaultPeriodTimings.find((t) => t.period_no === periodNo);
     setSaveError(null);
     setSelectedCell({
       periodNo,
       dayOfWeek,
       existing,
-      defaultStartTime: sibling?.start_time?.slice(0, 5),
-      defaultEndTime: sibling?.end_time?.slice(0, 5),
+      defaultStartTime: sibling?.start_time?.slice(0, 5) ?? masterDefault?.start_time,
+      defaultEndTime: sibling?.end_time?.slice(0, 5) ?? masterDefault?.end_time,
     });
   }
 

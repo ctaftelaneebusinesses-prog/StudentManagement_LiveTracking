@@ -104,6 +104,7 @@ export interface StudentNotification {
   id: string;
   title: string;
   message: string;
+  type: string;
   audience_scope: NotificationAudienceScope;
   audience_class_id: string | null;
   audience_user_id: string | null;

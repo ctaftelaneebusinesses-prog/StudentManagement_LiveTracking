@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ClipboardList, CalendarClock, FileText, Trophy, BarChart3 } from "lucide-react";
 import { Tabs, TabItem } from "@/components/ui/Tabs";
@@ -22,7 +23,9 @@ const TABS: TabItem<TabKey>[] = [
 ];
 
 export function ExamsPage() {
-  const [tab, setTab] = useState<TabKey>("exams");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const linkedExamId = searchParams.get("examId");
+  const [tab, setTab] = useState<TabKey>(linkedExamId ? "results" : "exams");
   const [classFilter, setClassFilter] = useState("");
   const [selectedExamId, setSelectedExamId] = useState("");
 
@@ -43,11 +46,20 @@ export function ExamsPage() {
       if (selectedExamId) setSelectedExamId("");
       return;
     }
+    if (linkedExamId && exams.some((e) => e.id === linkedExamId)) {
+      setSelectedExamId(linkedExamId);
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("examId");
+        return next;
+      });
+      return;
+    }
     if (!exams.some((e) => e.id === selectedExamId)) {
       setSelectedExamId(exams[0].id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [exams]);
+  }, [exams, linkedExamId]);
 
   const selectedExam = exams.find((e) => e.id === selectedExamId) ?? null;
 

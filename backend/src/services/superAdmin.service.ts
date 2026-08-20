@@ -37,6 +37,32 @@ const ROLE_STATS = [
 ] as const;
 type StatRole = (typeof ROLE_STATS)[number];
 
+/** Numeric role id backing each stat, for roles with no dedicated profile table. */
+const ROLE_ID_BY_STAT: Record<StatRole, number> = {
+  school_admin: ROLE_ID.SCHOOL_ADMIN,
+  principal: ROLE_ID.PRINCIPAL,
+  teacher: ROLE_ID.TEACHER,
+  student: ROLE_ID.STUDENT,
+  accountant: ROLE_ID.ACCOUNTANT,
+  driver: ROLE_ID.DRIVER,
+  extracurricular_staff: ROLE_ID.EXTRACURRICULAR_STAFF,
+  support_staff: ROLE_ID.SUPPORT_STAFF,
+};
+
+/**
+ * Roles that have their own profile table — the source of truth for who's
+ * actually enrolled/employed. `user_roles` is only populated by a DB trigger
+ * on auth-user creation and can drift out of sync (e.g. a bulk import that
+ * inserts straight into `students` without going through that trigger), so
+ * counts for these roles must come from the profile table, not `user_roles`.
+ */
+const ROLE_TABLE_BY_STAT: Partial<Record<StatRole, string>> = {
+  teacher: "teachers",
+  student: "students",
+  driver: "drivers",
+  extracurricular_staff: "extracurricular_staff",
+};
+
 /** ids of every account holding super_admin — excluded from all cascades. */
 async function getSuperAdminUserIds(): Promise<string[]> {
   const { data, error } = await supabaseAdmin
@@ -47,12 +73,26 @@ async function getSuperAdminUserIds(): Promise<string[]> {
   return Array.from(new Set((data ?? []).map((row) => row.user_id)));
 }
 
-async function countUsersWithRole(role: StatRole, activeOnly = false): Promise<number> {
+/** Counts a role platform-wide, optionally restricted to a school. */
+async function countUsersWithRole(
+  role: StatRole,
+  { activeOnly = false, schoolId }: { activeOnly?: boolean; schoolId?: string } = {}
+): Promise<number> {
+  const table = ROLE_TABLE_BY_STAT[role];
+  if (table) {
+    let query = supabaseAdmin.from(table).select("id", { count: "exact", head: true });
+    if (schoolId) query = query.eq("school_id", schoolId);
+    const { count, error } = await query;
+    if (error) throw ApiError.internal(error.message);
+    return count ?? 0;
+  }
+
   let query = supabaseAdmin
-    .from("user_roles")
-    .select("user_id, roles!inner(name), users!inner(is_active)", { count: "exact", head: true })
-    .eq("roles.name", role);
-  if (activeOnly) query = query.eq("users.is_active", true);
+    .from("users")
+    .select("id", { count: "exact", head: true })
+    .eq("role_id", ROLE_ID_BY_STAT[role]);
+  if (activeOnly) query = query.eq("is_active", true);
+  if (schoolId) query = query.eq("school_id", schoolId);
 
   const { count, error } = await query;
   if (error) throw ApiError.internal(error.message);
@@ -94,7 +134,7 @@ export async function getPlatformDashboard() {
       roleTotals[role] = await countUsersWithRole(role);
     })
   );
-  const activeSchoolAdmins = await countUsersWithRole("school_admin", true);
+  const activeSchoolAdmins = await countUsersWithRole("school_admin", { activeOnly: true });
 
   // Students per school — one head-count per school keeps this O(schools)
   // instead of pulling every student row back just to group them.
@@ -230,24 +270,14 @@ async function loadAssignmentsBySchool(schoolIds: string[]): Promise<Map<string,
 
 /** Per-school headcounts used on both the Schools list and the school overview. */
 export async function getSchoolCounts(schoolId: string) {
-  const roleCount = async (role: StatRole) => {
-    const { count, error } = await supabaseAdmin
-      .from("user_roles")
-      .select("user_id, roles!inner(name), users!inner(school_id)", { count: "exact", head: true })
-      .eq("roles.name", role)
-      .eq("users.school_id", schoolId);
-    if (error) throw ApiError.internal(error.message);
-    return count ?? 0;
-  };
-
   const [students, teachers, principals, accountants, drivers, ecStaff, classRows, totalUsers] =
     await Promise.all([
-      roleCount("student"),
-      roleCount("teacher"),
-      roleCount("principal"),
-      roleCount("accountant"),
-      roleCount("driver"),
-      roleCount("extracurricular_staff"),
+      countUsersWithRole("student", { schoolId }),
+      countUsersWithRole("teacher", { schoolId }),
+      countUsersWithRole("principal", { schoolId }),
+      countUsersWithRole("accountant", { schoolId }),
+      countUsersWithRole("driver", { schoolId }),
+      countUsersWithRole("extracurricular_staff", { schoolId }),
       supabaseAdmin.from("classes").select("name").eq("school_id", schoolId),
       supabaseAdmin.from("users").select("id", { count: "exact", head: true }).eq("school_id", schoolId),
     ]);
