@@ -18,6 +18,7 @@ interface FormValues {
   phone: string;
   gender: string;
   father_name: string;
+  roll_no: string;
 }
 
 export function StudentForm({ meta, onSuccess }: { meta: RegistrationMeta; onSuccess: (r: RegistrationResult) => void }) {
@@ -54,6 +55,7 @@ export function StudentForm({ meta, onSuccess }: { meta: RegistrationMeta; onSuc
         gender: values.gender,
         father_name: values.father_name,
         father_phone: values.phone,
+        roll_no: values.roll_no,
       });
       onSuccess(result);
     } catch (err) {
@@ -72,6 +74,7 @@ export function StudentForm({ meta, onSuccess }: { meta: RegistrationMeta; onSuc
       <FormGrid>
         <Input label="Student name" error={errors.full_name?.message} {...register("full_name", { required: "Student name is required" })} />
         <Input label="Parent name" error={errors.father_name?.message} {...register("father_name", { required: "Parent name is required" })} />
+        <Input label="Roll number" error={errors.roll_no?.message} {...register("roll_no", { required: "Roll number is required" })} />
         <Input
           label="Mobile number"
           inputMode="numeric"
@@ -98,7 +101,7 @@ export function StudentForm({ meta, onSuccess }: { meta: RegistrationMeta; onSuc
         <PasswordField
           value={password}
           onChange={setPassword}
-          onGenerate={() => setPassword(generateDefaultPassword(watch("full_name"), watch("full_name")))}
+          onGenerate={() => setPassword(generateDefaultPassword(watch("father_name"), watch("roll_no")))}
         />
       </div>
 

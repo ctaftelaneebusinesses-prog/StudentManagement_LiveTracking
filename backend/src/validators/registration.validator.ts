@@ -109,7 +109,7 @@ export const registerStudentSchema = z.object({
     phone: requiredPhone,
     password: optionalPassword,
     admission_no: z.string().optional(),
-    roll_no: z.string().optional(),
+    roll_no: z.string().min(1, "Roll number is required"),
     class_id: z.string().uuid(),
     date_of_birth: optionalDate,
     gender: requiredGender,
