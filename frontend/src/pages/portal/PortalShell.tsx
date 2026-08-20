@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { SchoolProvider } from "@/context/SchoolContext";
@@ -33,6 +33,13 @@ function PortalShellChrome() {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [isCollapsed, setCollapsed] = useState(false);
   const location = useLocation();
+
+  // Belt-and-suspenders: close the mobile drawer whenever the route changes,
+  // not just when a nav link's onClick fires — so the drawer never lingers
+  // open over the newly-opened page on mobile.
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="flex h-screen bg-[var(--page-plane)] dark:bg-[#101012]">

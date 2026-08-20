@@ -1,5 +1,5 @@
-import { ReactNode, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { ReactNode, useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { SchoolProvider } from "@/context/SchoolContext";
 import { Sidebar } from "./components/Sidebar";
 import { Navbar } from "./components/Navbar";
@@ -8,6 +8,14 @@ import { Navbar } from "./components/Navbar";
 export function DashboardShell({ children }: { children: ReactNode }) {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
   const [isCollapsed, setCollapsed] = useState(false);
+  const { pathname } = useLocation();
+
+  // Belt-and-suspenders: close the mobile drawer whenever the route changes,
+  // not just when a nav link's onClick fires — so the drawer never lingers
+  // open over the newly-opened page on mobile.
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [pathname]);
 
   return (
     <SchoolProvider>

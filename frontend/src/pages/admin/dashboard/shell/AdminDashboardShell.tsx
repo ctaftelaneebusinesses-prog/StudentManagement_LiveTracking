@@ -1,4 +1,5 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { SchoolProvider } from "@/context/SchoolContext";
 import { useAuth } from "@/hooks/useAuth";
 import { AdminSidebar } from "./AdminSidebar";
@@ -17,7 +18,15 @@ export function AdminDashboardShell({ children }: { children: ReactNode }) {
   const { hasRole } = useAuth();
   const [isCollapsed, setCollapsed] = useState(false);
   const [isMobileOpen, setMobileOpen] = useState(false);
+  const { pathname } = useLocation();
   const Sidebar = hasRole("super_admin") ? SuperAdminMergedSidebar : AdminSidebar;
+
+  // Belt-and-suspenders: close the mobile drawer whenever the route changes,
+  // not just when a nav link's onClick fires — so the drawer never lingers
+  // open over the newly-opened page on mobile.
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   return (
     <SchoolProvider>
