@@ -15,10 +15,12 @@ import { Textarea } from "@/components/ui/Textarea";
 import { useToast } from "@/components/ui/Toast";
 import * as staffService from "@/services/admin/extracurricularStaff.service";
 import * as activitiesService from "@/services/admin/activities.service";
+import * as classesService from "@/services/admin/classes.service";
 import { ExtracurricularGender, ExtracurricularStaff } from "@/types/extracurricularStaff.types";
 import { getApiErrorMessage } from "@/lib/axios";
 import { generateDefaultPassword } from "@/utils/password";
 import { digitsOnly } from "@/utils/formHelpers";
+import { academicYearOptions } from "@/utils/classPicker";
 
 const GENDER_OPTIONS = [
   { value: "male", label: "Male" },
@@ -95,6 +97,32 @@ export function StaffFormModal({ isOpen, mode, staff, onClose, onSaved }: StaffF
     enabled: isOpen,
   });
 
+  // Class assignment is mandatory for a brand-new staff member — every
+  // extracurricular staff account must run at least one class, either a
+  // specific set or the whole school (e.g. a PT teacher covering every
+  // class), not just a "staff type" with nothing to actually teach.
+  const { data: classes = [] } = useQuery({
+    queryKey: ["admin", "classes"],
+    queryFn: classesService.fetchClasses,
+    enabled: isOpen && mode === "add",
+  });
+  const [assignAcademicYearId, setAssignAcademicYearId] = useState("");
+  const [assignScope, setAssignScope] = useState<"specific" | "whole_school">("specific");
+  const [assignClassIds, setAssignClassIds] = useState<Set<string>>(new Set());
+  const yearOptions = academicYearOptions(classes);
+  const classesForYear = classes
+    .filter((c) => c.academic_year_id === assignAcademicYearId)
+    .sort((a, b) => a.name.localeCompare(b.name) || a.section.localeCompare(b.section));
+
+  function toggleAssignClass(classId: string) {
+    setAssignClassIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(classId)) next.delete(classId);
+      else next.add(classId);
+      return next;
+    });
+  }
+
   // Fetch the full profile (edit mode only) to know which activities are
   // already assigned — the list-row `staff` object doesn't carry that.
   const profileQuery = useQuery({
@@ -132,6 +160,9 @@ export function StaffFormModal({ isOpen, mode, staff, onClose, onSaved }: StaffF
     }
     setPhotoFile(null);
     setSelectedActivityIds(new Set());
+    setAssignAcademicYearId("");
+    setAssignScope("specific");
+    setAssignClassIds(new Set());
     setSaveError(null);
   }, [isOpen, staff, reset]);
 
@@ -179,6 +210,19 @@ export function StaffFormModal({ isOpen, mode, staff, onClose, onSaved }: StaffF
           bio: values.bio || undefined,
         });
         staffId = created.id;
+
+        const classIds =
+          assignScope === "whole_school" ? classesForYear.map((c) => c.id) : Array.from(assignClassIds);
+        await Promise.all(
+          classIds.map((classId) =>
+            staffService.createBatch(staffId!, {
+              activity_id: values.staff_type_activity_id,
+              academic_year_id: assignAcademicYearId,
+              class_id: classId,
+              scope: "entire_class",
+            })
+          )
+        );
       } else {
         await staffService.updateExtracurricularStaff(staffId, {
           full_name: values.full_name,
@@ -211,6 +255,16 @@ export function StaffFormModal({ isOpen, mode, staff, onClose, onSaved }: StaffF
 
   async function onSubmit(values: StaffFormValues) {
     setSaveError(null);
+    if (mode === "add") {
+      if (!assignAcademicYearId) {
+        setSaveError("Select an academic year for this staff member's class assignment.");
+        return;
+      }
+      if (assignScope === "specific" && assignClassIds.size === 0) {
+        setSaveError("Assigning a class is required — pick at least one class, or choose \"Whole school\".");
+        return;
+      }
+    }
     setSaving(true);
     try {
       await saveMutation.mutateAsync(values);
@@ -302,6 +356,82 @@ export function StaffFormModal({ isOpen, mode, staff, onClose, onSaved }: StaffF
           </div>
           <Textarea label="Bio (optional)" rows={3} {...register("bio")} />
         </section>
+
+        {mode === "add" && (
+          <section className="space-y-3 border-t border-slate-100 pt-5 dark:border-white/10">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
+              Class assignment <span className="text-red-500">*</span>
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Required — every extracurricular staff member must be assigned to at least one class, or to the whole
+              school.
+            </p>
+
+            <Select
+              label="Academic year"
+              placeholder="Select year"
+              options={yearOptions}
+              value={assignAcademicYearId}
+              onChange={(e) => {
+                setAssignAcademicYearId(e.target.value);
+                setAssignClassIds(new Set());
+              }}
+            />
+
+            <div>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Assign to</label>
+              <div className="mt-1.5 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAssignScope("specific")}
+                  className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                    assignScope === "specific"
+                      ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"
+                      : "border-slate-300 text-slate-600 dark:border-white/20 dark:text-slate-300"
+                  }`}
+                >
+                  Specific class(es)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAssignScope("whole_school")}
+                  className={`flex-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors ${
+                    assignScope === "whole_school"
+                      ? "border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300"
+                      : "border-slate-300 text-slate-600 dark:border-white/20 dark:text-slate-300"
+                  }`}
+                >
+                  Whole school
+                </button>
+              </div>
+            </div>
+
+            {assignScope === "specific" && (
+              <div className="space-y-2 rounded-lg border border-slate-200 p-3 dark:border-white/10">
+                {!assignAcademicYearId ? (
+                  <p className="text-sm text-slate-400 dark:text-slate-500">Select an academic year first.</p>
+                ) : classesForYear.length === 0 ? (
+                  <p className="text-sm text-slate-400 dark:text-slate-500">No classes exist for this academic year yet.</p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                    {classesForYear.map((c) => (
+                      <label key={c.id} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+                        <Checkbox checked={assignClassIds.has(c.id)} onChange={() => toggleAssignClass(c.id)} />
+                        {c.name} - {c.section}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {assignScope === "whole_school" && assignAcademicYearId && (
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Will be assigned to all {classesForYear.length} class(es) in this academic year.
+              </p>
+            )}
+          </section>
+        )}
 
         {mode === "edit" && (
           <section className="space-y-3 border-t border-slate-100 pt-5 dark:border-white/10">

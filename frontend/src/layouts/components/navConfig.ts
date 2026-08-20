@@ -137,7 +137,6 @@ export const PORTAL_NAV_GROUPS: Record<RoleName, PortalNavGroup[]> = {
     {
       label: "Training",
       items: [
-        { label: "Attendance", to: "/dashboard/extracurricular/attendance", icon: ClipboardList },
         { label: "Practice Work", to: "/dashboard/extracurricular/practice-work", icon: BookOpen },
         { label: "Events", to: "/dashboard/extracurricular/events", icon: CalendarCheck },
         { label: "Achievements", to: "/dashboard/extracurricular/achievements", icon: Trophy },

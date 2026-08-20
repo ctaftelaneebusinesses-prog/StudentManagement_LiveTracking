@@ -133,7 +133,9 @@ export function ExtracurricularAttendancePage() {
           )}
         </div>
 
-        {!batchId ? (
+        {!batchesQuery.isLoading && batches.length === 0 ? (
+          <EmptyState title="No classes assigned yet" description="Once the admin assigns you a class, it will appear here." />
+        ) : !batchId ? (
           <EmptyState title="Select a class to take attendance" description="Choose an academic year, class, and section above." />
         ) : studentsQuery.isLoading ? (
           <Skeleton className="h-48 w-full" />

@@ -527,15 +527,20 @@ function PTMScene({ active }: StorySceneIllustrationProps) {
 function CongratulationsScene({ active }: StorySceneIllustrationProps) {
   const confettiColors = ["#ff6b8b", "#4fa1ff", "#ffd166", "#63c78a", "#9b8cff"];
   const shapes = ["square", "circle", "streamer"] as const;
-  const motherColor = "#4338ca";
+  const motherColor = "#3457d5";
   const childColor = "#f0a93a";
   return (
     <svg viewBox={VIEW} className="h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Mother and child sharing a proud hug beside a trophy, with confetti falling">
       <defs>
-        <linearGradient id="congratsBg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#fde3f2" />
-          <stop offset="100%" stopColor="#eef0ff" />
+        <linearGradient id="congratsBg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#4c1d95" />
+          <stop offset="55%" stopColor="#9333ea" />
+          <stop offset="100%" stopColor="#c026a3" />
         </linearGradient>
+        <radialGradient id="cinematicGlow" cx="50%" cy="45%" r="65%">
+          <stop offset="0%" stopColor="#fff4d6" stopOpacity="0.42" />
+          <stop offset="100%" stopColor="#fff4d6" stopOpacity="0" />
+        </radialGradient>
         <radialGradient id="trophyGoldGrad" cx="35%" cy="22%" r="85%">
           <stop offset="0%" stopColor="#fff3c4" />
           <stop offset="45%" stopColor="#ffd166" />
@@ -548,9 +553,13 @@ function CongratulationsScene({ active }: StorySceneIllustrationProps) {
         <clipPath id="trophyCupClip">
           <path d="M -20 6 Q -24 -34 0 -34 Q 24 -34 20 6 Z" />
         </clipPath>
+        <filter id="congratsSoftBlur" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="5" />
+        </filter>
       </defs>
       <rect x="-110" width="700" height="260" fill="url(#congratsBg)" />
-      <Ground y={205} color="#e6def6" />
+      <ellipse cx="240" cy="110" rx="260" ry="150" fill="url(#cinematicGlow)" />
+      <Ground y={205} color="#3b0a5e" />
 
       {/* Confetti burst from the top-left and top-right corners, mixed shapes */}
       {Array.from({ length: 22 }).map((_, i) => {
@@ -571,6 +580,7 @@ function CongratulationsScene({ active }: StorySceneIllustrationProps) {
 
       {/* Achievement asset — a detailed trophy on a polished marble platform, balancing the hug on the left */}
       <g transform="translate(90 165)">
+        <ellipse cx="4" cy="50" rx="42" ry="9" fill="#000000" opacity="0.3" filter="url(#congratsSoftBlur)" />
         <ellipse cx="0" cy="46" rx="38" ry="8" fill="url(#marbleGrad)" />
         <rect x="-30" y="30" width="60" height="16" rx="4" fill="url(#marbleGrad)" />
         <rect x="-24" y="33" width="18" height="3" rx="1.5" fill="#ffffff" opacity="0.14" />
@@ -586,6 +596,10 @@ function CongratulationsScene({ active }: StorySceneIllustrationProps) {
           <path d="M -20 -18 Q -36 -16 -34 -2 Q -32 8 -20 6" fill="none" stroke="url(#trophyGoldGrad)" strokeWidth="4" strokeLinecap="round" />
           <path d="M 20 -18 Q 36 -16 34 -2 Q 32 8 20 6" fill="none" stroke="url(#trophyGoldGrad)" strokeWidth="4" strokeLinecap="round" />
           <polygon points={starPoints(0, -14, 7, 3)} fill="#fff3c4" opacity="0.9" />
+          {/* A constant soft gleam, plus the animated shimmer sweep below, so the cup always catches some light */}
+          <g clipPath="url(#trophyCupClip)">
+            <ellipse cx="-9" cy="-20" rx="5" ry="10" fill="#ffffff" opacity="0.35" transform="rotate(-18 -9 -20)" />
+          </g>
           {/* Shimmer overlay: a diagonal sweep clipped to the cup, looping every 3s */}
           <g clipPath="url(#trophyCupClip)">
             <g transform="skewX(-20)">
@@ -608,6 +622,8 @@ function CongratulationsScene({ active }: StorySceneIllustrationProps) {
 
       {/* Mother and child embrace — overlapping, interlocking shapes rather than two separate figures joined by a line */}
       <g transform="translate(360 150)">
+        <ellipse cx="6" cy="58" rx="48" ry="9" fill="#000000" opacity="0.28" filter="url(#congratsSoftBlur)" />
+
         {/* far arm, wraps behind the child */}
         <motion.path
           d="M -20 -2 Q 12 18 28 34"

@@ -1,0 +1,28 @@
+-- ============================================================================
+-- Migration: 076_close_notifications_write_policy_leak
+-- Run AFTER 075_active_trip_location_access.sql.
+--
+-- 043_scope_notifications_to_recipient.sql dropped `notifications_select_staff`
+-- (a SELECT policy that let any staff account see every notification in the
+-- school regardless of audience_user_id) because it defeated the careful
+-- per-recipient targeting used for registration/leave/profile-change
+-- notifications.
+--
+-- It missed a second policy with the exact same effect:
+-- `notifications_write_staff_or_teacher`, created `FOR ALL` in
+-- 006_student_management_module.sql. In Postgres RLS, a `FOR ALL` policy's
+-- `USING` clause governs SELECT/UPDATE/DELETE, not just writes — so this
+-- policy independently re-opened the identical leak (any staff/teacher sees
+-- every notification in the school) even after 043 shipped. Confirmed live:
+-- a school_admin was still seeing "Driver registration awaiting approval"
+-- rows addressed to other users' audience_user_id after 043 was applied.
+--
+-- Every write to `notifications` goes through supabaseAdmin (service role,
+-- bypasses RLS) — see notification.service.ts (notifyUsers/notifyStudents/
+-- createNotification/createEmergencyAlert) and announcement.service.ts. No
+-- code path writes to this table through a user-scoped client, so this
+-- policy was never actually needed for writes either; it's safe to drop
+-- outright rather than narrow it to specific commands.
+-- ============================================================================
+
+drop policy if exists notifications_write_staff_or_teacher on public.notifications;

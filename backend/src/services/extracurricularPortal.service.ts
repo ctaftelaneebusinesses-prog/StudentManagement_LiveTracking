@@ -349,51 +349,40 @@ export async function getMyBatches(staffId: string) {
 }
 
 /**
- * Roster for one of this staff member's own batches, flattened to match
- * `PortalBatchStudent` (`student_id, full_name, admission_no, roll_no`) in
- * `frontend/src/types/extracurricularPortal.types.ts` — deliberately not the
- * admin-side `ExtracurricularBatchStudent` join shape. Ownership is checked
- * first via `assertStaffOwnsBatch`.
+ * Roster for one of this staff member's own batches, matching
+ * `PortalBatchStudent` (`id, admission_no, roll_no, class_id, users: {
+ * full_name, email, phone, avatar_url }`) in
+ * `frontend/src/types/extracurricularPortal.types.ts` — every consumer
+ * (ExtracurricularStudentsPage/AttendancePage/PracticeWorkPage/EventsPage/
+ * AchievementsPage) reads `s.users.full_name`/`s.id`, so returning a flat
+ * `{student_id, full_name}` shape here crashes their render as soon as a
+ * batch actually has students (silently masked before, since no batch had
+ * any). Ownership is checked first via `assertStaffOwnsBatch`.
  */
 export async function getBatchStudents(staffId: string, batchId: string, schoolId: string) {
   const batch = await assertStaffOwnsBatch(staffId, batchId, schoolId);
+  const STUDENT_SELECT = "id, admission_no, roll_no, class_id, users(full_name, email, phone, avatar_url)";
 
   if (batch.scope === "entire_class") {
     const { data, error } = await supabaseAdmin
       .from("students")
-      .select("id, admission_no, roll_no, users(full_name)")
+      .select(STUDENT_SELECT)
       .eq("school_id", schoolId)
       .eq("class_id", batch.class_id)
       .order("roll_no");
     if (error) throw ApiError.internal(error.message);
-
-    return ((data ?? []) as unknown as { id: string; admission_no: string; roll_no: string | null; users: { full_name: string } | null }[]).map(
-      (row) => ({
-        student_id: row.id,
-        full_name: row.users?.full_name ?? "",
-        admission_no: row.admission_no,
-        roll_no: row.roll_no,
-      })
-    );
+    return data ?? [];
   }
 
   const { data, error } = await supabaseAdmin
     .from("extracurricular_batch_students")
-    .select("students(id, admission_no, roll_no, users(full_name))")
+    .select(`students(${STUDENT_SELECT})`)
     .eq("batch_id", batchId);
   if (error) throw ApiError.internal(error.message);
 
-  return (
-    (data ?? []) as unknown as { students: { id: string; admission_no: string; roll_no: string | null; users: { full_name: string } | null } | null }[]
-  )
+  return ((data ?? []) as unknown as { students: Record<string, unknown> | null }[])
     .map((row) => row.students)
-    .filter((s): s is NonNullable<typeof s> => !!s)
-    .map((s) => ({
-      student_id: s.id,
-      full_name: s.users?.full_name ?? "",
-      admission_no: s.admission_no,
-      roll_no: s.roll_no,
-    }));
+    .filter((s): s is NonNullable<typeof s> => !!s);
 }
 
 /** Today's recurring schedule slots across every batch this staff member runs. Field set matches `ExtracurricularScheduleSlot` exactly. */
@@ -501,11 +490,11 @@ async function notifyBatchStudents(
   studentIds: string[] | undefined,
   input: { title: string; message: string; type: notificationService.NotificationType; metadata?: Record<string, unknown> }
 ): Promise<void> {
-  const roster = await getBatchStudents(staffId, batchId, schoolId);
+  const roster = (await getBatchStudents(staffId, batchId, schoolId)) as { id: string }[];
   const targetIds =
     studentIds && studentIds.length > 0
-      ? roster.filter((s) => studentIds.includes(s.student_id)).map((s) => s.student_id)
-      : roster.map((s) => s.student_id);
+      ? roster.filter((s) => studentIds.includes(s.id)).map((s) => s.id)
+      : roster.map((s) => s.id);
   if (targetIds.length === 0) return;
   await notificationService.notifyStudents(schoolId, staffId, targetIds, input);
 }
