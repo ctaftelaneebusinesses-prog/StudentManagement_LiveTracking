@@ -28,6 +28,7 @@ export function DriverDashboardPage() {
   const [position, setPosition] = useState<{ latitude: number; longitude: number; updatedAt: string } | null>(null);
   const [gpsError, setGpsError] = useState("");
   const lastSent = useRef(0);
+  const lastPoint = useRef<LocationPayload | null>(null);
   const pendingQueue = useRef<LocationPayload[]>([]);
   const flushingQueue = useRef(false);
 
@@ -120,32 +121,63 @@ export function DriverDashboardPage() {
       setGpsError("This browser does not support location sharing.");
       return;
     }
-    const watcher = navigator.geolocation.watchPosition(
-      (point) => {
-        const now = Date.now();
-        const next = { latitude: point.coords.latitude, longitude: point.coords.longitude, updatedAt: new Date(point.timestamp).toISOString() };
-        setPosition(next);
-        if (now - lastSent.current >= 10000 || point.coords.accuracy <= 25) {
-          lastSent.current = now;
-          const payload: LocationPayload = {
-            latitude: next.latitude,
-            longitude: next.longitude,
-            accuracy_meters: point.coords.accuracy,
-            speed_mps: point.coords.speed ?? undefined,
-            heading: point.coords.heading ?? undefined,
-            recorded_at: next.updatedAt,
-          };
-          void tracking.sendLocation(trip.id, payload).catch(() => {
-            pendingQueue.current.push(payload);
-            if (pendingQueue.current.length > MAX_QUEUED_POINTS) pendingQueue.current.shift();
-            setGpsError("Connection lost — location updates are queued and will send automatically once it's back.");
-          });
-        }
-      },
-      (error) => setGpsError(error.code === error.PERMISSION_DENIED ? "Location permission is required while a trip is active." : "Unable to determine your location."),
-      { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
-    );
-    return () => navigator.geolocation.clearWatch(watcher);
+
+    const send = (payload: LocationPayload) => {
+      lastSent.current = Date.now();
+      void tracking.sendLocation(trip.id, payload).catch(() => {
+        pendingQueue.current.push(payload);
+        if (pendingQueue.current.length > MAX_QUEUED_POINTS) pendingQueue.current.shift();
+        setGpsError("Connection lost — location updates are queued and will send automatically once it's back.");
+      });
+    };
+
+    const onPosition = (point: GeolocationPosition) => {
+      const next = { latitude: point.coords.latitude, longitude: point.coords.longitude, updatedAt: new Date(point.timestamp).toISOString() };
+      setPosition(next);
+      const payload: LocationPayload = {
+        latitude: next.latitude,
+        longitude: next.longitude,
+        accuracy_meters: point.coords.accuracy,
+        speed_mps: point.coords.speed ?? undefined,
+        heading: point.coords.heading ?? undefined,
+        recorded_at: next.updatedAt,
+      };
+      lastPoint.current = payload;
+      if (Date.now() - lastSent.current >= 10000 || point.coords.accuracy <= 25) send(payload);
+    };
+
+    const onError = (error: GeolocationPositionError) =>
+      setGpsError(error.code === error.PERMISSION_DENIED ? "Location permission is required while a trip is active." : "Unable to determine your location.");
+
+    const geoOptions: PositionOptions = { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 };
+    let watcher = navigator.geolocation.watchPosition(onPosition, onError, geoOptions);
+
+    // Guarantees a fresh point reaches the backend on a fixed cadence even if
+    // `watchPosition` stops delivering callbacks mid-trip — a documented
+    // real-world failure mode on some mobile browsers (screen dim, OS power
+    // saving, backgrounded tab) where GPS updates silently stall until the
+    // page is reloaded. Without this, the student's map only ever advanced
+    // when the driver manually refreshed.
+    const heartbeat = setInterval(() => {
+      if (lastPoint.current && Date.now() - lastSent.current >= 10000) {
+        send({ ...lastPoint.current, recorded_at: new Date().toISOString() });
+      }
+    }, 10000);
+
+    // Second line of defense against the same stalling behavior: periodically
+    // tear down and recreate the watcher, since some browsers resume firing
+    // callbacks on a fresh `watchPosition` call even after the old one has
+    // gone silent.
+    const rearm = setInterval(() => {
+      navigator.geolocation.clearWatch(watcher);
+      watcher = navigator.geolocation.watchPosition(onPosition, onError, geoOptions);
+    }, 60000);
+
+    return () => {
+      navigator.geolocation.clearWatch(watcher);
+      clearInterval(heartbeat);
+      clearInterval(rearm);
+    };
   }, [trip]);
 
   if (dashboard.isLoading) return <Spinner label="Loading transport assignment..." />;

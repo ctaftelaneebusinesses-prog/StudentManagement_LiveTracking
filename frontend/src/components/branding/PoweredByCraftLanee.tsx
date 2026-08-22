@@ -32,16 +32,21 @@ const LOGO_DARK_SURFACE = "/craftlanee-logo.png"; // original light/white mark, 
  */
 export function PoweredByCraftLanee({ className = "", surface = "auto" }: PoweredByCraftLaneeProps) {
   return (
-    <span className={`items-center gap-1.5 ${className}`}>
+    <a
+      href="https://craftlanee.com/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`items-center gap-2 opacity-90 transition-opacity hover:opacity-100 ${className}`}
+    >
       <span className="text-[10px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">Powered by</span>
-      {surface === "light" && <img src={LOGO_LIGHT_SURFACE} alt="CraftLanee" className="h-3.5 w-auto" />}
-      {surface === "dark" && <img src={LOGO_DARK_SURFACE} alt="CraftLanee" className="h-3.5 w-auto" />}
+      {surface === "light" && <img src={LOGO_LIGHT_SURFACE} alt="CraftLanee" className="h-4 w-auto" />}
+      {surface === "dark" && <img src={LOGO_DARK_SURFACE} alt="CraftLanee" className="h-4 w-auto" />}
       {surface === "auto" && (
         <>
-          <img src={LOGO_LIGHT_SURFACE} alt="CraftLanee" className="h-3.5 w-auto dark:hidden" />
-          <img src={LOGO_DARK_SURFACE} alt="CraftLanee" className="hidden h-3.5 w-auto dark:block" />
+          <img src={LOGO_LIGHT_SURFACE} alt="CraftLanee" className="h-4 w-auto dark:hidden" />
+          <img src={LOGO_DARK_SURFACE} alt="CraftLanee" className="hidden h-4 w-auto dark:block" />
         </>
       )}
-    </span>
+    </a>
   );
 }

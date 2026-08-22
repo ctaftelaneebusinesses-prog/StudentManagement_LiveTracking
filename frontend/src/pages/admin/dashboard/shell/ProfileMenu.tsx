@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronDown, LogOut, Settings, User } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { ROLE_LABEL } from "@/utils/roles";
 
@@ -76,17 +76,6 @@ export function ProfileMenu() {
           >
             <User size={16} strokeWidth={1.85} />
             My profile
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setOpen(false);
-              navigate("/dashboard/admin/school");
-            }}
-            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ink-secondary)] transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.05]"
-          >
-            <Settings size={16} strokeWidth={1.85} />
-            School settings
           </button>
           <div className="my-1 h-px bg-black/[0.06] dark:bg-white/[0.08]" />
           <button

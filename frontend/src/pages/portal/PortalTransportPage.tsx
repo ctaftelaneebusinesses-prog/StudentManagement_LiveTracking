@@ -59,6 +59,12 @@ export function PortalTransportPage() {
     queryFn: () => transportService.fetchStudentTransport(studentId),
     enabled: !!studentId,
     refetchInterval: 12000,
+    // Without this, TanStack Query pauses the interval whenever this tab
+    // isn't focused (e.g. screen locked) and only resumes on next focus —
+    // since `refetchOnWindowFocus` is disabled app-wide (queryClient.ts),
+    // that focus wouldn't even trigger a catch-up fetch, so the map could
+    // sit on a stale position indefinitely.
+    refetchIntervalInBackground: true,
   });
 
   const statusQuery = useQuery({
@@ -66,6 +72,7 @@ export function PortalTransportPage() {
     queryFn: () => trackingService.fetchStudentTripStatus(studentId),
     enabled: !!studentId,
     refetchInterval: 15000,
+    refetchIntervalInBackground: true,
   });
 
   const historyQuery = useQuery({

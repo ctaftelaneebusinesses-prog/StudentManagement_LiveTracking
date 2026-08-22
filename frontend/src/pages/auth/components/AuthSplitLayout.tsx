@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import { GraduationCap, ShieldCheck, Sparkles } from "lucide-react";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
-import { QuickTour } from "@/components/quickTour/QuickTour";
 import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
 
 interface AuthSplitLayoutProps {
@@ -34,17 +33,19 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
       </div>
 
       <div className="absolute right-4 top-4 z-20 flex items-center gap-1 lg:right-8 lg:top-8">
-        <QuickTour />
         <LanguageSwitcher />
       </div>
 
       {/* Brand panel — fixed height (matches the h-screen parent), never scrolls; only the form panel beside it does. */}
       <div className={`relative z-10 hidden h-full shrink-0 flex-col justify-between overflow-y-auto p-10 lg:flex ${compact ? "lg:w-[38%]" : "lg:w-1/2"} xl:p-14`}>
-        <div className="flex items-center gap-2.5 text-white">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur">
+        <div className="flex items-center gap-3 text-white">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white/25 to-white/5 shadow-lg shadow-black/20 ring-1 ring-white/15 backdrop-blur">
             <GraduationCap className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-tight">Smart School Management</span>
+          <div>
+            <p className="text-lg font-semibold leading-tight tracking-tight">Smart School Management</p>
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-400">School ERP Platform</p>
+          </div>
         </div>
 
         <div className="max-w-md">
@@ -68,8 +69,8 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-xs text-slate-400">© {new Date().getFullYear()} Smart School Management System</p>
+        <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-5">
+          <p className="text-xs text-slate-500">© {new Date().getFullYear()} Smart School Management System</p>
           <PoweredByCraftLanee className="inline-flex" surface="dark" />
         </div>
       </div>
