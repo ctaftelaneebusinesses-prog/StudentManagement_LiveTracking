@@ -76,13 +76,17 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
       </div>
 
       {/* Form panel — the only region that scrolls when a form is taller than the viewport.
-          `items-start` (not `items-center`) is deliberate: centering a flex
-          item inside an `overflow-y-auto` container clips the item's own top
-          edge out of scroll range once it's taller than the container (a
-          well-known flexbox/overflow interaction) — `py-10` below does the
-          vertical balancing instead, safely. */}
-      <div className="relative z-10 flex h-full flex-1 items-start justify-center overflow-y-auto px-4 py-10 sm:px-8">
-        <div className="w-full">{children}</div>
+          Centering via `my-auto` on the child (not `items-center` on this
+          flex container) is deliberate: `items-center` inside an
+          `overflow-y-auto` container clips the item's own top edge out of
+          scroll range once it's taller than the container (a well-known
+          flexbox/overflow interaction). Auto margins don't have that
+          problem — they absorb the free space and center the card when it
+          fits (matching the brand panel's own vertical rhythm), then
+          collapse to 0 and scroll normally once the card is taller than the
+          viewport, instead of clipping. */}
+      <div className="relative z-10 flex h-full flex-1 justify-center overflow-y-auto px-4 py-10 sm:px-8">
+        <div className="my-auto w-full">{children}</div>
       </div>
     </div>
   );
