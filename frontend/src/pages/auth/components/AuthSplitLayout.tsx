@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { GraduationCap, ShieldCheck, Sparkles } from "lucide-react";
+import { GraduationCap, ShieldCheck, Sparkles, Lock } from "lucide-react";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { PoweredByCraftLanee } from "@/components/branding/PoweredByCraftLanee";
 
@@ -24,12 +24,17 @@ const HIGHLIGHTS = [
  */
 export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
   return (
-    <div className="relative flex h-screen w-full overflow-hidden bg-slate-950">
-      {/* Ambient gradient mesh background, shared across the full viewport. */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-500/30 blur-3xl" />
-        <div className="absolute -right-24 top-1/3 h-80 w-80 rounded-full bg-accent-500/20 blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />
+    <div className="relative flex h-screen w-full overflow-hidden bg-[#060b16]">
+      {/* Ambient gradient mesh + dot-grid texture, shared across the full viewport. */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-10%,#0d2140_0%,#060b16_55%)]" />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.35] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_20%,black,transparent)]"
+        style={{ backgroundImage: "radial-gradient(rgba(255,255,255,0.5) 1px, transparent 1px)", backgroundSize: "28px 28px" }}
+      />
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="animate-float absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-500/30 blur-3xl" />
+        <div className="animate-float absolute -right-24 top-1/3 h-80 w-80 rounded-full bg-accent-500/25 blur-3xl [animation-delay:0.8s]" />
+        <div className="animate-float absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl [animation-delay:1.6s]" />
       </div>
 
       <div className="absolute right-4 top-4 z-20 flex items-center gap-1 lg:right-8 lg:top-8">
@@ -37,7 +42,7 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
       </div>
 
       {/* Brand panel — fixed height (matches the h-screen parent), never scrolls; only the form panel beside it does. */}
-      <div className={`relative z-10 hidden h-full shrink-0 flex-col justify-between overflow-y-auto p-10 lg:flex ${compact ? "lg:w-[38%]" : "lg:w-1/2"} xl:p-14`}>
+      <div className={`relative z-10 hidden h-full shrink-0 flex-col justify-between overflow-y-auto border-r border-white/[0.06] p-10 lg:flex ${compact ? "lg:w-[38%]" : "lg:w-1/2"} xl:p-14`}>
         <div className="flex items-center gap-3 text-white">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white/25 to-white/5 shadow-lg shadow-black/20 ring-1 ring-white/15 backdrop-blur">
             <GraduationCap className="h-5 w-5" />
@@ -49,29 +54,45 @@ export function AuthSplitLayout({ children, compact }: AuthSplitLayoutProps) {
         </div>
 
         <div className="max-w-md">
-          <h1 className="text-3xl font-semibold leading-tight text-white xl:text-4xl">
-            Everything your school needs, in one place.
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-accent-400/25 bg-accent-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-accent-300">
+            <Sparkles className="h-3 w-3" />
+            All-in-one school ERP
+          </span>
+          <h1 className="mt-4 text-3xl font-semibold leading-[1.15] tracking-tight text-white xl:text-4xl">
+            Everything your school needs,{" "}
+            <span className="bg-gradient-to-r from-accent-300 to-brand-300 bg-clip-text text-transparent">
+              in one place.
+            </span>
           </h1>
-          <p className="mt-4 text-sm text-slate-300 xl:text-base">
+          <p className="mt-4 text-sm leading-relaxed text-slate-300 xl:text-base">
             Attendance, homework, fees, transport, and communication — for Admins, Teachers, Students, and every
             role in between.
           </p>
 
-          <div className="mt-10 space-y-5">
+          <div className="mt-10 space-y-4">
             {HIGHLIGHTS.map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 backdrop-blur">
+              <div
+                key={text}
+                className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.03] p-3.5 backdrop-blur-sm transition-colors hover:border-white/[0.12] hover:bg-white/[0.05]"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-brand-400/30 to-accent-400/30 ring-1 ring-white/10">
                   <Icon className="h-4 w-4 text-white" />
                 </div>
-                <p className="text-sm text-slate-200">{text}</p>
+                <p className="pt-1 text-sm text-slate-200">{text}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-5">
-          <p className="text-xs text-slate-500">© {new Date().getFullYear()} Smart School Management System</p>
-          <PoweredByCraftLanee className="inline-flex" surface="dark" />
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <Lock className="h-3.5 w-3.5 text-accent-400" />
+            Encrypted credentials, role-based access for every account
+          </div>
+          <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-5">
+            <p className="text-xs text-slate-500">© {new Date().getFullYear()} Smart School Management System</p>
+            <PoweredByCraftLanee className="inline-flex" surface="dark" />
+          </div>
         </div>
       </div>
 
@@ -112,13 +133,24 @@ interface AuthGlassCardProps {
 }
 
 const VARIANT_CLASSES: Record<NonNullable<AuthGlassCardProps["variant"]>, string> = {
-  dark: "border-white/10 bg-white/[0.07] backdrop-blur-xl",
-  light: "border-black/5 bg-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.35)] dark:border-white/10 dark:bg-[#17171a]",
+  dark: "border-white/10 bg-white/[0.07] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] backdrop-blur-xl",
+  light:
+    "border-black/5 bg-white shadow-[0_30px_80px_-20px_rgba(0,0,0,0.45)] dark:border-white/10 dark:bg-[#17171a]",
 };
 
-/** Glassmorphism card used inside AuthSplitLayout's form panel — see AuthGlassCardProps for the dark/light variants. */
+/**
+ * Glassmorphism card used inside AuthSplitLayout's form panel — see
+ * AuthGlassCardProps for the dark/light variants. The gradient hairline
+ * across the top (via `before:`, so it costs no extra DOM node) is the one
+ * recurring brand accent tying every auth step — school-code, role picker,
+ * form, success — back to the same visual system.
+ */
 export function AuthGlassCard({ children, className = "", variant = "dark" }: AuthGlassCardProps) {
   return (
-    <div className={`rounded-2xl border p-6 shadow-2xl sm:p-8 ${VARIANT_CLASSES[variant]} ${className}`}>{children}</div>
+    <div
+      className={`relative overflow-hidden rounded-2xl border p-6 before:absolute before:inset-x-0 before:top-0 before:h-[3px] before:bg-gradient-to-r before:from-brand-400 before:via-accent-400 before:to-brand-400 before:content-[''] sm:p-8 ${VARIANT_CLASSES[variant]} ${className}`}
+    >
+      {children}
+    </div>
   );
 }

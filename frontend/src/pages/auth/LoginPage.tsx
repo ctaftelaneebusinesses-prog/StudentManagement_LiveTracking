@@ -3,12 +3,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ShieldCheck, AlertCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/Button";
 import { ROLE_HOME_ROUTE } from "@/utils/roles";
 import { AuthSplitLayout, AuthGlassCard } from "./components/AuthSplitLayout";
 import { AuthInput } from "./components/AuthInput";
+import { AuthButton } from "./components/AuthButton";
 
 const loginFormSchema = z.object({
   email: z.string().email("Enter a valid email address"),
@@ -44,9 +44,12 @@ export function LoginPage() {
     <AuthSplitLayout>
       <div className="mx-auto max-w-md">
         <AuthGlassCard>
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-semibold text-white">Welcome back</h1>
-            <p className="mt-1.5 text-sm text-slate-300">Sign in to your account</p>
+          <div className="mb-8 flex flex-col items-center text-center">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-400/25 to-accent-400/25 ring-1 ring-white/15">
+              <ShieldCheck className="h-6 w-6 text-accent-300" />
+            </div>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">Welcome back</h1>
+            <p className="mt-1.5 text-sm text-slate-300">Sign in to your account to continue</p>
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -55,6 +58,7 @@ export function LoginPage() {
                 label="Email"
                 type="email"
                 autoComplete="email"
+                icon={<Mail className="h-4 w-4" />}
                 error={errors.email?.message}
                 {...register("email")}
               />
@@ -63,6 +67,7 @@ export function LoginPage() {
                   label="Password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
+                  icon={<Lock className="h-4 w-4" />}
                   error={errors.password?.message}
                   className="pr-11"
                   {...register("password")}
@@ -78,26 +83,28 @@ export function LoginPage() {
                 </button>
               </div>
 
+              <div className="flex justify-end">
+                <Link to="/forgot-password" className="text-sm font-medium text-brand-300 hover:text-brand-200 hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
+
               {serverError && (
-                <p role="alert" className="text-sm text-red-300">
+                <p role="alert" className="flex items-start gap-2 rounded-lg border border-red-400/20 bg-red-500/10 px-3 py-2.5 text-sm text-red-300">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                   {serverError}
                 </p>
               )}
             </div>
 
-            <div className="space-y-4 text-center">
-              <Button type="submit" className="w-full" isLoading={isSubmitting}>
-                Sign in
-              </Button>
-              <Link to="/forgot-password" className="block text-sm font-medium text-brand-300 hover:underline">
-                Forgot password?
-              </Link>
-            </div>
+            <AuthButton type="submit" isLoading={isSubmitting}>
+              Sign in
+            </AuthButton>
           </form>
 
-          <p className="mt-10 text-center text-sm text-slate-400">
+          <p className="mt-8 text-center text-sm text-slate-400">
             Don't have an account?{" "}
-            <Link to="/register" className="font-medium text-brand-300 hover:underline">
+            <Link to="/register" className="font-medium text-brand-300 hover:text-brand-200 hover:underline">
               Register here
             </Link>
           </p>
