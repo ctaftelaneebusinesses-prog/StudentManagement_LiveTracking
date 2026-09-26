@@ -33,8 +33,21 @@ export async function login(req: Request, res: Response, next: NextFunction) {
  */
 export async function recordLoginAttempt(req: Request, res: Response, next: NextFunction) {
   try {
-    const { email, success } = req.body;
-    void logLoginAttempt(email, success, { ip: req.ip, userAgent: req.headers["user-agent"] });
+    // SEC-17: previously public and unauthenticated — anyone could POST an
+    // arbitrary {email, success} and forge Login History rows for any account.
+    // Now requireAuth-gated: a record can only be written for the caller's own
+    // verified identity (email/id from the token, never the body), and reaching
+    // this endpoint proves the login actually succeeded. Failed-login rows are
+    // no longer accepted from the browser (they were inherently unauthenticated
+    // and forgeable); reliable failure logging needs a server-observed signal
+    // (e.g. a Supabase auth hook) as a follow-up.
+    if (!req.user) throw ApiError.unauthorized();
+    void logLoginAttempt(req.user.email, true, {
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+      userId: req.user.id,
+      schoolId: req.user.schoolId ?? undefined,
+    });
     return sendSuccess(res, { message: "Recorded" });
   } catch (err) {
     return next(err);

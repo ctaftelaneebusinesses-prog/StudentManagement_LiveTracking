@@ -13,6 +13,7 @@ import { PortalSkeleton } from "./components/ui/PortalSkeleton";
 import { PortalEmptyState } from "./components/ui/PortalEmptyState";
 import { PortalModal } from "./components/ui/PortalModal";
 import { staggerContainer, fadeSlideUp } from "./components/ui/portalMotion";
+import { sanitizeRichText } from "@/utils/sanitizeHtml";
 
 export function PortalExamsPage() {
   const studentId = usePortalStudentId();
@@ -147,7 +148,7 @@ export function PortalExamsPage() {
         {viewingDoc?.content && (
           <div
             className="prose max-w-none text-sm text-[var(--ink-secondary)] [&_h2]:text-lg [&_h2]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
-            dangerouslySetInnerHTML={{ __html: viewingDoc.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeRichText(viewingDoc.content) }}
           />
         )}
       </PortalModal>

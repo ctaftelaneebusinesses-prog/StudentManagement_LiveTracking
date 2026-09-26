@@ -37,6 +37,37 @@ interface SubmissionRow {
   submitted_at: string;
 }
 
+// SEC-20: homework buckets are private (migration 081). Files are stored as
+// bucket-relative object paths in attachment_url; we mint a short-lived signed
+// URL on read so no permanent public URL exists. Legacy rows that still hold a
+// full `/object/public/<bucket>/...` URL are handled by extracting the path.
+const ATTACHMENT_BUCKET = "homework-attachments";
+const SUBMISSION_BUCKET = "homework-submissions";
+const SIGNED_URL_TTL_SECONDS = 60 * 60;
+
+async function toSignedUrl(value: string | null | undefined, bucket: string): Promise<string | null> {
+  if (!value) return null;
+  let path = value;
+  const marker = `/object/public/${bucket}/`;
+  const idx = value.indexOf(marker);
+  if (idx !== -1) path = value.slice(idx + marker.length); // legacy stored public URL
+  else if (/^https?:\/\//i.test(value)) return value; // some other external URL — leave as-is
+  const { data } = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, SIGNED_URL_TTL_SECONDS);
+  return data?.signedUrl ?? null;
+}
+async function signHomework<T extends { attachment_url: string | null }>(row: T): Promise<T> {
+  return { ...row, attachment_url: await toSignedUrl(row.attachment_url, ATTACHMENT_BUCKET) };
+}
+async function signHomeworkList<T extends { attachment_url: string | null }>(rows: T[] | null): Promise<T[]> {
+  return Promise.all((rows ?? []).map(signHomework));
+}
+async function signSubmission<T extends { attachment_url: string | null }>(row: T): Promise<T> {
+  return { ...row, attachment_url: await toSignedUrl(row.attachment_url, SUBMISSION_BUCKET) };
+}
+async function signSubmissionList<T extends { attachment_url: string | null }>(rows: T[] | null): Promise<T[]> {
+  return Promise.all((rows ?? []).map(signSubmission));
+}
+
 export async function listForClass(schoolId: string, classId: string) {
   const { data, error } = await supabaseAdmin
     .from("homework")
@@ -45,7 +76,7 @@ export async function listForClass(schoolId: string, classId: string) {
     .eq("class_id", classId)
     .order("due_date", { ascending: false });
   if (error) throw ApiError.internal(error.message);
-  return data;
+  return signHomeworkList(data as unknown as HomeworkRow[]);
 }
 
 /** Notifies the class's students/parents (in-app + push) that a homework item is now visible — shared by auto-approve-at-create and explicit Class Teacher approval. */
@@ -92,6 +123,12 @@ export async function createHomework(
 ) {
   await assertClassInSchool(schoolId, input.class_id);
 
+  // SEC-20: the attachment is a homework-attachments object path; it must be
+  // under this school's own folder so it can't reference another tenant's file.
+  if (input.attachment_url && !input.attachment_url.startsWith(`${schoolId}/`)) {
+    throw ApiError.badRequest("attachment_url must reference this school's own homework folder");
+  }
+
   const isClassTeacher = await isClassTeacherOfClass(input.class_id, teacherId);
   const now = new Date().toISOString();
 
@@ -117,7 +154,7 @@ export async function createHomework(
     await notifyClassTeacherOfPendingHomework(schoolId, teacherId, homework);
   }
 
-  return homework;
+  return signHomework(homework as HomeworkRow);
 }
 
 /** Tells the class's homeroom teacher a subject teacher's homework is waiting for review — a no-op if the class has no class teacher assigned yet. */
@@ -152,7 +189,7 @@ export async function listForReview(schoolId: string, classId: string) {
     .eq("class_id", classId)
     .order("created_at", { ascending: false });
   if (error) throw ApiError.internal(error.message);
-  return data;
+  return signHomeworkList(data as unknown as HomeworkRow[]);
 }
 
 export async function approveHomework(schoolId: string, homeworkId: string, reviewerId: string) {
@@ -180,7 +217,7 @@ export async function approveHomework(schoolId: string, homeworkId: string, revi
       .catch((err) => logger.error({ err }, "Failed to notify teacher of homework approval"));
   }
 
-  return homework;
+  return signHomework(homework as HomeworkRow);
 }
 
 export async function requestChanges(schoolId: string, homeworkId: string, reviewerId: string, note: string) {
@@ -207,7 +244,7 @@ export async function requestChanges(schoolId: string, homeworkId: string, revie
       .catch((err) => logger.error({ err }, "Failed to notify teacher of requested homework changes"));
   }
 
-  return homework;
+  return signHomework(homework as HomeworkRow);
 }
 
 /**
@@ -225,6 +262,11 @@ export async function updateHomework(schoolId: string, homeworkId: string, edito
   if (existingError) throw ApiError.internal(existingError.message);
   if (!existing) throw ApiError.notFound("Homework not found");
 
+  // SEC-20: a replaced attachment path must stay under this school's folder.
+  if (typeof patch.attachment_url === "string" && !patch.attachment_url.startsWith(`${schoolId}/`)) {
+    throw ApiError.badRequest("attachment_url must reference this school's own homework folder");
+  }
+
   const fullPatch = { ...patch } as Record<string, unknown>;
   if (existing.status === "needs_changes" && !(await isClassTeacherOfClass(existing.class_id, editorId))) {
     fullPatch.status = "pending";
@@ -240,7 +282,7 @@ export async function updateHomework(schoolId: string, homeworkId: string, edito
     .single();
   if (error) throw ApiError.internal(error.message);
   if (!data) throw ApiError.notFound("Homework not found");
-  return data;
+  return signHomework(data as unknown as HomeworkRow);
 }
 
 export async function deleteHomework(schoolId: string, homeworkId: string) {
@@ -271,7 +313,7 @@ export async function listUpcomingForStudent(schoolId: string, studentId: string
     .order("due_date", { ascending: true })
     .limit(limit);
   if (error) throw ApiError.internal(error.message);
-  return data;
+  return signHomeworkList(data as unknown as HomeworkRow[]);
 }
 
 const SUBMISSION_SELECT =
@@ -292,6 +334,10 @@ export async function submitHomework(
 ) {
   if (!input.submission_text && !input.attachment_url) {
     throw ApiError.badRequest("Provide submission text or an attachment");
+  }
+  // SEC-20: the submission file path must be under the student's own folder.
+  if (input.attachment_url && !input.attachment_url.startsWith(`${studentId}/`)) {
+    throw ApiError.badRequest("attachment_url must reference your own submission folder");
   }
 
   const { data: homework, error: homeworkError } = await supabaseAdmin
@@ -329,7 +375,7 @@ export async function submitHomework(
     .select(SUBMISSION_SELECT)
     .single();
   if (error) throw ApiError.internal(error.message);
-  return data;
+  return signSubmission(data as unknown as SubmissionRow);
 }
 
 /** All submissions for one homework item, most recent first — the teacher's grading/monitoring view. */
@@ -341,7 +387,7 @@ export async function listSubmissionsForHomework(schoolId: string, homeworkId: s
     .eq("homework_id", homeworkId)
     .order("submitted_at", { ascending: false });
   if (error) throw ApiError.internal(error.message);
-  return data;
+  return signSubmissionList(data as unknown as SubmissionRow[]);
 }
 
 /**
@@ -377,8 +423,9 @@ export async function listAllForStudent(schoolId: string, studentId: string) {
   if (homeworkError) throw ApiError.internal(homeworkError.message);
   if (submissionError) throw ApiError.internal(submissionError.message);
 
-  const homework = (homeworkRows ?? []) as unknown as HomeworkRow[];
-  const submissions = (submissionRows ?? []) as unknown as SubmissionRow[];
+  // SEC-20: sign both the homework attachment and the student's submission file.
+  const homework = await signHomeworkList((homeworkRows ?? []) as unknown as HomeworkRow[]);
+  const submissions = await signSubmissionList((submissionRows ?? []) as unknown as SubmissionRow[]);
   const submissionByHomework = new Map(submissions.map((s) => [s.homework_id, s]));
 
   return homework.map((hw) => ({

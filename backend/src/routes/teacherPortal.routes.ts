@@ -1,6 +1,6 @@
 import { Router } from "express";
 import * as teacherPortalController from "../controllers/teacherPortal.controller";
-import { requireAuth } from "../middleware/auth.middleware";
+import { requireAuth, requireRole } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
 import {
   classIdParamSchema,
@@ -22,6 +22,11 @@ import {
 const router = Router();
 
 router.use(requireAuth);
+// SEC-16: every endpoint here is teacher self-service (leave, attendance
+// check-in/out, my classes/students/timetable, assessments), scoped to the
+// caller's own id. Without a role gate a student/driver/etc. could, e.g.,
+// file a "teacher" leave request. Restrict the whole portal to teachers.
+router.use(requireRole("teacher"));
 
 router.get("/dashboard", teacherPortalController.getDashboard);
 router.get("/my-assignments", teacherPortalController.listMyAssignments);

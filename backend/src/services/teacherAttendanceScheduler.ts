@@ -9,9 +9,28 @@ interface SchoolSettingsRow {
   settings: { attendance?: { teacherCheckinCutoff?: string } } | null;
 }
 
-function currentHHMM(): string {
-  const now = new Date();
-  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+// FN-05: the per-school `teacherCheckinCutoff` is a wall-clock time. Previously
+// the cutoff (compared against the server's LOCAL time) and the attendance date
+// (a UTC date) were computed in different zones, so on a UTC-hosted server the
+// sweep could fire on the wrong day / at the wrong time. Compute BOTH in a
+// single school-local zone. This app is India-based (+91 numbers, Indian region
+// data); if multi-timezone schools are ever added, store a per-school zone here.
+const SCHOOL_TIME_ZONE = "Asia/Kolkata";
+
+function schoolLocalNow(): { date: string; hhmm: string } {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: SCHOOL_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(new Date());
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  let hour = get("hour");
+  if (hour === "24") hour = "00"; // en-CA hour12:false can emit "24" at midnight
+  return { date: `${get("year")}-${get("month")}-${get("day")}`, hhmm: `${hour}:${get("minute")}` };
 }
 
 async function sweepSchoolsPastCutoff() {
@@ -21,8 +40,7 @@ async function sweepSchoolsPastCutoff() {
     return;
   }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const nowHHMM = currentHHMM();
+  const { date: today, hhmm: nowHHMM } = schoolLocalNow();
 
   for (const school of (data ?? []) as SchoolSettingsRow[]) {
     const cutoff = school.settings?.attendance?.teacherCheckinCutoff;

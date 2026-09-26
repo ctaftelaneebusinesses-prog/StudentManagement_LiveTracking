@@ -52,14 +52,18 @@ export async function assertTeacherOwnsClass(req: Request, classId: string): Pro
   if (homeroomError) throw ApiError.internal(homeroomError.message);
   if (homeroom) return;
 
+  // FN-01: a teacher can teach SEVERAL subjects in one class, so this filter
+  // (teacher_id + class_id, no subject) can match multiple class_subjects rows.
+  // .maybeSingle() errors (PGRST116) on >1 row and 500'd the request — use
+  // .limit(1) and test presence instead.
   const { data: assignment, error } = await supabaseAdmin
     .from("class_subjects")
     .select("id")
     .eq("teacher_id", user.id)
     .eq("class_id", classId)
-    .maybeSingle();
+    .limit(1);
   if (error) throw ApiError.internal(error.message);
-  if (!assignment) throw ApiError.forbidden("You do not teach this class");
+  if (!assignment || assignment.length === 0) throw ApiError.forbidden("You do not teach this class");
 }
 
 export async function assertTeacherOwnsClassSubject(
@@ -129,7 +133,13 @@ export async function requireStudentWriteAccess(req: Request, _res: Response, ne
     const user = req.user;
     if (!user) throw ApiError.unauthorized();
 
-    if (isStaff(user.roles) || user.permissions.includes("students.manage")) {
+    // SEC-10: only admin-tier staff (school_admin/principal/super_admin) bypass
+    // the per-class ownership check. Teachers ALSO hold `students.manage`
+    // (migration 057), so short-circuiting on that permission let any teacher
+    // create/edit/move ANY student in the school — the exact bypass that check
+    // is meant to prevent. Teachers fall through to the own-class enforcement
+    // below.
+    if (isStaff(user.roles)) {
       return next();
     }
     if (!user.roles.includes("teacher")) {

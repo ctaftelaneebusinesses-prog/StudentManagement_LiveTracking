@@ -4,6 +4,7 @@ import { assertClassInSchool, assertExamInSchool } from "../utils/scopeGuards";
 import { logger } from "../config/logger";
 import * as notificationService from "./notification.service";
 import * as pushService from "./push.service";
+import { sanitizeRichText } from "../utils/sanitizeHtml";
 
 export function calculateGrade(marksObtained: number, maxMarks: number): string {
   if (!Number.isFinite(marksObtained) || !Number.isFinite(maxMarks) || maxMarks <= 0) {
@@ -427,7 +428,9 @@ export async function addExamDocument(
       doc_type: input.doc_type,
       file_name: input.file_name ?? "Question Paper",
       storage_path: input.storage_path ?? null,
-      content: input.content ?? null,
+      // SEC-11: content is rendered as HTML in the portal; sanitize on write so
+      // stored content can never carry script/event-handler/js-URL payloads.
+      content: sanitizeRichText(input.content ?? null),
       notes: input.notes,
       uploaded_by: uploadedBy,
     })

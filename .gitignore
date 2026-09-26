@@ -6,3 +6,6 @@ build/
 *.log
 .DS_Store
 backend/backup-*/
+.env.staging
+.env.*.local
+audit/test-data/

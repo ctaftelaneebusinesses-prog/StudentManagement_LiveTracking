@@ -19,6 +19,20 @@ export type AudienceType =
 export type AttachmentFileType = "pdf" | "image" | "document";
 
 const ATTACHMENT_BUCKET = "announcement-attachments";
+
+/**
+ * SEC-09: an announcement attachment's storage_path must be under the owning
+ * school+announcement folder (`{schoolId}/{announcementId}/...`), matching the
+ * storage RLS policy shape used elsewhere. This stops a caller from
+ * registering a path that points at another tenant's object (which the read
+ * path would then mint a signed URL for).
+ */
+function assertAttachmentPathInScope(schoolId: string, announcementId: string, storagePath: string): void {
+  const expectedPrefix = `${schoolId}/${announcementId}/`;
+  if (!storagePath.startsWith(expectedPrefix)) {
+    throw ApiError.badRequest("storage_path must be under this announcement's own folder");
+  }
+}
 const ANNOUNCEMENT_SELECT = "id, school_id, title, body, audience_type, publish_at, notified_at, created_by, created_at, updated_at";
 
 interface AttachmentInput {
@@ -437,6 +451,10 @@ export async function createAnnouncement(schoolId: string, createdBy: string, in
   }
 
   if (input.attachments && input.attachments.length > 0) {
+    // SEC-09: a stored path must live under this school+announcement's own
+    // folder, so it can't be pointed at another tenant's object (whose signed
+    // URL we would otherwise mint on read).
+    for (const a of input.attachments) assertAttachmentPathInScope(schoolId, input.id, a.storage_path);
     const { error: attachmentError } = await supabaseAdmin.from("announcement_attachments").insert(
       input.attachments.map((a) => ({
         announcement_id: input.id,
@@ -529,18 +547,28 @@ export async function updateAnnouncement(schoolId: string, id: string, input: Up
   }
 
   if (input.remove_attachment_ids && input.remove_attachment_ids.length > 0) {
+    // SEC-09: scope the lookup AND delete to THIS announcement, so a caller
+    // can't remove (or delete the storage object of) another announcement's —
+    // or another school's — attachment by passing its id.
     const { data: toRemove } = await supabaseAdmin
       .from("announcement_attachments")
       .select("storage_path")
+      .eq("announcement_id", id)
       .in("id", input.remove_attachment_ids);
     if (toRemove && toRemove.length > 0) {
       await supabaseAdmin.storage.from(ATTACHMENT_BUCKET).remove(toRemove.map((r) => r.storage_path));
     }
-    const { error: removeError } = await supabaseAdmin.from("announcement_attachments").delete().in("id", input.remove_attachment_ids);
+    const { error: removeError } = await supabaseAdmin
+      .from("announcement_attachments")
+      .delete()
+      .eq("announcement_id", id)
+      .in("id", input.remove_attachment_ids);
     if (removeError) throw ApiError.internal(removeError.message);
   }
 
   if (input.new_attachments && input.new_attachments.length > 0) {
+    // SEC-09: same folder-scope guard as createAnnouncement.
+    for (const a of input.new_attachments) assertAttachmentPathInScope(schoolId, id, a.storage_path);
     const { error: attachmentError } = await supabaseAdmin.from("announcement_attachments").insert(
       input.new_attachments.map((a) => ({
         announcement_id: id,
@@ -565,6 +593,20 @@ export async function updateAnnouncement(schoolId: string, id: string, input: Up
 }
 
 export async function deleteAnnouncement(schoolId: string, id: string) {
+  // SEC-09: confirm the announcement belongs to this school BEFORE removing any
+  // storage objects. Previously the storage delete ran first, keyed only by
+  // announcement_id, so DELETE /announcements/<other-school-id> would delete
+  // that school's files (and report success) even though the row delete below
+  // matched nothing.
+  const { data: existing, error: existingError } = await supabaseAdmin
+    .from("announcements")
+    .select("id")
+    .eq("id", id)
+    .eq("school_id", schoolId)
+    .maybeSingle();
+  if (existingError) throw ApiError.internal(existingError.message);
+  if (!existing) throw ApiError.notFound("Announcement not found");
+
   const { data: attachments, error: fetchError } = await supabaseAdmin
     .from("announcement_attachments")
     .select("storage_path")

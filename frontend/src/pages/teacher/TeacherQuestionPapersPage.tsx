@@ -20,6 +20,7 @@ import * as assessmentsService from "@/services/teacher/assessments.service";
 import * as questionPapersService from "@/services/teacher/questionPapers.service";
 import { ExamDocument } from "@/types/exam.types";
 import { QuestionPaperRecord, TeacherClassSummary } from "@/types/teacher.types";
+import { sanitizeRichText } from "@/utils/sanitizeHtml";
 
 export function TeacherQuestionPapersPage() {
   const dashboardQuery = useQuery({ queryKey: ["teacher", "dashboard"], queryFn: portalService.fetchDashboard });
@@ -67,7 +68,7 @@ function ViewDocumentModal({ doc, onClose }: { doc: ExamDocument | QuestionPaper
       {doc?.content ? (
         <div
           className="prose max-w-none text-sm text-slate-800 dark:text-slate-100 [&_h2]:text-lg [&_h2]:font-semibold [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5"
-          dangerouslySetInnerHTML={{ __html: doc.content }}
+          dangerouslySetInnerHTML={{ __html: sanitizeRichText(doc.content) }}
         />
       ) : doc?.url ? (
         <a href={doc.url} target="_blank" rel="noreferrer" className="text-sm text-brand-600 hover:underline">

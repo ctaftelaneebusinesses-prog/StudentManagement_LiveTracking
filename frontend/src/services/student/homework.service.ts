@@ -41,6 +41,7 @@ export async function uploadSubmissionAttachment(studentId: string, file: File):
     .upload(path, file, { upsert: false, cacheControl: "3600" });
   if (uploadError) throw uploadError;
 
-  const { data } = supabase.storage.from("homework-submissions").getPublicUrl(path);
-  return data.publicUrl;
+  // SEC-20: the bucket is private — store the object PATH, not a public URL.
+  // The backend mints a short-lived signed URL on read.
+  return path;
 }

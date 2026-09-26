@@ -13,7 +13,7 @@ export const createHomeworkSchema = z.object({
     title: z.string().min(1),
     description: z.string().optional(),
     due_date: z.string().date(),
-    attachment_url: z.string().url().optional(),
+    attachment_url: z.string().min(1).max(512).optional(),
   }),
   query: z.object({}).optional(),
   params: z.object({}).optional(),
@@ -25,7 +25,7 @@ export const updateHomeworkSchema = z.object({
     title: z.string().min(1).optional(),
     description: z.string().optional(),
     due_date: z.string().date().optional(),
-    attachment_url: z.string().url().optional(),
+    attachment_url: z.string().min(1).max(512).optional(),
   }),
   query: z.object({}).optional(),
   params: z.object({ id: z.string().uuid() }),
@@ -40,7 +40,7 @@ export const homeworkIdParamSchema = z.object({
 const submitHomeworkBody = z
   .object({
     submission_text: z.string().max(5000).optional(),
-    attachment_url: z.string().url().optional(),
+    attachment_url: z.string().min(1).max(512).optional(),
   })
   .refine((value) => !!(value.submission_text || value.attachment_url), {
     message: "Provide submission text or an attachment",

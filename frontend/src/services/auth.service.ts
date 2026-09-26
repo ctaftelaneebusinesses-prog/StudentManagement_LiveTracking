@@ -130,8 +130,8 @@ export async function signInWithPassword(email: string, password: string) {
   clearDemoSession();
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  void reportLoginAttempt(email, !error);
   if (error) throw error;
+  void reportSuccessfulLogin();
   return data;
 }
 
@@ -141,8 +141,12 @@ export async function signInWithPassword(email: string, password: string) {
  * the outcome to Login History without affecting the actual sign-in result.
  * Fire-and-forget: a logging failure must never block or fail a login.
  */
-function reportLoginAttempt(email: string, success: boolean) {
-  return api.post("/auth/record-login-attempt", { email, success }).catch(() => undefined);
+function reportSuccessfulLogin() {
+  // SEC-17: the backend records the caller's own verified login from the
+  // session token (no client-supplied email/success). Only meaningful right
+  // after a successful sign-in, when the session — and thus the bearer token
+  // the axios interceptor attaches — exists. Fire-and-forget.
+  return api.post("/auth/record-login-attempt", {}).catch(() => undefined);
 }
 
 export async function signOut() {

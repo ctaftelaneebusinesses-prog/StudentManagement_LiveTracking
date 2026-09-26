@@ -4,6 +4,7 @@ import { logActivity } from "../services/auditLog.service";
 import { sendSuccess } from "../utils/ApiResponse";
 import { resolveSchoolId } from "../utils/tenant";
 import { assertPrincipalMayManageUser, assertPrincipalMayAssignRole } from "../utils/userAccess";
+import { assertUserInSchool } from "../utils/scopeGuards";
 
 export async function listUsers(req: Request, res: Response, next: NextFunction) {
   try {
@@ -134,6 +135,9 @@ export async function bulkDeleteUsers(req: Request, res: Response, next: NextFun
 
 export async function listUserRoles(req: Request, res: Response, next: NextFunction) {
   try {
+    // Tenant boundary (SEC-03): the target must belong to the caller's school.
+    const schoolId = resolveSchoolId(req);
+    await assertUserInSchool(schoolId, req.params.id);
     const roles = await userService.listUserRoles(req.params.id);
     return sendSuccess(res, roles);
   } catch (err) {
@@ -143,9 +147,12 @@ export async function listUserRoles(req: Request, res: Response, next: NextFunct
 
 export async function assignRole(req: Request, res: Response, next: NextFunction) {
   try {
+    const schoolId = resolveSchoolId(req);
+    // Tenant boundary (SEC-03): a school's admin may only assign roles to users
+    // in that school. Checked before any mutation.
+    await assertUserInSchool(schoolId, req.params.id);
     await assertPrincipalMayManageUser(req, req.params.id);
     await assertPrincipalMayAssignRole(req, req.body.role_id);
-    const schoolId = resolveSchoolId(req);
     const roles = await userService.assignRole(schoolId, req.params.id, req.body.role_id);
     void logActivity(schoolId, req.user?.id ?? null, "user.role_assigned", {
       targetType: "user",
@@ -160,9 +167,12 @@ export async function assignRole(req: Request, res: Response, next: NextFunction
 
 export async function revokeRole(req: Request, res: Response, next: NextFunction) {
   try {
+    const schoolId = resolveSchoolId(req);
+    // Tenant boundary (SEC-03): a school's admin may only revoke roles from
+    // users in that school.
+    await assertUserInSchool(schoolId, req.params.id);
     await assertPrincipalMayManageUser(req, req.params.id);
     await assertPrincipalMayAssignRole(req, Number(req.params.roleId));
-    const schoolId = resolveSchoolId(req);
     const roles = await userService.revokeRole(req.params.id, Number(req.params.roleId), schoolId);
     void logActivity(schoolId, req.user?.id ?? null, "user.role_revoked", {
       targetType: "user",

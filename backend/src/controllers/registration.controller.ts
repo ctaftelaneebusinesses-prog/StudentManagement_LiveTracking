@@ -4,6 +4,30 @@ import { sendSuccess } from "../utils/ApiResponse";
 import { resolveSchoolId } from "../utils/tenant";
 import { ApiError } from "../utils/ApiError";
 
+/**
+ * SEC-19: the public self-registration endpoints must not reveal whether an
+ * email is already registered (account enumeration). This runs a submit and,
+ * if provisioning fails only because the email already exists, returns the
+ * SAME generic "pending" response as a fresh submission — so an attacker can't
+ * distinguish existing accounts. Every other error propagates normally.
+ * (Authenticated admin create paths are unaffected and still 409.)
+ */
+async function submitRegistrationPublicly(
+  res: Response,
+  next: NextFunction,
+  run: () => Promise<{ user_id: string; status: "pending" }>
+) {
+  try {
+    return sendSuccess(res, await run(), 201);
+  } catch (err) {
+    if ((err as { code?: string }).code === "EMAIL_EXISTS") {
+      // Generic response: no user_id, indistinguishable from a real submission.
+      return sendSuccess(res, { status: "pending" as const }, 201);
+    }
+    return next(err);
+  }
+}
+
 /** GET /auth/register/meta?school_code=X — classes/subjects/activities for the registration form's pickers. Public, no requireAuth. */
 export async function getMeta(req: Request, res: Response, next: NextFunction) {
   try {
@@ -14,52 +38,28 @@ export async function getMeta(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export async function submitPrincipal(req: Request, res: Response, next: NextFunction) {
-  try {
-    return sendSuccess(res, await registrationService.registerPrincipal(req.body), 201);
-  } catch (err) {
-    return next(err);
-  }
+export function submitPrincipal(req: Request, res: Response, next: NextFunction) {
+  return submitRegistrationPublicly(res, next, () => registrationService.registerPrincipal(req.body));
 }
 
-export async function submitAccountant(req: Request, res: Response, next: NextFunction) {
-  try {
-    return sendSuccess(res, await registrationService.registerAccountant(req.body), 201);
-  } catch (err) {
-    return next(err);
-  }
+export function submitAccountant(req: Request, res: Response, next: NextFunction) {
+  return submitRegistrationPublicly(res, next, () => registrationService.registerAccountant(req.body));
 }
 
-export async function submitDriver(req: Request, res: Response, next: NextFunction) {
-  try {
-    return sendSuccess(res, await registrationService.registerDriver(req.body), 201);
-  } catch (err) {
-    return next(err);
-  }
+export function submitDriver(req: Request, res: Response, next: NextFunction) {
+  return submitRegistrationPublicly(res, next, () => registrationService.registerDriver(req.body));
 }
 
-export async function submitExtracurricularStaff(req: Request, res: Response, next: NextFunction) {
-  try {
-    return sendSuccess(res, await registrationService.registerExtracurricularStaff(req.body), 201);
-  } catch (err) {
-    return next(err);
-  }
+export function submitExtracurricularStaff(req: Request, res: Response, next: NextFunction) {
+  return submitRegistrationPublicly(res, next, () => registrationService.registerExtracurricularStaff(req.body));
 }
 
-export async function submitTeacher(req: Request, res: Response, next: NextFunction) {
-  try {
-    return sendSuccess(res, await registrationService.registerTeacher(req.body), 201);
-  } catch (err) {
-    return next(err);
-  }
+export function submitTeacher(req: Request, res: Response, next: NextFunction) {
+  return submitRegistrationPublicly(res, next, () => registrationService.registerTeacher(req.body));
 }
 
-export async function submitStudent(req: Request, res: Response, next: NextFunction) {
-  try {
-    return sendSuccess(res, await registrationService.registerStudent(req.body), 201);
-  } catch (err) {
-    return next(err);
-  }
+export function submitStudent(req: Request, res: Response, next: NextFunction) {
+  return submitRegistrationPublicly(res, next, () => registrationService.registerStudent(req.body));
 }
 
 /** GET /registration-requests — queue scoped by the caller's own role (see routes for the permission gates that select which branch runs). */
@@ -88,7 +88,8 @@ export async function review(req: Request, res: Response, next: NextFunction) {
   try {
     const schoolId = resolveSchoolId(req);
     const { action, notes } = req.body as { action: "approve" | "reject"; notes?: string };
-    return sendSuccess(res, await registrationService.review(schoolId, req.params.id, req.user!.id, action, notes));
+    const reviewer = { id: req.user!.id, roles: req.user!.roles, permissions: req.user!.permissions };
+    return sendSuccess(res, await registrationService.review(schoolId, req.params.id, reviewer, action, notes));
   } catch (err) {
     return next(err);
   }

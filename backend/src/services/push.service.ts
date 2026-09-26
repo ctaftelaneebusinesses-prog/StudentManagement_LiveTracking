@@ -28,6 +28,19 @@ export async function saveSubscription(
   schoolId: string | null,
   subscription: PushSubscriptionInput
 ) {
+  // SEC-14 (ownership): endpoint is globally unique, so an upsert keyed on it
+  // would silently reassign another user's subscription to the caller
+  // (takeover). Reject an endpoint already owned by someone else instead.
+  const { data: existing, error: lookupError } = await supabaseAdmin
+    .from("push_subscriptions")
+    .select("user_id")
+    .eq("endpoint", subscription.endpoint)
+    .maybeSingle();
+  if (lookupError) throw ApiError.internal(lookupError.message);
+  if (existing && existing.user_id !== userId) {
+    throw ApiError.forbidden("This push endpoint is registered to a different account");
+  }
+
   const { error } = await supabaseAdmin.from("push_subscriptions").upsert(
     {
       user_id: userId,
@@ -41,6 +54,24 @@ export async function saveSubscription(
   if (error) throw ApiError.internal(error.message);
 }
 
+/**
+ * SEC-14 (ownership): API-facing unsubscribe — scoped to the caller so one user
+ * cannot delete another user's subscription by passing its endpoint.
+ */
+export async function removeSubscriptionForUser(userId: string, endpoint: string) {
+  const { error } = await supabaseAdmin
+    .from("push_subscriptions")
+    .delete()
+    .eq("endpoint", endpoint)
+    .eq("user_id", userId);
+  if (error) throw ApiError.internal(error.message);
+}
+
+/**
+ * System-only prune of a dead endpoint (404/410 from the push service) during
+ * delivery. Not reachable from the request path — the endpoint here comes from
+ * a row the server already loaded, never from user input.
+ */
 export async function removeSubscription(endpoint: string) {
   const { error } = await supabaseAdmin.from("push_subscriptions").delete().eq("endpoint", endpoint);
   if (error) throw ApiError.internal(error.message);
