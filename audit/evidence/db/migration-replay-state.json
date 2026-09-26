@@ -1,0 +1,1929 @@
+{
+  "results": [
+    {
+      "file": "schema.sql",
+      "ok": true
+    },
+    {
+      "file": "rls_policies.sql",
+      "ok": true
+    },
+    {
+      "file": "002_rbac_permissions.sql",
+      "ok": true
+    },
+    {
+      "file": "003_rbac_rls_policies.sql",
+      "ok": true
+    },
+    {
+      "file": "004_avatar_storage.sql",
+      "ok": true
+    },
+    {
+      "file": "005_school_admin_module.sql",
+      "ok": true
+    },
+    {
+      "file": "006_student_management_module.sql",
+      "ok": true
+    },
+    {
+      "file": "007_teacher_module.sql",
+      "ok": true
+    },
+    {
+      "file": "008_parent_module.sql",
+      "ok": true
+    },
+    {
+      "file": "009_transport_module.sql",
+      "ok": true
+    },
+    {
+      "file": "010_realtime_van_tracking.sql",
+      "ok": true
+    },
+    {
+      "file": "011_homework_submissions.sql",
+      "ok": true
+    },
+    {
+      "file": "012_notification_system.sql",
+      "ok": true
+    },
+    {
+      "file": "014_production_indexes.sql",
+      "ok": true
+    },
+    {
+      "file": "015_attendance_reporting.sql",
+      "ok": true
+    },
+    {
+      "file": "016_student_management_extras.sql",
+      "ok": true
+    },
+    {
+      "file": "017_teacher_module_extras.sql",
+      "ok": true
+    },
+    {
+      "file": "018_timetable_module_extras.sql",
+      "ok": true
+    },
+    {
+      "file": "019_exam_module_extras.sql",
+      "ok": true
+    },
+    {
+      "file": "019_fee_module.sql",
+      "ok": true
+    },
+    {
+      "file": "020_announcement_module.sql",
+      "ok": true
+    },
+    {
+      "file": "021_transport_module_upgrade.sql",
+      "ok": true
+    },
+    {
+      "file": "022_reports_module.sql",
+      "ok": true
+    },
+    {
+      "file": "023_settings_module.sql",
+      "ok": true
+    },
+    {
+      "file": "023_support_staff_role.sql",
+      "ok": true
+    },
+    {
+      "file": "024_school_logo_storage.sql",
+      "ok": true
+    },
+    {
+      "file": "025_classes_module_upgrade.sql",
+      "ok": true
+    },
+    {
+      "file": "025_student_profile_enhancements.sql",
+      "ok": true
+    },
+    {
+      "file": "026_school_management_module.sql",
+      "ok": true
+    },
+    {
+      "file": "027_equalize_admin_roles.sql",
+      "ok": true
+    },
+    {
+      "file": "028_student_aadhaar.sql",
+      "ok": true
+    },
+    {
+      "file": "029_accountant_role.sql",
+      "ok": true
+    },
+    {
+      "file": "029_grant_principal_admin_parity.sql",
+      "ok": true
+    },
+    {
+      "file": "030_optional_route_code.sql",
+      "ok": true
+    },
+    {
+      "file": "031_announcement_principal_audience.sql",
+      "ok": true
+    },
+    {
+      "file": "032_teacher_portal_extras.sql",
+      "ok": true
+    },
+    {
+      "file": "033_teacher_profile_address.sql",
+      "ok": true
+    },
+    {
+      "file": "034_leave_requests_dual_approval.sql",
+      "ok": true
+    },
+    {
+      "file": "035_student_leave_requests_self_service.sql",
+      "ok": true
+    },
+    {
+      "file": "036_notifications_direct_user_scope.sql",
+      "ok": true
+    },
+    {
+      "file": "037_avatars_teacher_write.sql",
+      "ok": true
+    },
+    {
+      "file": "038_timetable_change_requests.sql",
+      "ok": true
+    },
+    {
+      "file": "039_extracurricular_staff_role.sql",
+      "ok": true
+    },
+    {
+      "file": "039_homework_approval_and_marks_tracking.sql",
+      "ok": true
+    },
+    {
+      "file": "040_extracurricular_staff_module.sql",
+      "ok": true
+    },
+    {
+      "file": "040_question_paper_compose_and_publish.sql",
+      "ok": true
+    },
+    {
+      "file": "041_extracurricular_staff_module_extras.sql",
+      "ok": true
+    },
+    {
+      "file": "042_student_profile_change_requests.sql",
+      "ok": true
+    },
+    {
+      "file": "043_scope_notifications_to_recipient.sql",
+      "ok": true
+    },
+    {
+      "file": "044_evaluated_papers.sql",
+      "ok": true
+    },
+    {
+      "file": "045_teacher_attendance_checkin.sql",
+      "ok": true
+    },
+    {
+      "file": "046_transport_fee_tracking.sql",
+      "ok": true
+    },
+    {
+      "file": "047_announcement_specific_teachers.sql",
+      "ok": true
+    },
+    {
+      "file": "048_activity_assignment_tracking.sql",
+      "ok": true
+    },
+    {
+      "file": "049_student_specific_fee_items.sql",
+      "ok": true
+    },
+    {
+      "file": "049_transport_view_and_vehicle_name.sql",
+      "ok": true
+    },
+    {
+      "file": "050_trip_student_status.sql",
+      "ok": true
+    },
+    {
+      "file": "051_teacher_transport_manage.sql",
+      "ok": true
+    },
+    {
+      "file": "052_accountant_module_enhancements.sql",
+      "ok": true
+    },
+    {
+      "file": "053_transport_route_ownership.sql",
+      "ok": true
+    },
+    {
+      "file": "054_parent_live_location.sql",
+      "ok": true
+    },
+    {
+      "file": "055_student_fee_overrides.sql",
+      "ok": true
+    },
+    {
+      "file": "056_announcement_accountants_ec_staff.sql",
+      "ok": true
+    },
+    {
+      "file": "057_teacher_student_management_parity.sql",
+      "ok": true
+    },
+    {
+      "file": "058_student_documents_teacher_write.sql",
+      "ok": true
+    },
+    {
+      "file": "059_extracurricular_activity_notifications.sql",
+      "ok": true
+    },
+    {
+      "file": "060_timetable_extracurricular_periods.sql",
+      "ok": true
+    },
+    {
+      "file": "061_registration_approval.sql",
+      "ok": true
+    },
+    {
+      "file": "062_syllabus_module.sql",
+      "ok": true
+    },
+    {
+      "file": "063_registration_review_super_admin.sql",
+      "ok": true
+    },
+    {
+      "file": "064_remove_parent_role.sql",
+      "ok": true
+    },
+    {
+      "file": "065_registration_notification_types.sql",
+      "ok": true
+    },
+    {
+      "file": "066_super_admin_multi_school.sql",
+      "ok": true
+    },
+    {
+      "file": "067_user_roles_null_school_fix.sql",
+      "ok": true
+    },
+    {
+      "file": "068_school_creation_requests.sql",
+      "ok": true
+    },
+    {
+      "file": "069_platform_notifications.sql",
+      "ok": true
+    },
+    {
+      "file": "070_school_request_notification_types.sql",
+      "ok": true
+    },
+    {
+      "file": "071_website_knowledge_assessment.sql",
+      "ok": true
+    },
+    {
+      "file": "072_website_knowledge_question_seed.sql",
+      "ok": true
+    },
+    {
+      "file": "073_learning_games.sql",
+      "ok": true
+    },
+    {
+      "file": "074_website_knowledge_notification_type.sql",
+      "ok": true
+    },
+    {
+      "file": "075_active_trip_location_access.sql",
+      "ok": true
+    },
+    {
+      "file": "076_close_notifications_write_policy_leak.sql",
+      "ok": true
+    }
+  ],
+  "matrix": [
+    {
+      "role_id": 1,
+      "role": "school_admin",
+      "permissions": "academic_years.manage, activities.manage, announcements.manage, announcements.view, attendance.manage, attendance.view, branches.manage, calendar.manage, classes.manage, departments.manage, evaluated_papers.manage, extracurricular_staff.manage, fees.manage, fees.view, homework.manage, homework.view, marks.manage, marks.view, notifications.manage, notifications.view, profile.edit_self, reports.view, roles.manage, school.manage_settings, schools.request_creation, schools.view_assigned, security_logs.view, students.manage, students.view, teachers.manage, timetable.manage, timetable.view, transport.manage, transport.view, users.manage, users.view"
+    },
+    {
+      "role_id": 2,
+      "role": "principal",
+      "permissions": "academic_years.manage, activities.manage, announcements.manage, announcements.view, attendance.manage, attendance.view, branches.manage, calendar.manage, classes.manage, departments.manage, evaluated_papers.manage, extracurricular_staff.manage, fees.manage, fees.view, homework.manage, homework.view, marks.manage, marks.view, notifications.manage, notifications.view, profile.edit_self, registration.review, reports.view, roles.manage, school.manage_settings, security_logs.view, students.manage, students.view, teachers.manage, timetable.manage, timetable.view, transport.manage, transport.view, users.manage, users.view"
+    },
+    {
+      "role_id": 3,
+      "role": "teacher",
+      "permissions": "academic_years.manage, activities.manage, announcements.manage, announcements.view, attendance.manage, attendance.view, departments.manage, evaluated_papers.manage, homework.manage, homework.view, marks.manage, marks.view, notifications.manage, notifications.view, profile.edit_self, students.manage, students.view, timetable.view, transport.manage, transport.view"
+    },
+    {
+      "role_id": 5,
+      "role": "student",
+      "permissions": "announcements.view, attendance.view, fees.view, homework.submit, homework.view, marks.view, notifications.view, profile.edit_self, timetable.view"
+    },
+    {
+      "role_id": 6,
+      "role": "driver",
+      "permissions": "profile.edit_self"
+    },
+    {
+      "role_id": 7,
+      "role": "super_admin",
+      "permissions": "academic_years.manage, activities.manage, announcements.manage, announcements.view, assessment.manage_questions, assessment.manage_settings, attendance.manage, attendance.view, branches.manage, calendar.manage, classes.manage, departments.manage, evaluated_papers.manage, extracurricular_staff.manage, fees.manage, fees.view, homework.manage, homework.submit, homework.view, marks.manage, marks.view, notifications.manage, notifications.view, platform.manage_school_admins, platform.manage_schools, platform.view_audit_log, profile.edit_self, registration.review, reports.view, roles.manage, school.manage_settings, schools.view_assigned, security_logs.view, students.manage, students.view, teachers.manage, timetable.manage, timetable.view, transport.manage, transport.view, users.manage, users.view"
+    },
+    {
+      "role_id": 8,
+      "role": "support_staff",
+      "permissions": "profile.edit_self"
+    },
+    {
+      "role_id": 9,
+      "role": "accountant",
+      "permissions": "fees.manage, fees.view, profile.edit_self, reports.view"
+    },
+    {
+      "role_id": 10,
+      "role": "extracurricular_staff",
+      "permissions": "profile.edit_self"
+    }
+  ],
+  "noRls": [
+    {
+      "relname": "extracurricular_staff_code_seq"
+    }
+  ],
+  "rlsNoPolicy": [],
+  "buckets": [
+    {
+      "id": "announcement-attachments",
+      "public": false
+    },
+    {
+      "id": "avatars",
+      "public": true
+    },
+    {
+      "id": "evaluated-papers",
+      "public": false
+    },
+    {
+      "id": "exam-documents",
+      "public": false
+    },
+    {
+      "id": "extracurricular-achievements",
+      "public": false
+    },
+    {
+      "id": "homework-attachments",
+      "public": true
+    },
+    {
+      "id": "homework-submissions",
+      "public": true
+    },
+    {
+      "id": "school-logos",
+      "public": true
+    },
+    {
+      "id": "student-documents",
+      "public": false
+    },
+    {
+      "id": "syllabus-documents",
+      "public": false
+    },
+    {
+      "id": "teacher-documents",
+      "public": false
+    }
+  ],
+  "secdef": [
+    {
+      "proname": "accessible_school_ids",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "assert_assignee_is_school_admin",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "current_role_name",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "current_school_id",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "fn_log_attendance_change",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "handle_new_auth_user",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "has_permission",
+      "args": "permission_code text",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "has_role",
+      "args": "role_name_param text",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "has_school_access",
+      "args": "p_school_id uuid",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "is_staff",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "is_super_admin",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "my_permissions",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "my_roles",
+      "args": "",
+      "config": "search_path=public"
+    },
+    {
+      "proname": "next_extracurricular_staff_code",
+      "args": "p_school_id uuid",
+      "config": "search_path=public"
+    }
+  ],
+  "userCols": [
+    {
+      "column_name": "is_active",
+      "column_default": "true"
+    },
+    {
+      "column_name": "status",
+      "column_default": "'approved'::text"
+    }
+  ],
+  "anonPolicies": [
+    {
+      "tablename": "academic_years",
+      "policyname": "academic_years_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "academic_years",
+      "policyname": "academic_years_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "activities",
+      "policyname": "activities_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "activity_logs",
+      "policyname": "activity_logs_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "announcement_attachments",
+      "policyname": "announcement_attachments_select_meta",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "announcement_attachments",
+      "policyname": "announcement_attachments_write_meta",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "announcement_classes",
+      "policyname": "announcement_classes_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "announcement_classes",
+      "policyname": "announcement_classes_write",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "announcement_extracurricular_staff",
+      "policyname": "announcement_ec_staff_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "announcement_extracurricular_staff",
+      "policyname": "announcement_ec_staff_write",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "announcement_teachers",
+      "policyname": "announcement_teachers_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "announcement_teachers",
+      "policyname": "announcement_teachers_write",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "announcements",
+      "policyname": "announcements_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "announcements",
+      "policyname": "announcements_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "attendance",
+      "policyname": "attendance_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "attendance",
+      "policyname": "attendance_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "attendance",
+      "policyname": "attendance_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "attendance",
+      "policyname": "attendance_write_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "attendance_history",
+      "policyname": "attendance_history_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "attendance_history",
+      "policyname": "attendance_history_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "branches",
+      "policyname": "branches_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "branches",
+      "policyname": "branches_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "class_subjects",
+      "policyname": "class_subjects_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "class_subjects",
+      "policyname": "class_subjects_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "classes",
+      "policyname": "classes_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "classes",
+      "policyname": "classes_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "departments",
+      "policyname": "departments_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "departments",
+      "policyname": "departments_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "drivers",
+      "policyname": "drivers_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "drivers",
+      "policyname": "drivers_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "drivers",
+      "policyname": "drivers_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "evaluated_papers",
+      "policyname": "evaluated_papers_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "evaluated_papers",
+      "policyname": "evaluated_papers_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "evaluated_papers",
+      "policyname": "evaluated_papers_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exam_documents",
+      "policyname": "exam_documents_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exam_documents",
+      "policyname": "exam_documents_select_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exam_documents",
+      "policyname": "exam_documents_write_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "exam_marks",
+      "policyname": "exam_marks_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exam_marks",
+      "policyname": "exam_marks_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exam_marks",
+      "policyname": "exam_marks_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exam_marks",
+      "policyname": "exam_marks_write_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "exam_schedule",
+      "policyname": "exam_schedule_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exam_schedule",
+      "policyname": "exam_schedule_write_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "exams",
+      "policyname": "exams_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "exams",
+      "policyname": "exams_write_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "extracurricular_achievements",
+      "policyname": "ec_achievements_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_achievements",
+      "policyname": "ec_achievements_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_attendance",
+      "policyname": "ec_attendance_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_attendance",
+      "policyname": "ec_attendance_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_batch_students",
+      "policyname": "ec_batch_students_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_batch_students",
+      "policyname": "ec_batch_students_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_batches",
+      "policyname": "ec_batches_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_batches",
+      "policyname": "ec_batches_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_events",
+      "policyname": "ec_events_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_events",
+      "policyname": "ec_events_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_practice_work",
+      "policyname": "ec_practice_work_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_practice_work",
+      "policyname": "ec_practice_work_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_schedule_slots",
+      "policyname": "ec_schedule_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_schedule_slots",
+      "policyname": "ec_schedule_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_staff",
+      "policyname": "ec_staff_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_staff",
+      "policyname": "ec_staff_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_staff_activities",
+      "policyname": "ec_staff_activities_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "extracurricular_staff_activities",
+      "policyname": "ec_staff_activities_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "fee_payments",
+      "policyname": "fee_payments_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "fee_payments",
+      "policyname": "fee_payments_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "fee_payments",
+      "policyname": "fee_payments_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "fee_structures",
+      "policyname": "fee_structures_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "fee_structures",
+      "policyname": "fee_structures_select_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "fee_structures",
+      "policyname": "fee_structures_select_student_direct",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "fee_structures",
+      "policyname": "fee_structures_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "holidays",
+      "policyname": "holidays_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "holidays",
+      "policyname": "holidays_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "homework",
+      "policyname": "homework_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "homework",
+      "policyname": "homework_select_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "homework",
+      "policyname": "homework_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "homework",
+      "policyname": "homework_write_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "homework_submissions",
+      "policyname": "homework_submissions_select_own",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "homework_submissions",
+      "policyname": "homework_submissions_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "homework_submissions",
+      "policyname": "homework_submissions_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "homework_submissions",
+      "policyname": "homework_submissions_update_own",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "homework_submissions",
+      "policyname": "homework_submissions_write_own",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "learning_game_attempts",
+      "policyname": "learning_game_attempts_select_class_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "learning_game_attempts",
+      "policyname": "learning_game_attempts_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "learning_game_attempts",
+      "policyname": "learning_game_attempts_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "learning_game_stats",
+      "policyname": "learning_game_stats_select_class_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "learning_game_stats",
+      "policyname": "learning_game_stats_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "learning_game_stats",
+      "policyname": "learning_game_stats_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "learning_game_user_achievements",
+      "policyname": "learning_game_achievements_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "learning_game_user_achievements",
+      "policyname": "learning_game_achievements_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "leave_requests",
+      "policyname": "leave_requests_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "leave_requests",
+      "policyname": "leave_requests_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "login_history",
+      "policyname": "login_history_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "notification_reads",
+      "policyname": "notification_reads_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "notification_reads",
+      "policyname": "notification_reads_write_self",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "notifications",
+      "policyname": "notifications_select_class",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "notifications",
+      "policyname": "notifications_select_direct",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "notifications",
+      "policyname": "notifications_select_direct_user",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "notifications",
+      "policyname": "notifications_select_role",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "notifications",
+      "policyname": "notifications_select_school_wide",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "announcement_attachments_delete_staff",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "announcement_attachments_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "announcement_attachments_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "announcement_attachments_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_delete_own",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_read_public",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_update_own",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_update_teacher",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_write_own",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "avatars_write_teacher",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "ec_achievements_files_delete_staff",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "ec_achievements_files_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "ec_achievements_files_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "ec_achievements_files_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "evaluated_papers_storage_delete",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "evaluated_papers_storage_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "evaluated_papers_storage_write",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "exam_documents_delete_staff",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "exam_documents_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "exam_documents_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "exam_documents_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_attachments_delete_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_attachments_read_public",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_attachments_update_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_attachments_write_staff_or_teacher",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_submissions_delete_own",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_submissions_read_public",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_submissions_update_own",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "homework_submissions_write_own",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "school_logos_read_public",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "school_logos_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "school_logos_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "student_documents_delete_staff",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "student_documents_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "student_documents_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "student_documents_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "student_documents_write_teacher",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "syllabus_documents_delete_staff",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "syllabus_documents_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "syllabus_documents_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "syllabus_documents_write_teacher",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "teacher_documents_delete_staff",
+      "roles": "{public}",
+      "cmd": "DELETE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "teacher_documents_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "teacher_documents_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "objects",
+      "policyname": "teacher_documents_write_staff",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "permissions",
+      "policyname": "permissions_select_all",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "pickup_points",
+      "policyname": "pickup_points_select_staff_or_driver",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "pickup_points",
+      "policyname": "pickup_points_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "platform_audit_logs",
+      "policyname": "platform_audit_logs_super_admin",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "push_subscriptions",
+      "policyname": "push_subscriptions_self",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "registration_requests",
+      "policyname": "registration_requests_select_assigned_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "registration_requests",
+      "policyname": "registration_requests_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "role_permissions",
+      "policyname": "role_permissions_select_all",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "roles",
+      "policyname": "roles_select_all",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "routes",
+      "policyname": "routes_select_staff_or_driver",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "routes",
+      "policyname": "routes_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "school_admin_schools",
+      "policyname": "school_admin_schools_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "school_admin_schools",
+      "policyname": "school_admin_schools_write_super_admin",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "school_creation_requests",
+      "policyname": "school_creation_requests_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "schools",
+      "policyname": "schools_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "schools",
+      "policyname": "schools_write_super_admin",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "student_documents",
+      "policyname": "student_documents_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_documents",
+      "policyname": "student_documents_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_documents",
+      "policyname": "student_documents_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "student_fee_overrides",
+      "policyname": "student_fee_overrides_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_fee_overrides",
+      "policyname": "student_fee_overrides_select_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_fee_overrides",
+      "policyname": "student_fee_overrides_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "student_leave_requests",
+      "policyname": "student_leave_requests_insert_student",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "student_leave_requests",
+      "policyname": "student_leave_requests_select_class_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_leave_requests",
+      "policyname": "student_leave_requests_select_own",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_leave_requests",
+      "policyname": "student_leave_requests_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_leave_requests",
+      "policyname": "student_leave_requests_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "student_live_locations",
+      "policyname": "student_live_locations_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_pickup_points",
+      "policyname": "student_pickups_select_staff_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_pickup_points",
+      "policyname": "student_pickups_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "student_profile_change_requests",
+      "policyname": "student_profile_change_requests_insert_own",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "student_profile_change_requests",
+      "policyname": "student_profile_change_requests_select_class_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_profile_change_requests",
+      "policyname": "student_profile_change_requests_select_own",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_profile_change_requests",
+      "policyname": "student_profile_change_requests_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_siblings",
+      "policyname": "student_siblings_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_siblings",
+      "policyname": "student_siblings_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "student_siblings",
+      "policyname": "student_siblings_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "students",
+      "policyname": "students_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "students",
+      "policyname": "students_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "students",
+      "policyname": "students_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "students",
+      "policyname": "students_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "subjects",
+      "policyname": "subjects_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "subjects",
+      "policyname": "subjects_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "syllabus",
+      "policyname": "syllabus_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "syllabus",
+      "policyname": "syllabus_select_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "teacher_attendance",
+      "policyname": "teacher_attendance_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "teacher_attendance",
+      "policyname": "teacher_attendance_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "teacher_documents",
+      "policyname": "teacher_documents_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "teacher_documents",
+      "policyname": "teacher_documents_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "teachers",
+      "policyname": "teachers_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "teachers",
+      "policyname": "teachers_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "timetable_change_requests",
+      "policyname": "timetable_change_requests_insert_self",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "timetable_change_requests",
+      "policyname": "timetable_change_requests_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "timetable_change_requests",
+      "policyname": "timetable_change_requests_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "timetable_periods",
+      "policyname": "timetable_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "timetable_periods",
+      "policyname": "timetable_select_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "timetable_periods",
+      "policyname": "timetable_select_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "timetable_periods",
+      "policyname": "timetable_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "trip_history",
+      "policyname": "trip_history_select_staff_driver_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "trip_student_status",
+      "policyname": "trip_student_status_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "trip_student_status",
+      "policyname": "trip_student_status_write_driver_or_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "trips",
+      "policyname": "trips_select_staff_driver",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "trips",
+      "policyname": "trips_update_own_driver",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "trips",
+      "policyname": "trips_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "user_roles_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "user_roles_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "user_roles",
+      "policyname": "user_roles_write_authorized",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "users",
+      "policyname": "users_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "users",
+      "policyname": "users_update_self",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "users",
+      "policyname": "users_update_staff",
+      "roles": "{public}",
+      "cmd": "UPDATE"
+    },
+    {
+      "tablename": "vehicle_locations",
+      "policyname": "vehicle_locations_insert_own_driver",
+      "roles": "{public}",
+      "cmd": "INSERT"
+    },
+    {
+      "tablename": "vehicle_locations",
+      "policyname": "vehicle_locations_select_staff_driver_student",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "vehicle_maintenance_records",
+      "policyname": "vehicle_maintenance_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "vehicle_maintenance_records",
+      "policyname": "vehicle_maintenance_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "vehicles",
+      "policyname": "vehicles_select_own_driver",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "vehicles",
+      "policyname": "vehicles_select_same_school",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "vehicles",
+      "policyname": "vehicles_write_staff",
+      "roles": "{public}",
+      "cmd": "ALL"
+    },
+    {
+      "tablename": "website_knowledge_attempt_answers",
+      "policyname": "wk_attempt_answers_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_attempts",
+      "policyname": "wk_attempts_select_class_teacher",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_attempts",
+      "policyname": "wk_attempts_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_attempts",
+      "policyname": "wk_attempts_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_certificates",
+      "policyname": "wk_certificates_select_self",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_certificates",
+      "policyname": "wk_certificates_select_staff",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_notification_log",
+      "policyname": "wk_notification_log_select_recipient",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_question_set_items",
+      "policyname": "wk_question_set_items_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_question_sets",
+      "policyname": "wk_question_sets_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_questions",
+      "policyname": "wk_questions_select",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_settings",
+      "policyname": "wk_settings_select_all",
+      "roles": "{public}",
+      "cmd": "SELECT"
+    },
+    {
+      "tablename": "website_knowledge_settings",
+      "policyname": "wk_settings_write_super_admin",
+      "roles": "{public}",
+      "cmd": "ALL"
+    }
+  ]
+}

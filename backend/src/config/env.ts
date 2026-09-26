@@ -19,7 +19,13 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASSWORD: z.string().optional(),
   SMTP_FROM: z.string().default("School Management System <no-reply@school.local>"),
-  SMTP_SECURE: z.coerce.boolean().default(false),
+  // FN-04: z.coerce.boolean() treats ANY non-empty string as true, so
+  // SMTP_SECURE=false was parsed as true (breaking STARTTLS on port 587).
+  // Parse the string explicitly: only "true"/"1" enable implicit TLS.
+  SMTP_SECURE: z
+    .string()
+    .optional()
+    .transform((v) => v === "true" || v === "1"),
   // Web push is optional — if unset, push sends are skipped with a warning
   // instead of failing the request that triggered them (same posture as SMTP).
   VAPID_PUBLIC_KEY: z.string().optional(),

@@ -10,7 +10,7 @@ interface WordBuilderEngineProps {
 
 function scramble(word: string): string {
   const letters = word.split("");
-  let attempt = letters.slice();
+  const attempt = letters.slice();
   do {
     for (let i = attempt.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));

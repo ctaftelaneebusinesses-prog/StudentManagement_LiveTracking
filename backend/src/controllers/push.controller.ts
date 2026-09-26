@@ -18,7 +18,8 @@ export async function subscribe(req: Request, res: Response, next: NextFunction)
 
 export async function unsubscribe(req: Request, res: Response, next: NextFunction) {
   try {
-    await pushService.removeSubscription(req.body.endpoint);
+    // SEC-14: scope the delete to the caller so it can only remove their own.
+    await pushService.removeSubscriptionForUser(req.user!.id, req.body.endpoint);
     return sendSuccess(res, { message: "Unsubscribed" });
   } catch (err) {
     return next(err);

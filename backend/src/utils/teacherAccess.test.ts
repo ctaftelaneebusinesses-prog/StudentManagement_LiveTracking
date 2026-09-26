@@ -244,4 +244,43 @@ describe("requireStudentWriteAccess", () => {
     expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 403 }));
     expect(fromMock).not.toHaveBeenCalled();
   });
+
+  // SEC-10: teachers hold `students.manage` (migration 057). Holding that
+  // permission must NOT bypass the per-class ownership check.
+  it("rejects a teacher WITH students.manage editing a student outside their class", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "students") return chain({ data: { class_id: "other-class" }, error: null });
+      if (table === "classes") return chain({ data: null, error: null }); // not homeroom teacher
+      if (table === "class_subjects") return chain({ data: null, error: null }); // not a subject teacher
+      throw new Error(`unexpected table ${table}`);
+    });
+    const req = {
+      ...fakeReq(["teacher"]),
+      method: "PATCH",
+      body: {},
+      params: { id: "student-x" },
+    };
+    (req.user as { permissions: string[] }).permissions = ["students.manage"];
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ statusCode: 403 }));
+  });
+
+  it("still allows a teacher WITH students.manage editing a student in their own class", async () => {
+    fromMock.mockImplementation((table: string) => {
+      if (table === "students") return chain({ data: { class_id: "class-1" }, error: null });
+      if (table === "classes") return chain({ data: { id: "class-1" }, error: null }); // homeroom teacher
+      throw new Error(`unexpected table ${table}`);
+    });
+    const req = {
+      ...fakeReq(["teacher"]),
+      method: "PATCH",
+      body: {},
+      params: { id: "student-1" },
+    };
+    (req.user as { permissions: string[] }).permissions = ["students.manage"];
+    const next = vi.fn();
+    await requireStudentWriteAccess(req as unknown as Request, {} as never, next);
+    expect(next).toHaveBeenCalledWith();
+  });
 });

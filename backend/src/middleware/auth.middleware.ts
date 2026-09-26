@@ -18,7 +18,18 @@ async function loadAuthenticatedUser(req: Request, enforceApproval: boolean): Pr
   const token = header.slice("Bearer ".length);
   const { data: authData, error: authError } = await supabaseAdmin.auth.getUser(token);
 
-  if (authError || !authData.user) {
+  if (authError) {
+    // FN-09: a transient failure (GoTrue unreachable, 5xx, network error) is
+    // NOT proof the token is invalid — reporting it as 401 signs the user out
+    // (the axios interceptor treats 401 as session-dead). Only a genuine auth
+    // rejection (4xx) means the session is bad; anything else is a 503.
+    const status = (authError as { status?: number }).status;
+    if (status === undefined || status >= 500) {
+      throw new ApiError(503, "Authentication service temporarily unavailable");
+    }
+    throw ApiError.unauthorized("Invalid or expired session");
+  }
+  if (!authData.user) {
     throw ApiError.unauthorized("Invalid or expired session");
   }
 

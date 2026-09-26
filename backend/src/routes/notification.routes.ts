@@ -13,7 +13,14 @@ router.get("/me", notificationController.listForMe);
 router.put("/read-all", notificationController.markAllReadForMe);
 router.put("/:notificationId/read", validate(markReadForMeSchema), notificationController.markReadForMe);
 
-router.get("/", requirePermission("notifications.view"), notificationController.listForSchool);
+// SEC-07: this is the staff-facing school-wide notification log (Emergency
+// Alerts console) — listForSchool returns every notification in the school,
+// including ones addressed to a specific user, using the service-role client.
+// It must be gated on `notifications.manage` (staff), NOT `notifications.view`
+// (which students also hold). A user's own notifications come from
+// /notifications/me (RLS-scoped) and /students/:id/notifications
+// (audience-filtered), which are unchanged.
+router.get("/", requirePermission("notifications.manage"), notificationController.listForSchool);
 router.post(
   "/",
   requirePermission("notifications.manage"),

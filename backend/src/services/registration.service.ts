@@ -69,9 +69,20 @@ const REQUEST_SELECT =
   "users!registration_requests_user_id_fkey(full_name, email, phone), roles(name)";
 
 /** Marks a just-provisioned account pending — every create-service/createUser/createAndLinkParent call defaults a new account to 'approved' (see 061_registration_approval.sql), so self-registration always overrides it right after. */
+/**
+ * SEC-12: self-registered accounts are created (by the shared provisioning
+ * path) with the default 'approved' status, so they MUST be flipped to
+ * 'pending' before the request returns — otherwise a self-registrant could log
+ * in before an approver acts. If that flip fails, we roll back the freshly
+ * created auth user (cascades to the profile + any role-specific row) rather
+ * than leave a usable, un-approved account behind (fail-closed).
+ */
 async function markPending(userId: string): Promise<void> {
   const { error } = await supabaseAdmin.from("users").update({ status: "pending" }).eq("id", userId);
-  if (error) throw ApiError.internal(error.message);
+  if (error) {
+    await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => undefined);
+    throw ApiError.internal(error.message);
+  }
 }
 
 /**
@@ -368,18 +379,39 @@ async function applyTeacherPayload(schoolId: string, teacherId: string, payload:
 export async function review(
   schoolId: string,
   requestId: string,
-  reviewerId: string,
+  reviewer: { id: string; roles: string[]; permissions: string[] },
   action: "approve" | "reject",
   notes?: string
 ) {
+  const reviewerId = reviewer.id;
   const { data: existing, error: existingError } = await supabaseAdmin
     .from("registration_requests")
-    .select("id, user_id, role_id, status, payload")
+    .select("id, user_id, role_id, status, payload, reviewer_type, assigned_reviewer_id")
     .eq("id", requestId)
     .eq("school_id", schoolId)
     .maybeSingle();
   if (existingError) throw ApiError.internal(existingError.message);
   if (!existing) throw ApiError.notFound("Registration request not found");
+
+  // SEC-05: authorize the reviewer against the request's routing, mirroring the
+  // queue-visibility model in listQueue (controllers/registration.controller.ts):
+  //   - 'admin'-routed  (principal / teacher-less student regs) -> users.manage
+  //   - 'principal'-routed (teacher/accountant/driver/EC regs)  -> registration.review
+  //   - 'class_teacher'-routed (student regs)                   -> the assigned
+  //       class teacher, or a principal/admin as an oversight escalation.
+  // Without this, any authenticated in-school user could approve/reject.
+  const reviewerType = (existing as { reviewer_type?: string }).reviewer_type;
+  const assignedReviewerId = (existing as { assigned_reviewer_id?: string | null }).assigned_reviewer_id ?? null;
+  const canManageUsers = reviewer.permissions.includes("users.manage");
+  const canReviewRegistrations = reviewer.permissions.includes("registration.review");
+  const authorized =
+    (reviewerType === "admin" && canManageUsers) ||
+    (reviewerType === "principal" && canReviewRegistrations) ||
+    (reviewerType === "class_teacher" &&
+      (assignedReviewerId === reviewerId || canReviewRegistrations || canManageUsers));
+  if (!authorized) {
+    throw ApiError.forbidden("You are not authorized to review this registration request");
+  }
 
   const status = action === "approve" ? "approved" : "rejected";
 

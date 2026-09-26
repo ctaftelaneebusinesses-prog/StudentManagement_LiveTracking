@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as registrationController from "../controllers/registration.controller";
 import { requireAuth } from "../middleware/auth.middleware";
 import { validate } from "../middleware/validate.middleware";
-import { authLimiter } from "../middleware/rateLimit.middleware";
+import { authLimiter, registrationLimiter } from "../middleware/rateLimit.middleware";
 import {
   registerPrincipalSchema,
   registerAccountantSchema,
@@ -25,17 +25,18 @@ import {
  */
 const submitRouter = Router();
 submitRouter.get("/meta", validate(registrationMetaQuerySchema), registrationController.getMeta);
-submitRouter.post("/principal", authLimiter, validate(registerPrincipalSchema), registrationController.submitPrincipal);
-submitRouter.post("/accountant", authLimiter, validate(registerAccountantSchema), registrationController.submitAccountant);
-submitRouter.post("/driver", authLimiter, validate(registerDriverSchema), registrationController.submitDriver);
+submitRouter.post("/principal", registrationLimiter, authLimiter, validate(registerPrincipalSchema), registrationController.submitPrincipal);
+submitRouter.post("/accountant", registrationLimiter, authLimiter, validate(registerAccountantSchema), registrationController.submitAccountant);
+submitRouter.post("/driver", registrationLimiter, authLimiter, validate(registerDriverSchema), registrationController.submitDriver);
 submitRouter.post(
   "/extracurricular-staff",
+  registrationLimiter,
   authLimiter,
   validate(registerExtracurricularStaffSchema),
   registrationController.submitExtracurricularStaff
 );
-submitRouter.post("/teacher", authLimiter, validate(registerTeacherSchema), registrationController.submitTeacher);
-submitRouter.post("/student", authLimiter, validate(registerStudentSchema), registrationController.submitStudent);
+submitRouter.post("/teacher", registrationLimiter, authLimiter, validate(registerTeacherSchema), registrationController.submitTeacher);
+submitRouter.post("/student", registrationLimiter, authLimiter, validate(registerStudentSchema), registrationController.submitStudent);
 
 const queueRouter = Router();
 queueRouter.use(requireAuth);

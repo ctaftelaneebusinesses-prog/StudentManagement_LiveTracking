@@ -2,6 +2,7 @@ import { supabaseAdmin } from "../config/supabase";
 import { ApiError } from "../utils/ApiError";
 import { provisionUser } from "../utils/provisionUser";
 import { generateDefaultPassword } from "../utils/defaultPassword";
+import { escapeOrFilterValue } from "../utils/searchFilter";
 
 interface ListUsersFilters {
   role?: string;
@@ -25,7 +26,11 @@ export async function listUsers(schoolId: string, filters: ListUsersFilters) {
     .order("created_at", { ascending: false });
 
   if (filters.search) {
-    query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`);
+    // SEC-15 / FN-03: the search term is interpolated into PostgREST's .or()
+    // filter DSL — escape it so a value containing `,` `(` `)` can't forge
+    // extra filter clauses (and no longer 500s on punctuation).
+    const pattern = escapeOrFilterValue(`%${filters.search}%`);
+    query = query.or(`full_name.ilike.${pattern},email.ilike.${pattern}`);
   }
   if (filters.role) {
     query = query.eq("roles.name", filters.role);

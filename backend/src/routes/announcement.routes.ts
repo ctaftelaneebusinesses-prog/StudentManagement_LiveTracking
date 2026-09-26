@@ -13,10 +13,17 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.get("/", requirePermission("announcements.view"), validate(listAnnouncementsSchema), announcementController.listAnnouncements);
+// SEC-08: this is the staff-facing announcement management list/detail — it
+// returns every announcement in the school regardless of audience. It must be
+// gated on `announcements.manage` (school_admin/principal/teacher/super_admin),
+// NOT `announcements.view` (which students/other roles also hold). Students
+// receive announcements through the audience-scoped notification fan-out
+// (publishAnnouncement -> notifyUsers -> /notifications/me,
+// /students/:id/notifications), not through this endpoint.
+router.get("/", requirePermission("announcements.manage"), validate(listAnnouncementsSchema), announcementController.listAnnouncements);
 router.get(
   "/:id",
-  requirePermission("announcements.view"),
+  requirePermission("announcements.manage"),
   validate(announcementIdParamSchema),
   announcementController.getAnnouncement
 );

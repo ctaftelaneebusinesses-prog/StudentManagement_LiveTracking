@@ -36,3 +36,22 @@ export const authLimiter = rateLimit({
     return account ? `${ipKeyGenerator(req.ip ?? "")}:${account}` : ipKeyGenerator(req.ip ?? "");
   },
 });
+
+/**
+ * SEC-01 hardening: dedicated cap for PUBLIC self-registration. authLimiter
+ * keys by IP+email, so an attacker rotating email addresses from one IP gets a
+ * fresh 20-request budget per email — no ceiling on mass account creation.
+ * This limiter is keyed by IP ALONE, capping how many registration attempts
+ * (across all emails) a single source can make. Registered accounts are still
+ * approval-gated (users.status) and cannot self-assign a privileged role
+ * (077_signup_trigger_privilege_fix.sql), so this closes the remaining
+ * abuse vector: automated bulk sign-ups.
+ */
+export const registrationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Too many registration attempts from this network. Please try again later." },
+  keyGenerator: (req: Request): string => ipKeyGenerator(req.ip ?? ""),
+});
