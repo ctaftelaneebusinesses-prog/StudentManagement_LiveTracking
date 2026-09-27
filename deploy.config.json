@@ -1,0 +1,11 @@
+{
+  "_comment": "Non-secret deploy config, checked into git. Used by backend/scripts/deploy.mjs as a second factor so a migration can never land on the wrong Supabase project, even if an .env file gets repointed by accident.",
+  "staging": {
+    "expectedRef": "ruseufindaxkwgajkuev",
+    "note": "Disposable test project. deploy.mjs is the ONLY environment this script will ever open a live database connection to."
+  },
+  "production": {
+    "note": "This app's production Supabase project is never given a live connection by this script, by design. `deploy.mjs migrate --env production` only reads the migrations/ directory and writes a single combined .sql bundle for a human to paste into the Supabase SQL Editor themselves. There is no --force / --apply escape hatch for production in this script."
+  },
+  "packages": ["backend", "frontend"]
+}

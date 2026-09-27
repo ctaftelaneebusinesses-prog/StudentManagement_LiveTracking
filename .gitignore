@@ -9,3 +9,4 @@ backend/backup-*/
 .env.staging
 .env.*.local
 audit/test-data/
+backend/deploy-logs/
